@@ -5,7 +5,7 @@ import kr.co.megabridge.megavnc.domain.HostPC;
 import lombok.Data;
 
 @Data
-public class HostPCRequestDTO {
+public class HostPcRequestDto {
 
     @NotBlank
     private String name;

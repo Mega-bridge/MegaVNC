@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Data
 @AllArgsConstructor
-public class HostPCResponseDTO {
+public class HostPcResponseDto {
 
     private Long id;
     private Date createdAt;

@@ -1,21 +1,21 @@
 package kr.co.megabridge.megavnc;
 
 import kr.co.megabridge.megavnc.domain.HostPC;
-import kr.co.megabridge.megavnc.repository.HostPCRepository;
+import kr.co.megabridge.megavnc.repository.HostPcRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class MegaVNCApplication {
+public class MegaVncApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MegaVNCApplication.class, args);
+        SpringApplication.run(MegaVncApplication.class, args);
     }
 
     @Bean
-    public CommandLineRunner dataLoader(HostPCRepository repo) {
+    public CommandLineRunner dataLoader(HostPcRepository repo) {
         return new CommandLineRunner() {
             @Override
             public void run(String... args) throws Exception {

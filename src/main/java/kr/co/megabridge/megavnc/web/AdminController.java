@@ -2,8 +2,8 @@ package kr.co.megabridge.megavnc.web;
 
 import jakarta.validation.Valid;
 import kr.co.megabridge.megavnc.domain.HostPC;
-import kr.co.megabridge.megavnc.dto.HostPCRequestDTO;
-import kr.co.megabridge.megavnc.repository.HostPCRepository;
+import kr.co.megabridge.megavnc.dto.HostPcRequestDto;
+import kr.co.megabridge.megavnc.repository.HostPcRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,10 +22,10 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final HostPCRepository hostPCRepository;
+    private final HostPcRepository hostPCRepository;
 
     @Autowired
-    public AdminController(HostPCRepository hostPCRepository) {
+    public AdminController(HostPcRepository hostPCRepository) {
         this.hostPCRepository = hostPCRepository;
     }
 
@@ -38,14 +38,14 @@ public class AdminController {
     public String showHostList(Model model) {
         loadHostPCs(model);
 
-        model.addAttribute("newHostPC", new HostPCRequestDTO());
+        model.addAttribute("newHostPC", new HostPcRequestDto());
 
         return "admin-hosts";
     }
 
     @PostMapping("/hosts")
     public String createHostPC(
-            @ModelAttribute("newHostPC") @Valid HostPCRequestDTO newHostPC,
+            @ModelAttribute("newHostPC") @Valid HostPcRequestDto newHostPC,
             Errors errors,
             Model model
     ) {

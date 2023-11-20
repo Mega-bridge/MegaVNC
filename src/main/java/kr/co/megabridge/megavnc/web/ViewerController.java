@@ -1,12 +1,10 @@
 package kr.co.megabridge.megavnc.web;
 
 import kr.co.megabridge.megavnc.domain.HostPC;
-import kr.co.megabridge.megavnc.repository.HostPCRepository;
+import kr.co.megabridge.megavnc.repository.HostPcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -16,10 +14,10 @@ import java.util.Optional;
 @RequestMapping("/viewer")
 public class ViewerController {
 
-    private final HostPCRepository hostPCRepository;
+    private final HostPcRepository hostPCRepository;
 
     @Autowired
-    public ViewerController(HostPCRepository hostPCRepository) {
+    public ViewerController(HostPcRepository hostPCRepository) {
         this.hostPCRepository = hostPCRepository;
     }
 
