@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MegaVNC</title>
+</head>
+<body>
+<div>
+    <label for="password">비밀번호: </label>
+    <input type="password" id="password" />
+    <button id="connect">연결</button>
+    <button id="disconnect">연결해제</button>
+</div>
+<div id="screen"></div>
+<script type="module" th:src="@{/js/viewer/viewer.js}"></script>
+</body>
+</html>

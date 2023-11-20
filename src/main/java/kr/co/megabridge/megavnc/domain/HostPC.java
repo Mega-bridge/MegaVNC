@@ -2,16 +2,17 @@ package kr.co.megabridge.megavnc.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 public class HostPC {
 
     @Id
@@ -21,13 +22,13 @@ public class HostPC {
     private Date createdAt;
 
     @NotBlank
-    private String name;
+    private final String name;
 
     @NotBlank
-    private String host;
+    private final String host;
 
     @NotBlank
-    private String port;
+    private final String port;
 
     @PrePersist
     void createdAt() {

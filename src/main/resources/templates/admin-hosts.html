@@ -11,7 +11,8 @@
     <li th:each="hostPC : ${hostPCs}">
         <span th:text="${hostPC.name}">이름</span> -
         <span th:text="${hostPC.host}">호스트</span> -
-        <span th:text="${hostPC.port}">포트</span>
+        <span th:text="${hostPC.port}">포트</span> -
+        <a th:href="@{/viewer(id=${hostPC.id},name=${hostPC.name},host=${hostPC.host},port=${hostPC.port})}">연결</a>
     </li>
 </ul>
 <h2>호스트 PC 추가</h2>

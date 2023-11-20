@@ -1,13 +1,22 @@
 package kr.co.megabridge.megavnc.dto;
 
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import kr.co.megabridge.megavnc.domain.HostPC;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class HostPCRequestDTO {
 
-    private final String name;
-    private final String host;
-    private final String port;
+    @NotBlank
+    private String name;
+
+    @NotBlank
+    private String host;
+
+    @NotBlank
+    private String port;
+
+    public HostPC toEntity() {
+        return new HostPC(name, host, port);
+    }
 }

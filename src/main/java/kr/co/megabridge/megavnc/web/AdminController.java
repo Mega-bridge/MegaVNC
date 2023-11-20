@@ -3,7 +3,9 @@ package kr.co.megabridge.megavnc.web;
 import jakarta.validation.Valid;
 import kr.co.megabridge.megavnc.domain.HostPC;
 import kr.co.megabridge.megavnc.dto.HostPCRequestDTO;
+import kr.co.megabridge.megavnc.repository.HostPCRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -20,36 +22,47 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
 
+    private final HostPCRepository hostPCRepository;
+
+    @Autowired
+    public AdminController(HostPCRepository hostPCRepository) {
+        this.hostPCRepository = hostPCRepository;
+    }
+
+    @GetMapping
+    public String adminHome() {
+        return "redirect:/admin/hosts";
+    }
+
     @GetMapping("/hosts")
     public String showHostList(Model model) {
-        loadData(model);
+        loadHostPCs(model);
 
-        model.addAttribute("newHostPC", new HostPC());
+        model.addAttribute("newHostPC", new HostPCRequestDTO());
 
         return "admin-hosts";
     }
 
     @PostMapping("/hosts")
     public String createHostPC(
-            @ModelAttribute("newHostPC") @Valid HostPCRequestDTO newHostPC, Errors errors, Model model
+            @ModelAttribute("newHostPC") @Valid HostPCRequestDTO newHostPC,
+            Errors errors,
+            Model model
     ) {
         if (errors.hasErrors()) {
-            loadData(model);
+            loadHostPCs(model);
             return "admin-hosts";
         }
 
+        hostPCRepository.save(newHostPC.toEntity());
         log.info("Create HostPC: " + newHostPC);
+
         return "redirect:/admin/hosts";
     }
 
-    private void loadData(Model model) {
-        List<HostPCRequestDTO> hostPCs = Arrays.asList(
-                new HostPCRequestDTO("PC1", "11.11.11.11", "5700"),
-                new HostPCRequestDTO("PC2", "22.22.22.22", "5700"),
-                new HostPCRequestDTO("PC3", "33.33.33.33", "5700"),
-                new HostPCRequestDTO("PC4", "44.44.44.44", "5700"),
-                new HostPCRequestDTO("PC5", "55.55.55.55", "5700")
-        );
+    private void loadHostPCs(Model model) {
+        List<HostPC> hostPCs = new ArrayList<>();
+        hostPCRepository.findAll().forEach(hostPCs::add);
 
         model.addAttribute("hostPCs", hostPCs);
     }
