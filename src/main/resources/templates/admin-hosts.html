@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MegaVNC</title>
+</head>
+<body>
+<h1>관리자</h1>
+<h2>호스트 PC 목록</h2>
+<ul>
+    <li th:each="hostPC : ${hostPCs}">
+        <span th:text="${hostPC.name}">이름</span> -
+        <span th:text="${hostPC.host}">호스트</span> -
+        <span th:text="${hostPC.port}">포트</span>
+    </li>
+</ul>
+<h2>호스트 PC 추가</h2>
+<form method="post" th:object="${newHostPC}">
+    <div th:if="${#fields.hasErrors()}">
+        아래 오류로 추가할 수 없습니다.
+    </div>
+    <ul>
+        <li>
+            <label for="name">이름: </label>
+            <input type="text" name="name" id="name" th:field="*{name}" />
+            <span th:if="${#fields.hasErrors('name')}"
+                  th:errors="*{name}">이름 오류</span>
+        </li>
+        <li>
+            <label for="host">호스트: </label>
+            <input type="text" name="host" id="host" th:field="*{host}" />
+            <span th:if="${#fields.hasErrors('host')}"
+                  th:errors="*{host}">호스트 오류</span>
+        </li>
+        <li>
+            <label for="port">포트: </label>
+            <input type="text" name="port" id="port" th:field="*{port}" />
+            <span th:if="${#fields.hasErrors('port')}"
+                  th:errors="*{port}">포트 오류</span>
+        </li>
+    </ul>
+    <button>추가</button>
+</form>
+</body>
+</html>
