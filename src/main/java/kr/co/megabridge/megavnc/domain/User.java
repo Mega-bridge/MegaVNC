@@ -1,6 +1,7 @@
 package kr.co.megabridge.megavnc.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,19 +18,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class User implements UserDetails {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     @Column(unique = true)
-    @NonNull
+    @NotBlank
     private final String username;
 
-    @NonNull
+    @NotBlank
     private final String password;
 
     @NonNull
     private final Set<String> roles;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
