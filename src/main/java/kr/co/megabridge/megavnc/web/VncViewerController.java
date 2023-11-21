@@ -12,12 +12,12 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/viewer")
-public class ViewerController {
+public class VncViewerController {
 
     private final HostPcRepository hostPCRepository;
 
     @Autowired
-    public ViewerController(HostPcRepository hostPCRepository) {
+    public VncViewerController(HostPcRepository hostPCRepository) {
         this.hostPCRepository = hostPCRepository;
     }
 

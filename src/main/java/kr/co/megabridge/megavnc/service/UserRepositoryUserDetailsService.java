@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.security;
+package kr.co.megabridge.megavnc.service;
 
 import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.repository.UserRepository;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserRepositoryUserDetailsService implements UserDetailsService {
+
     private final UserRepository userRepository;
 
     @Autowired
@@ -20,9 +21,8 @@ public class UserRepositoryUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
-        if (user != null) {
+        if (user != null)
             return user;
-        }
-        throw new UsernameNotFoundException("User '" + username + "' not found");
+        throw new UsernameNotFoundException("Username '" + username + "' not found");
     }
 }
