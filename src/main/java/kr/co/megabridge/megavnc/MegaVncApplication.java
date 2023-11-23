@@ -34,7 +34,7 @@ public class MegaVncApplication {
                 hostPcRepository.save(new HostPC("PC3", "33.33.33.33", "5700"));
                 hostPcRepository.save(new HostPC("PC4", "44.44.44.44", "5700"));
 
-                User admin = new User("admin", encoder.encode("1234"), Set.of("ADMIN"));
+                User admin = User.createUser("admin", "1234", Set.of("ADMIN"), encoder);
                 userRepository.save(admin);
             }
         };

@@ -1,13 +1,14 @@
 package kr.co.megabridge.megavnc.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,14 +24,29 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(unique = true)
-    @NotBlank
+    @NonNull
     private final String username;
 
-    @NotBlank
+    @NonNull
     private final String password;
 
     @NonNull
     private final Set<String> roles;
+
+    private Date createdAt;
+
+    public static User createUser(
+            String username,
+            String password,
+            Set<String> roles,
+            PasswordEncoder passwordEncoder) {
+        return new User(username, passwordEncoder.encode(password), roles);
+    }
+
+    @PrePersist
+    private void createdAt() {
+        this.createdAt = new Date();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

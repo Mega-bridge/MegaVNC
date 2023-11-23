@@ -1,34 +1,18 @@
 package kr.co.megabridge.megavnc.config;
 
-import jakarta.servlet.DispatcherType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import javax.sql.DataSource;
-
 @Configuration
-//@EnableWebSecurity
+@EnableWebSecurity
 public class SecurityConfig {
 
     /*
@@ -40,20 +24,19 @@ public class SecurityConfig {
      */
 
     @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .requestMatchers(
+                        new AntPathRequestMatcher("/css/**"),
+                        new AntPathRequestMatcher("/images/**"),
+                        new AntPathRequestMatcher("/h2-console/**"));
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf((csrf) ->
-                        csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
-                .headers((headers) ->
-                        headers.addHeaderWriter(new XFrameOptionsHeaderWriter(
-                                XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
                 .authorizeHttpRequests(request -> request
-                        //.dispatcherTypeMatchers(DispatcherType.FORWARD)
-                        //.permitAll()
-                        .requestMatchers(
-                                new AntPathRequestMatcher("/css/**"),
-                                new AntPathRequestMatcher("/images/**"),
-                                new AntPathRequestMatcher("/h2-console/**"))
+                        .requestMatchers(new AntPathRequestMatcher("/register"))
                         .permitAll()
                         .anyRequest()
                         .authenticated())
@@ -62,8 +45,6 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/admin/hosts", true)
                         .permitAll())
                 .logout(Customizer.withDefaults());
-
-        // http.authorizeHttpRequests((authz) -> authz.anyRequest().hasRole("USER")).httpBasic(Customizer.withDefaults());
 
         return http.build();
     }

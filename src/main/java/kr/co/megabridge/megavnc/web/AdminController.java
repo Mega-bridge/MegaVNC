@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class AdminController {
     }
 
     @GetMapping("/hosts")
-    public String showHostList(Model model) {
+    public String showHostList(Model model, Principal principal) {
         loadHostPCs(model);
 
         model.addAttribute("newHostPC", new HostPcRequestDto());
