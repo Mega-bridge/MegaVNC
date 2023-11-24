@@ -33,8 +33,11 @@ public class RegisterController {
 
     @PostMapping
     public String processRegister(@ModelAttribute("user") @Valid UserRegisterDto user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "register";
+        if (!userRegisterService.isUsernameUnique(user.getUsername())) {
+            bindingResult.rejectValue(
+                    "username",
+                    "error.user",
+                    "이미 존재하는 사용자명입니다.");
         }
 
         if (!user.getPassword().equals(user.getPasswordConfirm())) {
@@ -42,14 +45,9 @@ public class RegisterController {
                     "passwordConfirm",
                     "error.user",
                     "비밀번호 확인이 일치하지 않습니다.");
-            return "register";
         }
 
-        if (!userRegisterService.isUsernameUnique(user.getUsername())) {
-            bindingResult.rejectValue(
-                    "username",
-                    "error.user",
-                    "이미 존재하는 사용자명입니다.");
+        if (bindingResult.hasErrors()) {
             return "register";
         }
 

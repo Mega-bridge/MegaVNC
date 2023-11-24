@@ -6,19 +6,30 @@
 </head>
 <body>
 <form method="post" th:action="@{/login}">
-    <img th:src="@{/images/mega-logo.png}" alt="" width="72" height="72">
-    <h1>MegaVNC 로그인</h1>
+    <div>
+        <img th:src="@{/images/mega-logo.png}" alt="" width="72" height="72">
+        <h1>MegaVNC 로그인</h1>
+    </div>
 
-    <label for="username">사용자명</label>
-    <input type="text" id="username" name="username">
+    <div th:if="${loginError}">사용자명 또는 비밀번호가 올바르지 않습니다.</div>
 
-    <label for="password">비밀번호</label>
-    <input type="password" id="password" name="password">
+    <div>
+        <label for="username">사용자명</label>
+        <input type="text" id="username" name="username" autofocus="autofocus">
+    </div>
 
-    <button type="submit">로그인</button>
+    <div>
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" name="password">
+    </div>
+
+    <div>
+        <button type="submit">로그인</button>
+    </div>
 </form>
 
-<a th:href="@{/register}">회원가입</a>
-
+<div>
+    <a th:href="@{/register}">회원가입</a>
+</div>
 </body>
 </html>

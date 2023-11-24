@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments/head.html :: fragment-head"></head>
+<head>
+    <meta charset="UTF-8">
+    <title>MegaVNC</title>
+</head>
 <body>
-<header th:replace="/fragments/header.html :: fragment-header"></header>
+<header th:replace="~{/fragments/header.html :: fragment-header}"></header>
+
 <h1>관리자</h1>
+
 <h2>호스트 PC 목록</h2>
+
 <ul>
     <li th:each="hostPC : ${hostPCs}">
         <span th:text="${hostPC.name}">이름</span> -
@@ -13,6 +19,7 @@
         <a th:href="@{/viewer(id=${hostPC.id},name=${hostPC.name},host=${hostPC.host},port=${hostPC.port})}">연결</a>
     </li>
 </ul>
+
 <h2>호스트 PC 추가</h2>
 <form method="post" th:object="${newHostPC}">
     <div th:if="${#fields.hasErrors()}">
