@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MegaVNC</title>
+</head>
+<body>
+<header th:replace="~{/fragments/header.html :: fragment-header}"></header>
+
+<h1>관리자</h1>
+
+<ul>
+    <li>
+        <a th:href="@{/admin/remote-pcs}">원격 PC 관리</a>
+    </li>
+    <li>
+        <a th:href="@{/admin/users}">사용자 PC 관리</a>
+    </li>
+</ul>
+</body>
+</html>

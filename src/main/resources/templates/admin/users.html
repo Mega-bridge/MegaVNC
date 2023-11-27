@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MegaVNC</title>
+</head>
+<body>
+<header th:replace="~{/fragments/header.html :: fragment-header}"></header>
+
+<h1>관리자</h1>
+
+<h2>사용자 목록</h2>
+
+<ul>
+    <li th:each="user : ${users}">
+        <span th:text="${user.id}">ID</span> -
+        <span th:text="${user.username}">사용자명</span> -
+        <span th:text="${user.roles}">역할</span>
+    </li>
+</ul>
+</body>
+</html>

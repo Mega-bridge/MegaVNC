@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 @Table(name = "USERS")
 @Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
-@RequiredArgsConstructor
 public class User implements UserDetails {
 
     @Id
@@ -25,13 +24,13 @@ public class User implements UserDetails {
 
     @Column(unique = true)
     @NonNull
-    private final String username;
+    private String username;
 
     @NonNull
-    private final String password;
+    private String password;
 
     @NonNull
-    private final Set<String> roles;
+    private Set<String> roles;
 
     private Date createdAt;
 
@@ -39,8 +38,13 @@ public class User implements UserDetails {
             String username,
             String password,
             Set<String> roles,
-            PasswordEncoder passwordEncoder) {
-        return new User(username, passwordEncoder.encode(password), roles);
+            PasswordEncoder encoder) {
+        User user = new User();
+        user.username = username;
+        user.password = encoder.encode(password);
+        user.roles = roles;
+
+        return user;
     }
 
     @PrePersist

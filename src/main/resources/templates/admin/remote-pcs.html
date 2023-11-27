@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MegaVNC</title>
+</head>
+<body>
+<header th:replace="~{/fragments/header.html :: fragment-header}"></header>
+
+<h1>관리자</h1>
+
+<h2>원격 PC 목록</h2>
+
+<ul>
+    <li th:each="remotePc : ${remotePcs}">
+        <span th:text="${remotePc.id}">ID</span> -
+        <span th:text="${remotePc.name}">이름</span> -
+        <a th:href="@{/viewer(id=${remotePc.id})}">연결</a>
+    </li>
+</ul>
+
+<h2>원격 PC 추가</h2>
+<form method="post" th:object="${newRemotePc}">
+    <div th:if="${#fields.hasErrors()}">
+        아래 오류로 추가할 수 없습니다.
+    </div>
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    <ul>
+        <li>
+            <label for="name">이름: </label>
+            <input type="text" name="name" id="name" th:field="*{name}" />
+            <span th:if="${#fields.hasErrors('name')}"
+                  th:errors="*{name}">이름 오류</span>
+        </li>
+    </ul>
+    <button>추가</button>
+</form>
+</body>
+</html>

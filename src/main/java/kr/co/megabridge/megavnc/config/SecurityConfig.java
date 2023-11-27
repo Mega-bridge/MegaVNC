@@ -34,7 +34,7 @@ public class SecurityConfig {
                         .authenticated())
                 .formLogin(login -> login
                         .loginPage("/login")
-                        .defaultSuccessUrl("/admin/hosts", true)
+                        .defaultSuccessUrl("/admin", true)
                         .failureUrl("/login?error")
                         .permitAll())
                 .logout(Customizer.withDefaults());

@@ -1,7 +1,7 @@
 package kr.co.megabridge.megavnc.web;
 
-import kr.co.megabridge.megavnc.domain.HostPC;
-import kr.co.megabridge.megavnc.repository.HostPcRepository;
+import kr.co.megabridge.megavnc.domain.RemotePc;
+import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,18 +14,18 @@ import java.util.Optional;
 @RequestMapping("/viewer")
 public class VncViewerController {
 
-    private final HostPcRepository hostPCRepository;
+    private final RemotePcRepository remotePCRepository;
 
     @Autowired
-    public VncViewerController(HostPcRepository hostPCRepository) {
-        this.hostPCRepository = hostPCRepository;
+    public VncViewerController(RemotePcRepository remotePCRepository) {
+        this.remotePCRepository = remotePCRepository;
     }
 
     @GetMapping
     public String showViewer(@RequestParam Long id) {
         // Check permission
 
-        Optional<HostPC> hostPC = hostPCRepository.findById(id);
+        Optional<RemotePc> hostPC = remotePCRepository.findById(id);
         return "viewer";
     }
 }
