@@ -15,14 +15,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    /*
-    @Autowired
-    DataSource dataSource;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
-     */
-
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
@@ -55,27 +47,4 @@ public class SecurityConfig {
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
-/*
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(encoder());
-        return authenticationProvider;
-    }
-
-    @Bean
-    public UserDetailsManager users(DataSource dataSource) {
-        UserDetails user = User.withDefaultPasswordEncoder().username("user").password("password").roles("USER").build();
-        JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
-        users.createUser(user);
-        return users;
-    }
-
-    @Bean
-    @ConditionalOnProperty(name = "spring.h2.console.enabled", havingValue = "true")
-    public WebSecurityCustomizer configureH2ConsoleEnable() {
-        return web -> web.ignoring().requestMatchers(PathRequest.toH2Console());
-    }
-     */
 }
