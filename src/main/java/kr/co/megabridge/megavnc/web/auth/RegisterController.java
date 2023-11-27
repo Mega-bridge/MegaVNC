@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.web;
+package kr.co.megabridge.megavnc.web.auth;
 
 import jakarta.validation.Valid;
 import kr.co.megabridge.megavnc.dto.UserRegisterDto;
@@ -28,7 +28,7 @@ public class RegisterController {
     @GetMapping
     public String showRegister(Model model) {
         model.addAttribute("user", new UserRegisterDto());
-        return "register";
+        return "auth/register";
     }
 
     @PostMapping
@@ -48,7 +48,7 @@ public class RegisterController {
         }
 
         if (bindingResult.hasErrors()) {
-            return "register";
+            return "auth/register";
         }
 
         userRepositoryService.register(user.getUsername(), user.getPassword());

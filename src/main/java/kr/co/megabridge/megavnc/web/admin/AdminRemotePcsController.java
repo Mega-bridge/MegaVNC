@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.web;
+package kr.co.megabridge.megavnc.web.admin;
 
 import jakarta.validation.Valid;
 import kr.co.megabridge.megavnc.domain.RemotePc;

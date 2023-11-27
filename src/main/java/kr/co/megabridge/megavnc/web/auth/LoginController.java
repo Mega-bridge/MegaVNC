@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.web;
+package kr.co.megabridge.megavnc.web.auth;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -24,6 +24,6 @@ public class LoginController {
         if (registered != null)
             model.addAttribute("registered", true);
 
-        return "login";
+        return "auth/login";
     }
 }

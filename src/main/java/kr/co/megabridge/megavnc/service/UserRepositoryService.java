@@ -22,11 +22,9 @@ public class UserRepositoryService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Long register(String username, String password) {
+    public void register(String username, String password) {
         User user = User.createUser(username, password, Set.of("USER"), passwordEncoder);
         userRepository.save(user);
-
-        return user.getId();
     }
 
     public boolean isUsernameUnique(String username) {
@@ -36,5 +34,10 @@ public class UserRepositoryService {
 
     public List<User> listAllUsers() {
         return userRepository.findAll();
+    }
+
+    public void changePassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 }

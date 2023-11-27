@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.web;
+package kr.co.megabridge.megavnc.web.admin;
 
 import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.service.UserRepositoryService;

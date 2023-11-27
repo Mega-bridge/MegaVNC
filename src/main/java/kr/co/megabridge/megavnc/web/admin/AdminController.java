@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.web;
+package kr.co.megabridge.megavnc.web.admin;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
