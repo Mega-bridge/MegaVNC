@@ -25,6 +25,12 @@ public class RemotePc {
 
     private Date createdAt;
 
+    private Status status;
+
+    public static enum Status {
+        OFFLINE, STANDBY, ACTIVE
+    }
+
     public static RemotePc createRemotePc(String repeaterId, String name, User owner) {
         RemotePc remotePc = new RemotePc();
         remotePc.repeaterId = repeaterId;
