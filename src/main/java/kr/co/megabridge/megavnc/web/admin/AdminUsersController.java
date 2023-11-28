@@ -1,7 +1,7 @@
 package kr.co.megabridge.megavnc.web.admin;
 
 import kr.co.megabridge.megavnc.domain.User;
-import kr.co.megabridge.megavnc.service.UserRepositoryService;
+import kr.co.megabridge.megavnc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,16 +14,16 @@ import java.util.List;
 @RequestMapping("/admin/users")
 public class AdminUsersController {
 
-    UserRepositoryService userRepositoryService;
+    UserService userService;
 
     @Autowired
-    public AdminUsersController(UserRepositoryService userRepositoryService) {
-        this.userRepositoryService = userRepositoryService;
+    public AdminUsersController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
     public String showUsers(Model model) {
-        List<User> users = userRepositoryService.listAllUsers();
+        List<User> users = userService.listAllUsers();
 
         model.addAttribute("users", users);
 

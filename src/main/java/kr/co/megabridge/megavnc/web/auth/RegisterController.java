@@ -2,7 +2,7 @@ package kr.co.megabridge.megavnc.web.auth;
 
 import jakarta.validation.Valid;
 import kr.co.megabridge.megavnc.dto.UserRegisterDto;
-import kr.co.megabridge.megavnc.service.UserRepositoryService;
+import kr.co.megabridge.megavnc.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/register")
 public class RegisterController {
 
-    private final UserRepositoryService userRepositoryService;
+    private final UserService userService;
 
     @Autowired
-    public RegisterController(UserRepositoryService userRepositoryService) {
-        this.userRepositoryService = userRepositoryService;
+    public RegisterController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
@@ -33,7 +33,7 @@ public class RegisterController {
 
     @PostMapping
     public String processRegister(@ModelAttribute("user") @Valid UserRegisterDto user, BindingResult bindingResult) {
-        if (!userRepositoryService.isUsernameUnique(user.getUsername())) {
+        if (!userService.isUsernameUnique(user.getUsername())) {
             bindingResult.rejectValue(
                     "username",
                     "error.user",
@@ -51,7 +51,7 @@ public class RegisterController {
             return "auth/register";
         }
 
-        userRepositoryService.register(user.getUsername(), user.getPassword());
+        userService.register(user.getUsername(), user.getPassword());
 
         return "redirect:/login?registered";
     }

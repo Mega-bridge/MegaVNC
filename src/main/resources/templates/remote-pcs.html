@@ -7,14 +7,15 @@
 <body>
 <header th:replace="~{/fragments/header.html :: fragment-header}"></header>
 
-<h1>관리자</h1>
+<h1 th:text="${user.username}">사용자명</h1>
+
+<h2>원격 PC 목록</h2>
 
 <ul>
-    <li>
-        <a th:href="@{/admin/remote-pcs}">원격 PC 관리</a>
-    </li>
-    <li>
-        <a th:href="@{/admin/users}">사용자 관리</a>
+    <li th:each="remotePc : ${remotePcs}">
+        <span th:text="${remotePc.id}">ID</span> -
+        <span th:text="${remotePc.name}">이름</span> -
+        <a th:href="@{/viewer(id=${remotePc.id})}">연결</a>
     </li>
 </ul>
 </body>

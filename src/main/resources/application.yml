@@ -5,3 +5,6 @@ spring:
 
   datasource:
     url: jdbc:h2:mem:test
+
+jwt:
+  secret: 5Eiliz6V03PMlE86d6CNDbHTaUyVAaoO

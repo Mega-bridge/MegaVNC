@@ -36,12 +36,13 @@ public class User implements UserDetails {
 
     public static User createUser(
             String username,
-            String password,
+            String rawPassword,
             Set<String> roles,
-            PasswordEncoder encoder) {
+            PasswordEncoder encoder
+    ) {
         User user = new User();
         user.username = username;
-        user.password = encoder.encode(password);
+        user.password = encoder.encode(rawPassword);
         user.roles = roles;
 
         return user;

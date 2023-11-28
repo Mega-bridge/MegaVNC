@@ -2,7 +2,7 @@ package kr.co.megabridge.megavnc.web.auth;
 
 import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.dto.ChangePasswordDto;
-import kr.co.megabridge.megavnc.service.UserRepositoryService;
+import kr.co.megabridge.megavnc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ChangePasswordController {
 
     private final PasswordEncoder encoder;
-    private final UserRepositoryService userRepositoryService;
+    private final UserService userService;
 
     @Autowired
-    public ChangePasswordController(PasswordEncoder encoder, UserRepositoryService userRepositoryService) {
+    public ChangePasswordController(PasswordEncoder encoder, UserService userService) {
         this.encoder = encoder;
-        this.userRepositoryService = userRepositoryService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -51,7 +51,7 @@ public class ChangePasswordController {
             return "auth/change-password";
         }
 
-        userRepositoryService.changePassword(user, changePassword.getNewPassword());
+        userService.changePassword(user, changePassword.getNewPassword());
 
         return "redirect:/login";
     }

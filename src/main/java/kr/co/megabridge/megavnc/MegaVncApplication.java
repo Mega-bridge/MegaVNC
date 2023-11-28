@@ -28,10 +28,13 @@ public class MegaVncApplication {
         return new CommandLineRunner() {
             @Override
             public void run(String... args) throws Exception {
-                User admin = User.createUser("admin", "1234", Set.of("ADMIN"), encoder);
-                userRepository.save(admin);
+                User admin = User.createUser("admin", "1234", Set.of("ROLE_ADMIN"), encoder);
+                User user = User.createUser("user", "1234", Set.of("ROLE_USER"), encoder);
 
-                remotePcRepository.save(RemotePc.createRemotePc("123456789", "WinTestHost", admin));
+                userRepository.save(admin);
+                userRepository.save(user);
+
+                remotePcRepository.save(RemotePc.createRemotePc("123456789", "WinTestHost", user));
             }
         };
     }
