@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.config;
+package kr.co.megabridge.megavnc.security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

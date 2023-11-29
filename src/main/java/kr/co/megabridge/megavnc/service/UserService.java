@@ -1,6 +1,6 @@
 package kr.co.megabridge.megavnc.service;
 
-import kr.co.megabridge.megavnc.config.JwtTokenProvider;
+import kr.co.megabridge.megavnc.security.JwtTokenProvider;
 import kr.co.megabridge.megavnc.domain.JwtToken;
 import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.repository.UserRepository;
@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

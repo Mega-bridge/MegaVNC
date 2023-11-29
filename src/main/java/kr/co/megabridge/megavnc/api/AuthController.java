@@ -1,12 +1,10 @@
 package kr.co.megabridge.megavnc.api;
 
 import kr.co.megabridge.megavnc.domain.JwtToken;
-import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
