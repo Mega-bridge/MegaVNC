@@ -34,7 +34,7 @@ public class MegaVncApplication {
                 userRepository.save(admin);
                 userRepository.save(user);
 
-                remotePcRepository.save(RemotePc.createRemotePc("123456789", "WinTestHost", user));
+                remotePcRepository.save(RemotePc.createRemotePc("000000000", "Test", user));
             }
         };
     }

@@ -16,6 +16,7 @@ public class RemotePc {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(unique = true)
     private String repeaterId;
 
     private String name;
@@ -36,6 +37,7 @@ public class RemotePc {
         remotePc.repeaterId = repeaterId;
         remotePc.name = name;
         remotePc.owner = owner;
+        remotePc.status = Status.OFFLINE;
         return remotePc;
     }
 

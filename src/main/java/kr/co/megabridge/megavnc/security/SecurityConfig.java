@@ -35,9 +35,11 @@ public class SecurityConfig {
                 .requestMatchers(
                         new AntPathRequestMatcher("/css/**"),
                         new AntPathRequestMatcher("/images/**"),
-                        new AntPathRequestMatcher("/h2-console/**"));
+                        new AntPathRequestMatcher("/h2-console/**"),
+                        new AntPathRequestMatcher("/api/**"));
     }
 
+    /*
     @Bean
     @Order(1)
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
@@ -58,12 +60,15 @@ public class SecurityConfig {
 
         return http.build();
     }
+     */
 
     @Bean
-    @Order(2)
+    // @Order(2)
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(request -> request
+                        //.requestMatchers(new AntPathRequestMatcher("/api/**"))
+                        //.permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/register"))
                         .permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/admin/**"))

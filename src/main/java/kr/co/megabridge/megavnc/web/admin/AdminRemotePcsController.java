@@ -4,8 +4,7 @@ import jakarta.validation.Valid;
 import kr.co.megabridge.megavnc.domain.RemotePc;
 import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.dto.RemotePcRegisterDto;
-import kr.co.megabridge.megavnc.repository.RemotePcRepository;
-import kr.co.megabridge.megavnc.service.RemotePcRepositoryService;
+import kr.co.megabridge.megavnc.service.RemotePcService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,11 +24,11 @@ import java.util.List;
 @RequestMapping("/admin/remote-pcs")
 public class AdminRemotePcsController {
 
-    private final RemotePcRepositoryService remotePcRepositoryService;
+    private final RemotePcService remotePcService;
 
     @Autowired
-    public AdminRemotePcsController(RemotePcRepositoryService remotePcRepositoryService) {
-        this.remotePcRepositoryService = remotePcRepositoryService;
+    public AdminRemotePcsController(RemotePcService remotePcService) {
+        this.remotePcService = remotePcService;
     }
 
     @GetMapping
@@ -60,7 +59,7 @@ public class AdminRemotePcsController {
 
     private void loadRemotePcs(Model model) {
         List<RemotePc> remotePcs = new ArrayList<>();
-        remotePcRepositoryService.findAll().forEach(remotePcs::add);
+        remotePcService.findAll().forEach(remotePcs::add);
 
         model.addAttribute("remotePcs", remotePcs);
     }

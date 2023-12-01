@@ -4,6 +4,7 @@ import kr.co.megabridge.megavnc.security.JwtTokenProvider;
 import kr.co.megabridge.megavnc.domain.JwtToken;
 import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 public class UserService {
 
@@ -63,4 +65,17 @@ public class UserService {
 
         return jwtTokenProvider.generateToken(authentication);
     }
+
+    public Optional<User> authUser(String username, String rawPassword) {
+        Optional<User> user = userRepository.findByUsername(username);
+
+        if (user.isEmpty())
+            return Optional.empty();
+
+        if (!passwordEncoder.matches(rawPassword, user.get().getPassword()))
+            return Optional.empty();
+
+        return user;
+    }
+
 }
