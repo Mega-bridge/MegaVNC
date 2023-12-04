@@ -44,4 +44,11 @@ public class RemotePcService {
     public Optional<RemotePc> findRemotePcByRepeaterId(String repeaterId) {
         return repository.findByRepeaterId(repeaterId);
     }
+
+    public void setRemotePcStatus(String repeaterId, RemotePc.Status status) {
+        Optional<RemotePc> remotePc = repository.findByRepeaterId(repeaterId);
+        RemotePc update = remotePc.orElseThrow();
+        update.setStatus(status);
+        repository.save(update);
+    }
 }

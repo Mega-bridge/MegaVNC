@@ -8,3 +8,7 @@ spring:
 
 jwt:
   secret: 5Eiliz6V03PMlE86d6CNDbHTaUyVAaoO
+
+tcp:
+  server:
+    port: 2002

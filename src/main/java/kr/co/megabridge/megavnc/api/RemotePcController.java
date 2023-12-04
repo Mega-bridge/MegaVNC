@@ -17,13 +17,13 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/remote-pcs")
-public class RemotePcRegisterController {
+public class RemotePcController {
 
     private final RemotePcService remotePcService;
     private final UserService userService;
 
     @Autowired
-    public RemotePcRegisterController(RemotePcService remotePcService, UserService userService) {
+    public RemotePcController(RemotePcService remotePcService, UserService userService) {
         this.remotePcService = remotePcService;
         this.userService = userService;
     }
