@@ -28,6 +28,8 @@ public class MessageService {
         String msg = new String(message);
         String[] tokens = msg.split(",");
 
+        log.info(msg); // XXX
+
         Map<String, String> msgKv = new HashMap<>();
 
         for (String token : tokens) {

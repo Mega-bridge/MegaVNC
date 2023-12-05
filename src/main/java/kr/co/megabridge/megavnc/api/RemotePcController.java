@@ -29,22 +29,22 @@ public class RemotePcController {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, String>> registerRemotePc(@RequestBody RemotePcRegisterApiDto register) {
+    public ResponseEntity<Map<String, Object>> registerRemotePc(@RequestBody RemotePcRegisterApiDto register) {
         Optional<User> user = userService.authUser(register.getUsername(), register.getPassword());
 
         if (user.isEmpty())
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
 
-        String repeaterId = remotePcService.registerRemotePc(register.getRemotePcName(), user.get());
+        Long repeaterId = remotePcService.registerRemotePc(register.getRemotePcName(), user.get());
 
-        Map<String, String> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         response.put("repeaterId", repeaterId);
 
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{repeaterId}")
-    public ResponseEntity<RemotePc> getRemotePcByRepeaterId(@PathVariable String repeaterId) {
+    public ResponseEntity<RemotePc> getRemotePcByRepeaterId(@PathVariable Long repeaterId) {
         // TODO: DTO 사용하도록 변경
         Optional<RemotePc> remotePc = remotePcService.findRemotePcByRepeaterId(repeaterId);
 

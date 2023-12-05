@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface RemotePcRepository extends CrudRepository<RemotePc, Long> {
     Iterable<RemotePc> findByOwner(User user);
     Optional<RemotePc> findTopByOrderByRepeaterIdDesc();
-    Optional<RemotePc> findByRepeaterId(String repeaterId);
+    Optional<RemotePc> findByRepeaterId(Long repeaterId);
 }

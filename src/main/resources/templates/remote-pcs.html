@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>MegaVNC</title>
+    <style>
+        table, th, td {
+            border-collapse: collapse;
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
 <header th:replace="~{/fragments/header.html :: fragment-header}"></header>
@@ -11,12 +20,21 @@
 
 <h2>원격 PC 목록</h2>
 
-<ul>
-    <li th:each="remotePc : ${remotePcs}">
-        <span th:text="${remotePc.id}">ID</span> -
-        <span th:text="${remotePc.name}">이름</span> -
-        <a th:href="@{/viewer(id=${remotePc.id})}">연결</a>
-    </li>
-</ul>
+<table style="td { border: 1px solid black }">
+    <tr>
+        <th scope="col">ID</th>
+        <th scope="col">이름</th>
+        <th scope="col">등록일</th>
+        <th scope="col">상태</th>
+        <th scope="col">연결</th>
+    </tr>
+    <tr th:each="remotePc : ${remotePcs}">
+        <td th:text="${remotePc.id}">ID</td>
+        <td th:text="${remotePc.name}">이름</td>
+        <td th:text="${#dates.format(remotePc.createdAt, 'yyyy-MM-dd HH:mm:ss')}">등록일</td>
+        <td th:text="${remotePc.status}">상태</td>
+        <td><a th:href="@{/viewer/{id}(id=${remotePc.id})}">연결</a></td>
+    </tr>
+</table>
 </body>
 </html>

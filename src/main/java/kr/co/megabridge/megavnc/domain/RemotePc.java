@@ -17,7 +17,7 @@ public class RemotePc {
     private Long id;
 
     @Column(unique = true)
-    private String repeaterId;
+    private Long repeaterId;
 
     private String name;
 
@@ -32,7 +32,7 @@ public class RemotePc {
         OFFLINE, STANDBY, ACTIVE
     }
 
-    public static RemotePc createRemotePc(String repeaterId, String name, User owner) {
+    public static RemotePc createRemotePc(Long repeaterId, String name, User owner) {
         RemotePc remotePc = new RemotePc();
         remotePc.repeaterId = repeaterId;
         remotePc.name = name;

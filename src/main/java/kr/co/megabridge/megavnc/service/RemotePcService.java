@@ -26,29 +26,33 @@ public class RemotePcService {
         return repository.findByOwner(user);
     }
 
-    public String registerRemotePc(String remotePcName, User owner) {
+    public Long registerRemotePc(String remotePcName, User owner) {
         Optional<RemotePc> currTop = repository.findTopByOrderByRepeaterIdDesc();
 
-        long nextRepeaterId = 0L;
+        // Make sure the repeater id starts from 100.
+        // Base remote pc in data loader also ensures it.
+        long nextRepeaterId = 100;
         if (currTop.isPresent())
-            nextRepeaterId = Long.parseLong(currTop.get().getRepeaterId()) + 1;
+            nextRepeaterId = currTop.get().getRepeaterId() + 1;
 
-        String nextRepeaterIdStr = String.format("%09d", nextRepeaterId);
-
-        RemotePc remotePc = RemotePc.createRemotePc(nextRepeaterIdStr, remotePcName, owner);
+        RemotePc remotePc = RemotePc.createRemotePc(nextRepeaterId, remotePcName, owner);
         repository.save(remotePc);
 
-        return nextRepeaterIdStr;
+        return nextRepeaterId;
     }
 
-    public Optional<RemotePc> findRemotePcByRepeaterId(String repeaterId) {
+    public Optional<RemotePc> findRemotePcByRepeaterId(Long repeaterId) {
         return repository.findByRepeaterId(repeaterId);
     }
 
-    public void setRemotePcStatus(String repeaterId, RemotePc.Status status) {
+    public void setRemotePcStatus(Long repeaterId, RemotePc.Status status) {
         Optional<RemotePc> remotePc = repository.findByRepeaterId(repeaterId);
         RemotePc update = remotePc.orElseThrow();
         update.setStatus(status);
         repository.save(update);
+    }
+
+    public RemotePc findById(Long id) {
+        return repository.findById(id).orElseThrow();
     }
 }

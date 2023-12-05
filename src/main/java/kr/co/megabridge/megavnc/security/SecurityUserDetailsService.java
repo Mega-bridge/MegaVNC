@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.service;
+package kr.co.megabridge.megavnc.security;
 
 import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.repository.UserRepository;

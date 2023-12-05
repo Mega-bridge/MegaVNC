@@ -21,8 +21,8 @@ public class EventMessage {
 
     private int maxSessions;
 
-    public String getRepeaterId() {
-        return String.format("%09d", code);
+    public Long getRepeaterId() {
+        return code;
     }
 
 
