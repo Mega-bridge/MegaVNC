@@ -1,10 +1,9 @@
-spring:
-  h2:
-    console:
-      enabled: true
+server:
+  port: 8080
 
-  datasource:
-    url: jdbc:h2:mem:test
+spring:
+  profiles:
+    active: dev
 
 jwt:
   secret: 5Eiliz6V03PMlE86d6CNDbHTaUyVAaoO

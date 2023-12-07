@@ -12,8 +12,8 @@ import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Entity
-@Table(name = "USERS")
+@Entity(name = "users")
+@Table(name = "users")
 @Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 public class User implements UserDetails {

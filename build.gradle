@@ -40,6 +40,9 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-integration'
 	implementation 'org.springframework.integration:spring-integration-ip'
+
+	implementation 'org.postgresql:postgresql:42.5.1'
+	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
 }
 
 tasks.named('bootBuildImage') {

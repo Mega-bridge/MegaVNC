@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Data
-@Entity
+@Entity(name = "remote_pc")
+@Table(name = "remote_pc")
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 public class RemotePc {
 

@@ -1,0 +1,12 @@
+# dev
+
+spring:
+  datasource:
+    url: jdbc:postgresql://192.168.0.34:5432/megavnc
+    username: megavncuser
+    password: "!mb220719"
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
