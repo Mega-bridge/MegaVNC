@@ -12,7 +12,7 @@ window.onload = function() {
     connectButton.addEventListener("click", () => {
         rfb = new RFB(
             screen,
-            "ws://192.168.0.31:6080",
+            "ws://vnc.megabridge.co.kr:6080",
             {
                 credentials: { password: passwordInput.value },
                 repeaterID: repeaterId
