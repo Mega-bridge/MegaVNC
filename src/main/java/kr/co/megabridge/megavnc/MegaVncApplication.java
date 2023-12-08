@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
 import java.util.Set;
 
 @SpringBootApplication
@@ -20,7 +21,6 @@ public class MegaVncApplication {
         SpringApplication.run(MegaVncApplication.class, args);
     }
 
-    @Profile("local") // "jpa.hibernate.ddl-auto: create" 와 함께 사용
     @Bean
     public CommandLineRunner dataLoader(
             RemotePcRepository remotePcRepository,
@@ -30,13 +30,27 @@ public class MegaVncApplication {
         return new CommandLineRunner() {
             @Override
             public void run(String... args) throws Exception {
-                User admin = User.createUser("admin", "1234", Set.of("ROLE_ADMIN"), encoder);
-                User user = User.createUser("user", "1234", Set.of("ROLE_USER"), encoder);
+                Optional<User> findAdmin = userRepository.findByUsername("admin");
+                if (findAdmin.isEmpty()) {
+                    User admin = User.createUser("admin", "1234", Set.of("ROLE_ADMIN"), encoder);
+                    userRepository.save(admin);
+                }
 
-                userRepository.save(admin);
-                userRepository.save(user);
+                Optional<User> findUser = userRepository.findByUsername("user");
+                if (findUser.isEmpty()) {
+                    User user = User.createUser("user", "1234", Set.of("ROLE_USER"), encoder);
+                    userRepository.save(user);
+                }
 
-                remotePcRepository.save(RemotePc.createRemotePc(100L, "BASE", admin));
+                // Repeater에서 99번 이하 ID 사용시, 자동으로 59xx번 ID로 변환되어서 100부터 시작
+                Optional<RemotePc> findBase = remotePcRepository.findByRepeaterId(100L);
+                if (findBase.isEmpty()) {
+                    User admin = userRepository.findByUsername("admin").orElseThrow();
+                    RemotePc base = RemotePc.createRemotePc(100L, "BASE", admin);
+                    remotePcRepository.save(base);
+                }
+
+
             }
         };
     }
