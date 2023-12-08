@@ -1,36 +1,50 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>MegaVNC</title>
+<head th:replace="~{/fragments/head :: head ('로그인')}">
+    <title></title>
 </head>
 <body>
-<form method="post" th:action="@{/login}">
-    <div>
-        <img th:src="@{/images/mega-logo.png}" alt="" width="72" height="72">
-        <h1>MegaVNC 로그인</h1>
+<div class="bg-body-secondary vh-100 d-flex align-items-center justify-content-center">
+    <div class="bg-body w-25 p-5 rounded shadow">
+        <div class="mb-5 d-flex justify-content-center">
+            <img th:src="@{/images/mega-logo.png}" src="https://placehold.co/72" alt="" width="72" height="72">
+        </div>
+        <div class="h4 text-center mb-5 fw-bold">MegaVNC 로그인</div>
+
+        <div th:if="${loginError}" class="card text-bg-danger mb-3">
+            <div class="card-body">사용자명 또는 비밀번호가 올바르지 않습니다.</div>
+        </div>
+
+        <div th:if="${registered}" class="card text-bg-success mb-3">
+            <div class="card-body">회원가입이 완료되었습니다.</div>
+        </div>
+
+        <form method="post" th:action="@{/login}">
+            <div class="mb-3">
+                <label for="username" class="form-label">사용자명</label>
+                <input type="text" id="username" name="username" autofocus="autofocus" class="form-control">
+            </div>
+        
+            <div class="mb-3">
+                <label for="password" class="form-label">비밀번호</label>
+                <input type="password" id="password" name="password" class="form-control">
+            </div>
+
+            <div class="mb-5 form-check">
+                <label class="form-check-label" for="rememberMe">로그인 유지</label>
+                <input type="checkbox" class="form-check-input" name="rememberMe" id="rememberMe">
+              </div>
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary">로그인</button>
+            </div>
+
+            <div class="text-center">
+                <a th:href="@{/register}" href="#" class="link-underline link-underline-opacity-0">회원가입</a>
+            </div>
+        </form>
+
     </div>
-
-    <div th:if="${loginError}">사용자명 또는 비밀번호가 올바르지 않습니다.</div>
-    <div th:if="${registered}">회원가입이 완료되었습니다.</div>
-
-    <div>
-        <label for="username">사용자명</label>
-        <input type="text" id="username" name="username" autofocus="autofocus">
-    </div>
-
-    <div>
-        <label for="password">비밀번호</label>
-        <input type="password" id="password" name="password">
-    </div>
-
-    <div>
-        <button type="submit">로그인</button>
-    </div>
-</form>
-
-<div>
-    <a th:href="@{/register}">회원가입</a>
 </div>
 </body>
 </html>

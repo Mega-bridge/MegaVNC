@@ -1,20 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
+<head th:replace="~{/fragments/head :: head ('원격 PC 목록')}">
     <title>MegaVNC</title>
-    <style>
-        table, th, td {
-            border-collapse: collapse;
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-        }
-    </style>
 </head>
-<body>
-<header th:replace="~{/fragments/header.html :: fragment-header}"></header>
+<body class="bg-body-tertiary">
+<header th:replace="~{/fragments/nav :: nav (${user.username})}"></header>
 
 <h1 th:text="${user.username}">사용자명</h1>
 
