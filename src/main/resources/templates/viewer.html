@@ -1,18 +1,33 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
+<head th:replace="~{/fragments/head :: head ('원격 PC 뷰어')}">
     <title>MegaVNC</title>
 </head>
-<body>
-<div>
-    <input id="repeaterId" type="hidden" th:value="${repeaterId}" />
-    <label for="password">비밀번호: </label>
-    <input type="password" id="password" />
-    <button id="connect">연결</button>
-    <button id="disconnect">연결해제</button>
+<body class="bg-body-secondary">
+<header th:replace="~{/fragments/nav :: nav (${user.username})}"></header>
+<input id="repeaterId" type="hidden" th:value="${repeaterId}" />
+
+<div class="container mt-5 mb-3">
+    <a th:href="@{/remote-pcs}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left me-2"></i>원격 PC 목록</a>
 </div>
-<div id="screen" style="width: 800px; height: 600px"></div>
+
+<div class="container mb-3">
+    <div class="bg-body rounded p-4 d-flex text-nowrap">
+        <input type="password" id="password" autofocus="autofocus" class="form-control me-3" placeholder="연결 암호">
+        <button id="connect" class="btn btn-primary me-2"><i class="fa-solid fa-link me-2"></i>연결</button>
+        <button id="disconnect" class="btn btn-secondary me-2"><i class="fa-solid fa-link-slash me-2"></i>연결해제</button>
+        <button class="btn btn-secondary" id="fullscreen"><i class="fa-solid fa-expand me-2"></i>전체화면</button>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="bg-body rounded py-4 d-flex align-items-center">
+        <div id="screen" style="height: 600px" class="bg-secondary-subtle w-100 mw-100"></div>
+    </div>
+
+</div>
+
+
 <script type="module" th:src="@{/js/viewer/viewer.js}"></script>
 </body>
 </html>

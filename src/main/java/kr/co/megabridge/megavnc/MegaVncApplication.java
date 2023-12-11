@@ -50,7 +50,14 @@ public class MegaVncApplication {
                     remotePcRepository.save(base);
                 }
 
-
+                // test pcs
+                /*
+                User user = userRepository.findByUsername("user").orElseThrow();
+                for (int i = 0; i < 10; i++) {
+                    RemotePc testPc = RemotePc.createRemotePc(i + 200L, "내 데스크탑 " + (i + 1), user);
+                    remotePcRepository.save(testPc);
+                }
+                 */
             }
         };
     }

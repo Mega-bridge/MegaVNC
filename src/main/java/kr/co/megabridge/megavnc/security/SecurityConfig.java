@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.RememberMeConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,11 +23,17 @@ public class SecurityConfig {
 
     private final LoginSuccessHandler successHandler;
     private final JwtTokenProvider tokenProvider;
+    private final SecurityUserDetailsService userDetailsService;
 
     @Autowired
-    public SecurityConfig(LoginSuccessHandler successHandler, JwtTokenProvider tokenProvider) {
+    public SecurityConfig(
+            LoginSuccessHandler successHandler,
+            JwtTokenProvider tokenProvider,
+            SecurityUserDetailsService userDetailsService
+    ) {
         this.successHandler = successHandler;
         this.tokenProvider = tokenProvider;
+        this.userDetailsService = userDetailsService;
     }
 
     @Bean
@@ -80,7 +87,10 @@ public class SecurityConfig {
                         .successHandler(successHandler)
                         .failureUrl("/login?error")
                         .permitAll())
-                .logout(Customizer.withDefaults());
+                .logout(Customizer.withDefaults())
+                .rememberMe(config -> config
+                        .rememberMeParameter("rememberMe")
+                        .userDetailsService(userDetailsService));
 
         return http.build();
     }

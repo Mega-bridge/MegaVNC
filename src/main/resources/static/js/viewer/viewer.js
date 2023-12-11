@@ -8,24 +8,31 @@ window.onload = function() {
     const connectButton = document.getElementById("connect");
     const disconnectButton = document.getElementById("disconnect");
     const screen = document.getElementById("screen");
+    const fullscreen = document.getElementById("fullscreen");
 
     connectButton.addEventListener("click", () => {
         rfb = new RFB(
             screen,
-            "ws://vnc.megabridge.co.kr:6080",
+            //"ws://vnc.megabridge.co.kr:6080",
+            "ws://localhost:6080",
             {
                 credentials: { password: passwordInput.value },
-                repeaterID: repeaterId
+                //repeaterID: repeaterId
             }
         );
         rfb.showDotCursor = true;
-//        rfb.resizeSession = true;
         rfb.scaleViewport = true;
-
+        rfb.addEventListener("securityfailure", () => {
+            window.alert("접속 암호가 올바르지 않습니다.");
+        });
     });
 
     disconnectButton.addEventListener("click", () => {
         rfb.disconnect();
+    });
+
+    fullscreen.addEventListener("click", () => {
+        screen.requestFullscreen();
     });
 };
 
