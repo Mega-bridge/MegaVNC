@@ -46,6 +46,9 @@ public class RemotePcsContoller {
         Long repeaterId = remotePc.getRepeaterId();
         model.addAttribute("repeaterId", repeaterId);
 
+        String pcName = remotePc.getName();
+        model.addAttribute("pcName", pcName);
+
         return "viewer";
     }
 }

@@ -12,7 +12,10 @@
 </div>
 
 <div class="container mb-3">
-    <div class="bg-body rounded p-4 d-flex text-nowrap">
+    <div class="bg-body rounded p-4 d-flex text-nowrap align-items-center">
+        <label for="password" class="me-3">
+            <span th:text="${pcName}" class="fw-bold text-info">PC 이름</span>의 연결 암호 입력:
+        </label>
         <input type="password" id="password" autofocus="autofocus" class="form-control me-3" placeholder="연결 암호">
         <button id="connect" class="btn btn-primary me-2"><i class="fa-solid fa-link me-2"></i>연결</button>
         <button id="disconnect" class="btn btn-secondary me-2"><i class="fa-solid fa-link-slash me-2"></i>연결해제</button>
