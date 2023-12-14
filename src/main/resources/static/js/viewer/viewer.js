@@ -11,13 +11,13 @@ window.onload = function() {
     const fullscreen = document.getElementById("fullscreen");
 
     connectButton.addEventListener("click", () => {
+
         rfb = new RFB(
             screen,
-            //"ws://vnc.megabridge.co.kr:6080",
-            "ws://localhost:6080",
+            "wss://vnc.megabridge.co.kr:6080",
             {
                 credentials: { password: passwordInput.value },
-                //repeaterID: repeaterId
+                repeaterID: repeaterId
             }
         );
         rfb.showDotCursor = true;

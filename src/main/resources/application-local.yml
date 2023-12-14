@@ -1,5 +1,11 @@
 # local
 
+server:
+  ssl:
+    key-store: keystore.p12
+    key-store-type: PKCS12
+    key-store-password: "!mb220719"
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/megavnc
