@@ -51,4 +51,15 @@ public class RemotePcsContoller {
 
         return "viewer";
     }
+
+    @GetMapping("/test")
+    public String testViewer(@AuthenticationPrincipal User user, Model model, HttpServletResponse response) {
+        model.addAttribute("user", user);
+
+        model.addAttribute("repeaterId", "repeaterId");
+
+        model.addAttribute("pcName", "pcName");
+
+        return "viewer";
+    }
 }

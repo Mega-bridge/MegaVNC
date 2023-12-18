@@ -11,15 +11,43 @@
     <a th:href="@{/remote-pcs}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left me-2"></i>원격 PC 목록</a>
 </div>
 
-<div class="container mb-3">
-    <div class="bg-body rounded p-4 d-flex text-nowrap align-items-center">
+<div class="container mb-3 d-flex flex-column">
+    <div class="d-flex flex-row align-items-center text-nowrap bg-body rounded p-4">
         <label for="password" class="me-3">
             <span th:text="${pcName}" class="fw-bold text-info">PC 이름</span>의 연결 암호 입력:
         </label>
         <input type="password" id="password" autofocus="autofocus" class="form-control me-3" placeholder="연결 암호">
         <button id="connect" class="btn btn-primary me-2"><i class="fa-solid fa-link me-2"></i>연결</button>
         <button id="disconnect" class="btn btn-secondary me-2"><i class="fa-solid fa-link-slash me-2"></i>연결해제</button>
-        <button class="btn btn-secondary" id="fullscreen"><i class="fa-solid fa-expand me-2"></i>전체화면</button>
+        <button class="btn btn-secondary me-2" id="fullscreen"><i class="fa-solid fa-expand me-2"></i>전체화면</button>
+        <button class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#tools">
+            <i class="fa-solid fa-gear"></i>
+        </button>
+    </div>
+    <div id="tools" class="collapse mt-2">
+        <div class="d-flex flex-row text-nowrap items-align-center">
+            <button class="btn btn-light me-2" id="pasteButton">
+                <i class="fa-solid fa-paste me-2"></i>클립보드 붙여넣기
+            </button>
+            <button class="btn btn-light me-2" id="captureButton">
+                <i class="fa-solid fa-camera me-2"></i>화면 캡처
+            </button>
+            <div class="bg-body-tertiary py-2 px-3 d-flex align-items-center rounded me-2">
+                <label for="qualityLevelInput" class="me-2">
+                    <i class="fa-solid fa-paint-roller me-2"></i>화면 품질
+                </label>
+                <input type="range" class="form-range" min="0" max="9" value="6" step="1" id="qualityLevelInput" />
+            </div>
+            <button class="btn btn-light me-2" id="ctrlAltDelButton">
+                <i class="fa-solid fa-wrench me-2"></i>Ctrl+Alt+Del (TODO)
+            </button>
+            <button class="btn btn-light me-2" id="rebootButton">
+                <i class="fa-solid fa-rotate-right me-2"></i>원격 PC 재부팅 (TODO)
+            </button>
+            <button class="btn btn-light me-2" id="powerOffButton">
+                <i class="fa-solid fa-power-off me-2"></i>원격 PC 종료 (TODO)
+            </button>
+        </div>
     </div>
 </div>
 
