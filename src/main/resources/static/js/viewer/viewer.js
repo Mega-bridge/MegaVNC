@@ -1,7 +1,7 @@
 import RFB from "./noVNC-1.4.0/core/rfb.js";
 
 let rfb, repeaterId, passwordInput, connectButton, disconnectButton, screen, fullscreenButton, pasteButton;
-let captureButton, qualityLevelInput, qualityLevel = 6;
+let captureButton, qualityLevelInput, qualityLevel = 6, shutdownButton;
 
 window.onload = function() {
     repeaterId = document.getElementById("repeaterId").value;
@@ -13,6 +13,7 @@ window.onload = function() {
     pasteButton = document.getElementById("pasteButton");
     captureButton = document.getElementById("captureButton");
     qualityLevelInput = document.getElementById("qualityLevelInput");
+    shutdownButton = document.getElementById("shutdownButton");
 
     connectButton.addEventListener("click", handleConnect);
     disconnectButton.addEventListener("click", handleDisconnect);
@@ -20,16 +21,17 @@ window.onload = function() {
     pasteButton.addEventListener("click", handlePaste);
     captureButton.addEventListener("click", handleCapture);
     qualityLevelInput.addEventListener("input", handleQualityLevel);
+    shutdownButton.addEventListener("click", handleShutdown);
 };
 
 function handleConnect() {
     rfb = new RFB(
             screen,
-            "ws://127.0.0.1:6080",                  // LOCAL
-            // "wss://vnc.megabridge.co.kr:6080",   // DEV
+            // "ws://127.0.0.1:6080",                   // LOCAL
+            "wss://vnc.megabridge.co.kr:6080",          // DEV
             {
                 credentials: { password: passwordInput.value },
-                // repeaterID: repeaterId           // DEV
+                repeaterID: repeaterId                  // DEV
             }
     );
 
@@ -80,4 +82,9 @@ function handleCapture() {
 
 function handleQualityLevel() {
     qualityLevel = parseInt(this.value);
+}
+
+function handleShutdown() {
+    rfb.machineShutdown();
+    console.log("sent");
 }
