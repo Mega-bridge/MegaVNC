@@ -13,9 +13,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity(name = "users")
-@Table(name = "users")
 @Data
-@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class User implements UserDetails {
 
     @Id

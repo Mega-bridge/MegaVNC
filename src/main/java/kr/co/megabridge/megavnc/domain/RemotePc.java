@@ -9,8 +9,7 @@ import java.util.Date;
 
 @Data
 @Entity(name = "remote_pc")
-@Table(name = "remote_pc")
-@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class RemotePc {
 
     @Id
