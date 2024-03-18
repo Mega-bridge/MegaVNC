@@ -1,6 +1,6 @@
 package kr.co.megabridge.megavnc.web.admin;
 
-import kr.co.megabridge.megavnc.domain.User;
+import kr.co.megabridge.megavnc.domain.Member;
 import kr.co.megabridge.megavnc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,7 +23,7 @@ public class AdminUsersController {
 
     @GetMapping
     public String showUsers(Model model) {
-        List<User> users = userService.listAllUsers();
+        List<Member> users = userService.listAllUsers();
 
         model.addAttribute("users", users);
 

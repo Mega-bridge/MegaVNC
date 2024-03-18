@@ -2,7 +2,7 @@ package kr.co.megabridge.megavnc.web.admin;
 
 import jakarta.validation.Valid;
 import kr.co.megabridge.megavnc.domain.RemotePc;
-import kr.co.megabridge.megavnc.domain.User;
+import kr.co.megabridge.megavnc.security.User;
 import kr.co.megabridge.megavnc.dto.RemotePcRegisterDto;
 import kr.co.megabridge.megavnc.service.RemotePcService;
 import lombok.extern.slf4j.Slf4j;

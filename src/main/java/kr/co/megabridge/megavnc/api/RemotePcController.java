@@ -1,7 +1,7 @@
 package kr.co.megabridge.megavnc.api;
 
+import kr.co.megabridge.megavnc.domain.Member;
 import kr.co.megabridge.megavnc.domain.RemotePc;
-import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.dto.RemotePcRegisterApiDto;
 import kr.co.megabridge.megavnc.service.RemotePcService;
 import kr.co.megabridge.megavnc.service.UserService;
@@ -30,12 +30,12 @@ public class RemotePcController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> registerRemotePc(@RequestBody RemotePcRegisterApiDto register) {
-        Optional<User> user = userService.authUser(register.getUsername(), register.getPassword());
+        Optional<Member> member = userService.authUser(register.getUsername(), register.getPassword());
 
-        if (user.isEmpty())
+        if (member.isEmpty())
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
 
-        Long repeaterId = remotePcService.registerRemotePc(register.getRemotePcName(), user.get());
+        Long repeaterId = remotePcService.registerRemotePc(register.getRemotePcName(), member.get());
 
         Map<String, Object> response = new HashMap<>();
         response.put("repeaterId", repeaterId);

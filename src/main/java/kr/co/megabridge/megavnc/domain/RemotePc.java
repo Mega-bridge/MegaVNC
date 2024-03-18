@@ -22,7 +22,7 @@ public class RemotePc {
     private String name;
 
     @ManyToOne
-    private User owner;
+    private Member owner;
 
     private Date createdAt;
 
@@ -32,7 +32,7 @@ public class RemotePc {
         OFFLINE, STANDBY, ACTIVE
     }
 
-    public static RemotePc createRemotePc(Long repeaterId, String name, User owner) {
+    public static RemotePc createRemotePc(Long repeaterId, String name, Member owner) {
         RemotePc remotePc = new RemotePc();
         remotePc.repeaterId = repeaterId;
         remotePc.name = name;

@@ -1,16 +1,18 @@
 package kr.co.megabridge.megavnc.service;
 
+import kr.co.megabridge.megavnc.domain.Member;
+import kr.co.megabridge.megavnc.enums.Role;
 import kr.co.megabridge.megavnc.security.JwtTokenProvider;
 import kr.co.megabridge.megavnc.domain.JwtToken;
-import kr.co.megabridge.megavnc.domain.User;
-import kr.co.megabridge.megavnc.repository.UserRepository;
+import kr.co.megabridge.megavnc.security.User;
+import kr.co.megabridge.megavnc.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,41 +23,47 @@ import java.util.Set;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     public UserService(
-            UserRepository userRepository,
+            MemberRepository memberRepository,
             PasswordEncoder passwordEncoder,
             AuthenticationManagerBuilder authenticationManagerBuilder,
             JwtTokenProvider jwtTokenProvider
     ) {
-        this.userRepository = userRepository;
+        this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
     public void register(String username, String password) {
-        User user = User.createUser(username, password, Set.of("ROLE_USER"), passwordEncoder);
-        userRepository.save(user);
+        User user = User.createUser(username, password, Set.of(Role.toValue(Role.ROLE_USER)), passwordEncoder);
+        Member member = Member.createMember(username,password,Role.toValue(Role.ROLE_USER),passwordEncoder,user);
+        memberRepository.save(member);
     }
 
     public boolean isUsernameUnique(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
-        return user.isEmpty();
+        Optional<Member> member = memberRepository.findByUsername(username);
+        return member.isEmpty();
     }
 
-    public List<User> listAllUsers() {
-        return userRepository.findAll();
+    public List<Member> listAllUsers() {
+        return memberRepository.findAll();
     }
 
     public void changePassword(User user, String newPassword) {
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+        Optional<Member> optionalMember = memberRepository.findByUsername(user.getUsername());
+        if(optionalMember.isEmpty()){
+            throw new UsernameNotFoundException("Username '" + user.getUsername() + "' not found.");
+        }
+        Member member = optionalMember.get();
+        member.setPassword(passwordEncoder.encode(newPassword));
+        memberRepository.save(member);
     }
 
     public JwtToken getJwtToken(String username, String password) {
@@ -66,16 +74,16 @@ public class UserService {
         return jwtTokenProvider.generateToken(authentication);
     }
 
-    public Optional<User> authUser(String username, String rawPassword) {
-        Optional<User> user = userRepository.findByUsername(username);
+    public Optional<Member> authUser(String username, String rawPassword) {
+        Optional<Member> member = memberRepository.findByUsername(username);
 
-        if (user.isEmpty())
+        if (member.isEmpty())
             return Optional.empty();
 
-        if (!passwordEncoder.matches(rawPassword, user.get().getPassword()))
+        if (!passwordEncoder.matches(rawPassword, member.get().getPassword()))
             return Optional.empty();
 
-        return user;
+        return member;
     }
 
 }

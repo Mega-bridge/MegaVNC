@@ -1,15 +1,13 @@
 package kr.co.megabridge.megavnc.api;
 
 import kr.co.megabridge.megavnc.domain.JwtToken;
-import kr.co.megabridge.megavnc.domain.User;
+import kr.co.megabridge.megavnc.domain.Member;
 import kr.co.megabridge.megavnc.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 import java.util.Map;
 import java.util.Optional;
 
@@ -33,9 +31,9 @@ public class AuthController {
 
     @PostMapping("/check")
     public ResponseEntity<String> check(@RequestBody Map<String, String> loginForm) {
-        Optional<User> user = userService.authUser(loginForm.get("username"), loginForm.get("password"));
+        Optional<Member> member = userService.authUser(loginForm.get("username"), loginForm.get("password"));
 
-        if (user.isEmpty())
+        if (member.isEmpty())
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Wrong username or password");
 
         return ResponseEntity.ok("Success");

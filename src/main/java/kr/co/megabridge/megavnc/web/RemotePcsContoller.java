@@ -2,7 +2,7 @@ package kr.co.megabridge.megavnc.web;
 
 import jakarta.servlet.http.HttpServletResponse;
 import kr.co.megabridge.megavnc.domain.RemotePc;
-import kr.co.megabridge.megavnc.domain.User;
+import kr.co.megabridge.megavnc.security.User;
 import kr.co.megabridge.megavnc.service.RemotePcService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -32,6 +32,7 @@ public class RemotePcsContoller {
 
     @GetMapping
     public String showRemotePcs(@AuthenticationPrincipal User user, Model model) {
+
         Iterable<RemotePc> remotePcs = remotePcService.findByOwner(user);
 
         model.addAttribute("remotePcs", remotePcs);

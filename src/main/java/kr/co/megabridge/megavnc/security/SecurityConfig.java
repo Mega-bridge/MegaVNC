@@ -42,7 +42,6 @@ public class SecurityConfig {
                 .requestMatchers(
                         new AntPathRequestMatcher("/css/**"),
                         new AntPathRequestMatcher("/images/**"),
-                        //new AntPathRequestMatcher("/h2-console/**"),
                         new AntPathRequestMatcher("/api/**"));
     }
 
