@@ -1,7 +1,14 @@
 # local
 
 server:
-  port: 8080
+  port: 8443
+  servlet:
+    session:
+      timeout: 60m
+  ssl:
+    key-store: keystore.p12
+    key-store-password: "!mb220719"
+    key-store-type: PKCS12
 
 spring:
   datasource:
@@ -13,6 +20,12 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: create-drop
+jwt:
+  secret: 5Eiliz6V03PMlE86d6CNDbHTaUyVAaoO
+
+tcp:
+  server:
+    port: 2002
 
 #### 스키마 생성용
 #    properties:

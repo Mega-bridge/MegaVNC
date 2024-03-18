@@ -17,19 +17,14 @@ import java.util.Map;
 @Service
 public class MessageService {
 
-    private RemotePcService remotePcService;
+    private final RemotePcService remotePcService;
 
-    @Autowired
-    public MessageService(RemotePcService remotePcService) {
-        this.remotePcService = remotePcService;
-    }
+
 
     public void processMessage(byte[] message) {
         String msg = new String(message);
+        //메시지 생성
         String[] tokens = msg.split(",");
-
-        // log.info(msg); // XXX
-
         Map<String, String> msgKv = new HashMap<>();
 
         for (String token : tokens) {
@@ -99,7 +94,7 @@ public class MessageService {
                 break;
         }
 
-        // log.info("Receive message : {}", new String(message));
+
 
         return;
     }

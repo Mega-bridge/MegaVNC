@@ -27,11 +27,11 @@ window.onload = function() {
 function handleConnect() {
     rfb = new RFB(
             screen,
-            // "ws://127.0.0.1:6080",                   // LOCAL
-            "wss://vnc.megabridge.co.kr:6080",          // DEV
+             "wss://192.168.0.228:6080",                   // LOCAL
+            //"wss://vnc.megabridge.co.kr:6080",          // DEV
             {
                 credentials: { password: passwordInput.value },
-                repeaterID: repeaterId                  // DEV
+                repeaterID: repeaterId
             }
     );
 

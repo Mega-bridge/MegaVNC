@@ -51,6 +51,7 @@ public class AdminRemotePcsController {
             loadRemotePcs(model);
             return "admin/remote-pcs";
         }
+        //TODO: 서비스로직 사용하도록 변경
 
         // remotePCRepository.save(RemotePc.createRemotePc(newRemotePc.getName(), user));
 

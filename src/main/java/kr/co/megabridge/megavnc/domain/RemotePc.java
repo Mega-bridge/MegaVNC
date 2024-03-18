@@ -28,7 +28,7 @@ public class RemotePc {
 
     private Status status;
 
-    public static enum Status {
+    public enum Status {
         OFFLINE, STANDBY, ACTIVE
     }
 

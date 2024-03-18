@@ -712,8 +712,7 @@ export default class RFB extends EventTargetMixin {
 
     _clientHasExpectedSize() {
         const [currentWidth, currentHeight] = this._currentClientSize();
-        return currentWidth == this._expectedClientWidth &&
-            currentHeight == this._expectedClientHeight;
+        return currentWidth == this._expectedClientWidth && currentHeight == this._expectedClientHeight;
     }
 
     _handleResize() {
@@ -1379,6 +1378,7 @@ export default class RFB extends EventTargetMixin {
         }
 
         if (isRepeater) {
+
             let repeaterID = "ID:" + this._repeaterID;
             while (repeaterID.length < 250) {
                 repeaterID += "\0";
@@ -1658,8 +1658,7 @@ export default class RFB extends EventTargetMixin {
             return false;
         }
 
-        if (this._rfbCredentials.ardPublicKey != undefined &&
-            this._rfbCredentials.ardCredentials != undefined) {
+        if (this._rfbCredentials.ardPublicKey != undefined && this._rfbCredentials.ardCredentials != undefined) {
             // if the async web crypto is done return the results
             this._sock.send(this._rfbCredentials.ardCredentials);
             this._sock.send(this._rfbCredentials.ardPublicKey);

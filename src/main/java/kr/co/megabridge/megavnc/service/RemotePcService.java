@@ -6,6 +6,7 @@ import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -47,7 +48,8 @@ public class RemotePcService {
 
     public void setRemotePcStatus(Long repeaterId, RemotePc.Status status) {
         Optional<RemotePc> remotePc = repository.findByRepeaterId(repeaterId);
-        RemotePc update = remotePc.orElseThrow();
+        RemotePc update = remotePc.orElseThrow(() -> new NoSuchElementException("RemotePc not found for repeaterId: " + repeaterId +",status: "+status));
+        //setter 사용 하면 안됨//TODO: 업데이트 매서드 만들기
         update.setStatus(status);
         repository.save(update);
     }
