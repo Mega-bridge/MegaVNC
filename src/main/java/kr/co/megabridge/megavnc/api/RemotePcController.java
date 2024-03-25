@@ -1,47 +1,43 @@
 package kr.co.megabridge.megavnc.api;
 
-import kr.co.megabridge.megavnc.domain.Member;
 import kr.co.megabridge.megavnc.domain.RemotePc;
-import kr.co.megabridge.megavnc.dto.RemotePcRegisterApiDto;
+import kr.co.megabridge.megavnc.dto.RequestRemotePcDto;
+import kr.co.megabridge.megavnc.dto.ResponseRemotePcDto;
 import kr.co.megabridge.megavnc.service.RemotePcService;
-import kr.co.megabridge.megavnc.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/api/remote-pcs")
 public class RemotePcController {
 
     private final RemotePcService remotePcService;
-    private final UserService userService;
-
-    @Autowired
-    public RemotePcController(RemotePcService remotePcService, UserService userService) {
-        this.remotePcService = remotePcService;
-        this.userService = userService;
-    }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> registerRemotePc(@RequestBody RemotePcRegisterApiDto register) {
-        Optional<Member> member = userService.authUser(register.getUsername(), register.getPassword());
+    public ResponseEntity<ResponseRemotePcDto>  getRepeaterIdByPcName(@RequestBody RequestRemotePcDto requestRemotePcDto){
 
-        if (member.isEmpty())
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-
-        Long repeaterId = remotePcService.registerRemotePc(register.getRemotePcName(), member.get());
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("repeaterId", repeaterId);
-
-        return ResponseEntity.ok(response);
+        ResponseRemotePcDto remotePc = remotePcService.findRemotePcByPcName(requestRemotePcDto);
+        //배정 처리
+        return  ResponseEntity.ok(remotePc);
     }
+
+
+    @PostMapping("/cancel-assignment")
+    public ResponseEntity<String> cancelAssignment(@RequestBody RequestRemotePcDto requestRemotePcDto){
+
+        remotePcService.cancelAssignment(requestRemotePcDto);
+
+
+        return ResponseEntity.ok("배정 취소됨");
+    }
+
+
 
     @GetMapping("/{repeaterId}")
     public ResponseEntity<RemotePc> getRemotePcByRepeaterId(@PathVariable Long repeaterId) {

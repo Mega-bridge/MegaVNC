@@ -6,6 +6,7 @@
 <body class="bg-body-secondary">
 <header th:replace="~{/fragments/nav :: nav (${user.username})}"></header>
 <input id="repeaterId" type="hidden" th:value="${repeaterId}" />
+<input id="accessPassword" type="hidden" th:value="${accessPassword}"/>
 
 <div class="container mt-5 mb-3">
     <a th:href="@{/remote-pcs}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left me-2"></i>원격 PC 목록</a>
@@ -13,11 +14,21 @@
 
 <div class="container mb-3 d-flex flex-column">
     <div class="d-flex flex-row align-items-center text-nowrap bg-body rounded p-4">
-        <label for="password" class="me-3">
+
+
+
+
+      <!--  <label for="password" class="me-3">
             <span th:text="${pcName}" class="fw-bold text-info">PC 이름</span>의 연결 암호 입력:
         </label>
-        <input type="password" id="password" autofocus="autofocus" class="form-control me-3" placeholder="연결 암호">
-        <button id="connect" class="btn btn-primary me-2"><i class="fa-solid fa-link me-2"></i>연결</button>
+        <input type="password" id="password" autofocus="autofocus" class="form-control me-3" placeholder="연결 암호">-->
+
+
+       <!-- <button id="connect" class="btn btn-primary me-2"><i class="fa-solid fa-link me-2"></i>연결</button>-->
+
+
+
+
         <button id="disconnect" class="btn btn-secondary me-2"><i class="fa-solid fa-link-slash me-2"></i>연결해제</button>
         <button class="btn btn-secondary me-2" id="fullscreen"><i class="fa-solid fa-expand me-2"></i>전체화면</button>
         <button class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#tools">
@@ -44,7 +55,7 @@
             <button class="btn btn-light me-2" id="rebootButton" disabled>
                 <i class="fa-solid fa-rotate-right me-2"></i>원격 PC 재부팅
             </button>
-            <button class="btn btn-light me-2" id="shutdownButton" disabled>
+            <button class="btn btn-light me-2"  id="shutdownButton" disabled>
                 <i class="fa-solid fa-power-off me-2"></i>원격 PC 종료
             </button>
         </div>

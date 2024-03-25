@@ -1,6 +1,6 @@
 package kr.co.megabridge.megavnc.web.auth;
 
-import kr.co.megabridge.megavnc.security.User;
+import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.dto.ChangePasswordDto;
 import kr.co.megabridge.megavnc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

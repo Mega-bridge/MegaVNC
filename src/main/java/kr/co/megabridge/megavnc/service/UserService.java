@@ -4,7 +4,7 @@ import kr.co.megabridge.megavnc.domain.Member;
 import kr.co.megabridge.megavnc.enums.Role;
 import kr.co.megabridge.megavnc.security.JwtTokenProvider;
 import kr.co.megabridge.megavnc.domain.JwtToken;
-import kr.co.megabridge.megavnc.security.User;
+import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,15 +74,15 @@ public class UserService {
         return jwtTokenProvider.generateToken(authentication);
     }
 
-    public Optional<Member> authUser(String username, String rawPassword) {
+    public Optional<Member> authUser(String username, String password) {
         Optional<Member> member = memberRepository.findByUsername(username);
 
         if (member.isEmpty())
             return Optional.empty();
-
-        if (!passwordEncoder.matches(rawPassword, member.get().getPassword()))
-            return Optional.empty();
-
+        if(passwordEncoder.matches(password,member.get().getUserDetail().getPassword())){
+            System.out.println("member.get().getPassword() = " + member.get().getUserDetail().getPassword());
+            System.out.println("password = " + password);
+            throw new RuntimeException("비밀번호가 일치하지 않습니다");}
         return member;
     }
 

@@ -1,12 +1,12 @@
 import RFB from "./noVNC-1.4.0/core/rfb.js";
 
-let rfb, repeaterId, passwordInput, connectButton, disconnectButton, screen, fullscreenButton, pasteButton;
+let rfb, repeaterId, accessPassword, connectButton, disconnectButton, screen, fullscreenButton, pasteButton;
 let captureButton, qualityLevelInput, qualityLevel = 6, shutdownButton;
 
 window.onload = function() {
     repeaterId = document.getElementById("repeaterId").value;
-    passwordInput = document.getElementById("password");
-    connectButton = document.getElementById("connect");
+    accessPassword = document.getElementById("accessPassword").value;
+   // connectButton = document.getElementById("connect");
     disconnectButton = document.getElementById("disconnect");
     screen = document.getElementById("screen");
     fullscreenButton = document.getElementById("fullscreen");
@@ -14,27 +14,27 @@ window.onload = function() {
     captureButton = document.getElementById("captureButton");
     qualityLevelInput = document.getElementById("qualityLevelInput");
     shutdownButton = document.getElementById("shutdownButton");
-
-    connectButton.addEventListener("click", handleConnect);
+    //다 완성 하고 보기
     disconnectButton.addEventListener("click", handleDisconnect);
     fullscreenButton.addEventListener("click", handleFullscreen);
     pasteButton.addEventListener("click", handlePaste);
     captureButton.addEventListener("click", handleCapture);
     qualityLevelInput.addEventListener("input", handleQualityLevel);
     shutdownButton.addEventListener("click", handleShutdown);
+    //connectButton.addEventListener("click",handleConnect)
+    handleConnect();
 };
 
 function handleConnect() {
     rfb = new RFB(
             screen,
-             "wss://192.168.0.228:6080",                   // LOCAL
+             "wss://192.168.0.235:6080",                   // LOCAL
             //"wss://vnc.megabridge.co.kr:6080",          // DEV
             {
-                credentials: { password: passwordInput.value },
+                credentials: { password: accessPassword },
                 repeaterID: repeaterId
             }
     );
-
     rfb.showDotCursor = true;
     rfb.scaleViewport = true;
     rfb.qualityLevel = qualityLevel;
@@ -47,6 +47,7 @@ function handleConnect() {
 
 function handleDisconnect() {
     rfb.disconnect();
+    window.location.href = "/remote-pcs";
 }
 
 function handleFullscreen() {

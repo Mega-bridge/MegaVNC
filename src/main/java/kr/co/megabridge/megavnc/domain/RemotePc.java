@@ -1,6 +1,7 @@
 package kr.co.megabridge.megavnc.domain;
 
 import jakarta.persistence.*;
+import kr.co.megabridge.megavnc.enums.Status;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ public class RemotePc {
     @Column(unique = true)
     private Long repeaterId;
 
+    @Column(unique = true)
     private String name;
 
     @ManyToOne
@@ -27,18 +29,23 @@ public class RemotePc {
     private Date createdAt;
 
     private Status status;
+    private String accessPassword;
 
-    public enum Status {
-        OFFLINE, STANDBY, ACTIVE
-    }
 
-    public static RemotePc createRemotePc(Long repeaterId, String name, Member owner) {
+    public static RemotePc createRemotePc(Long repeaterId, String name, String accessPassword ,Member owner) {
         RemotePc remotePc = new RemotePc();
         remotePc.repeaterId = repeaterId;
         remotePc.name = name;
         remotePc.owner = owner;
-        remotePc.status = Status.OFFLINE;
+        remotePc.status = Status.OFFLINE_NON_ASSIGNED;
+        remotePc.accessPassword = accessPassword;
         return remotePc;
+    }
+    public void cancelAssignment(){
+        this.status = Status.OFFLINE_NON_ASSIGNED;
+    }
+    public void assign(){
+        this.status = Status.OFFLINE_ASSIGNED;
     }
 
     @PrePersist

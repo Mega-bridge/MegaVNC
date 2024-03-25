@@ -1,6 +1,7 @@
 package kr.co.megabridge.megavnc.tcp;
 
 import kr.co.megabridge.megavnc.domain.RemotePc;
+import kr.co.megabridge.megavnc.enums.Status;
 import kr.co.megabridge.megavnc.service.RemotePcService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,19 +70,19 @@ public class MessageService {
 
         switch (eventMessage.getEvNum()) {
             case 2: // SERVER_CONNECT
-                remotePcService.setRemotePcStatus(eventMessage.getRepeaterId(), RemotePc.Status.STANDBY);
+                remotePcService.setRemotePcStatus(eventMessage.getRepeaterId(), Status.STANDBY);
                 log.info("SERVER_CONNECT: " + eventMessage.getRepeaterId());
                 break;
             case 3: // SERVER_DISCONNECT
-                remotePcService.setRemotePcStatus(eventMessage.getRepeaterId(), RemotePc.Status.OFFLINE);
+                remotePcService.setRemotePcStatus(eventMessage.getRepeaterId(), Status.OFFLINE_ASSIGNED);
                 log.info("SERVER_DISCONNECT: " + eventMessage.getRepeaterId());
                 break;
             case 4: // VIEWER_SERVER_SESSION_START
-                remotePcService.setRemotePcStatus(eventMessage.getRepeaterId(), RemotePc.Status.ACTIVE);
+                remotePcService.setRemotePcStatus(eventMessage.getRepeaterId(), Status.ACTIVE);
                 log.info("VIEWER_SERVER_SESSION_START: " + eventMessage.getRepeaterId());
                 break;
             case 5: // VIEWER_SERVER_SESSION_END
-                remotePcService.setRemotePcStatus(eventMessage.getRepeaterId(), RemotePc.Status.STANDBY);
+                remotePcService.setRemotePcStatus(eventMessage.getRepeaterId(), Status.STANDBY);
                 log.info("VIEWER_SERVER_SESSION_END: " + eventMessage.getRepeaterId());
                 break;
             case 6: // REPEATER_STARTUP // debug // FIXME
@@ -95,7 +96,5 @@ public class MessageService {
         }
 
 
-
-        return;
     }
 }

@@ -1,6 +1,7 @@
 package kr.co.megabridge.megavnc.security;
 
 import kr.co.megabridge.megavnc.domain.Member;
+import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

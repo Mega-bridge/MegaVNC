@@ -1,7 +1,6 @@
 package kr.co.megabridge.megavnc.domain;
 
 import jakarta.persistence.*;
-import kr.co.megabridge.megavnc.security.User;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Date;

@@ -1,34 +1,34 @@
 package kr.co.megabridge.megavnc.web;
 
 import jakarta.servlet.http.HttpServletResponse;
+import kr.co.megabridge.megavnc.domain.Member;
 import kr.co.megabridge.megavnc.domain.RemotePc;
-import kr.co.megabridge.megavnc.security.User;
+import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.service.RemotePcService;
-import org.springframework.beans.factory.annotation.Autowired;
+import kr.co.megabridge.megavnc.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/remote-pcs")
 public class RemotePcsContoller {
 
-    RemotePcService remotePcService;
+    private final RemotePcService remotePcService;
+    private final UserService userService;
 
-    @Autowired
-    public RemotePcsContoller(RemotePcService remotePcService) {
-        this.remotePcService = remotePcService;
-    }
 
     @GetMapping
     public String showRemotePcs(@AuthenticationPrincipal User user, Model model) {
@@ -57,12 +57,15 @@ public class RemotePcsContoller {
         String pcName = remotePc.getName();
         model.addAttribute("pcName", pcName);
 
+
+        String accessPassword = remotePc.getAccessPassword();
+        model.addAttribute("accessPassword",accessPassword);
         return "viewer";
     }
 
     @GetMapping("/download-server")
     public ResponseEntity<Resource> downloadServer() {
-        Resource file = new ClassPathResource("static/bin/MegaVNC-Server-v0.1.6.zip");
+        Resource file = new ClassPathResource("static/bin/MegaVNC-v0.1.7.zip");
         String contentDisposition = "attachment; filename=\"" +
                 UriUtils.encode(file.getFilename(), StandardCharsets.UTF_8) + "\"";
         return ResponseEntity
@@ -71,14 +74,19 @@ public class RemotePcsContoller {
                 .body(file);
     }
 
-    // @GetMapping("/test")
-    public String testViewer(@AuthenticationPrincipal User user, Model model, HttpServletResponse response) {
-        model.addAttribute("user", user);
+    @PostMapping("/register-pc")
+    public String registerRemotePc(@AuthenticationPrincipal User user, @RequestParam String accessPassword,
+                                   @RequestParam String remotePcName) {
+        Optional<Member> member = userService.authUser(user.getUsername(), user.getPassword());
+        if (member.isEmpty()) {
+            throw new UsernameNotFoundException("유저 " + user.getUsername() + "이 존재하지 않습니다");
+        }
+         remotePcService.registerRemotePc(remotePcName, accessPassword, member.get());
 
-        model.addAttribute("repeaterId", "repeaterId");
 
-        model.addAttribute("pcName", "pcName");
-
-        return "viewer";
+        return "redirect:/";
     }
+
+
+
 }

@@ -5,7 +5,7 @@ import kr.co.megabridge.megavnc.domain.RemotePc;
 import kr.co.megabridge.megavnc.enums.Role;
 import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import kr.co.megabridge.megavnc.repository.MemberRepository;
-import kr.co.megabridge.megavnc.security.User;
+import kr.co.megabridge.megavnc.domain.User;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -49,7 +49,7 @@ public class MegaVncApplication {
                 Optional<RemotePc> findBase = remotePcRepository.findByRepeaterId(100L);
                 if (findBase.isEmpty()) {
                     Member admin = memberRepository.findByUsername("admin").orElseThrow();
-                    RemotePc base = RemotePc.createRemotePc(100L, "BASE", admin);
+                    RemotePc base = RemotePc.createRemotePc(100L, "BASE", "1234",admin);
                     remotePcRepository.save(base);
                 }
 

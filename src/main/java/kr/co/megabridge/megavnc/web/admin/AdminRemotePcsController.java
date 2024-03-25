@@ -2,8 +2,8 @@ package kr.co.megabridge.megavnc.web.admin;
 
 import jakarta.validation.Valid;
 import kr.co.megabridge.megavnc.domain.RemotePc;
-import kr.co.megabridge.megavnc.security.User;
-import kr.co.megabridge.megavnc.dto.RemotePcRegisterDto;
+import kr.co.megabridge.megavnc.domain.User;
+import kr.co.megabridge.megavnc.dto.AdminRemotePcRegisterDto;
 import kr.co.megabridge.megavnc.service.RemotePcService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +35,14 @@ public class AdminRemotePcsController {
     public String showHostList(Model model) {
         loadRemotePcs(model);
 
-        model.addAttribute("newRemotePc", new RemotePcRegisterDto());
+        model.addAttribute("newRemotePc", new AdminRemotePcRegisterDto());
 
         return "admin/remote-pcs";
     }
 
     @PostMapping
     public String createRemotePc(
-            @ModelAttribute("newRemotePc") @Valid RemotePcRegisterDto newRemotePc,
+            @ModelAttribute("newRemotePc") @Valid AdminRemotePcRegisterDto newRemotePc,
             Errors errors,
             Model model,
             @AuthenticationPrincipal User user

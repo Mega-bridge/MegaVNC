@@ -29,7 +29,7 @@ public class AuthController {
         return ResponseEntity.ok(token);
     }
 
-    @PostMapping("/check")
+  /*  @PostMapping("/check")
     public ResponseEntity<String> check(@RequestBody Map<String, String> loginForm) {
         Optional<Member> member = userService.authUser(loginForm.get("username"), loginForm.get("password"));
 
@@ -37,5 +37,5 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Wrong username or password");
 
         return ResponseEntity.ok("Success");
-    }
+    }*/
 }
