@@ -5,8 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ResponseRemotePcDto {
-
-    private Long repeaterId;
-
+public class ResponseGroupDto {
+    private Long groupId;
+    private String groupName;
 }

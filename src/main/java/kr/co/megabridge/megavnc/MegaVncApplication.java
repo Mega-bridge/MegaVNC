@@ -2,7 +2,9 @@ package kr.co.megabridge.megavnc;
 
 import kr.co.megabridge.megavnc.domain.Member;
 import kr.co.megabridge.megavnc.domain.RemotePc;
+import kr.co.megabridge.megavnc.domain.Segment;
 import kr.co.megabridge.megavnc.enums.Role;
+import kr.co.megabridge.megavnc.repository.GroupRepository;
 import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import kr.co.megabridge.megavnc.repository.MemberRepository;
 import kr.co.megabridge.megavnc.domain.User;
@@ -26,22 +28,32 @@ public class MegaVncApplication {
     public CommandLineRunner dataLoader(
             RemotePcRepository remotePcRepository,
             MemberRepository memberRepository,
+            GroupRepository groupRepository,
             PasswordEncoder encoder
     ) {
         return new CommandLineRunner() {
             @Override
             public void run(String... args) throws Exception {
+
+                Optional<Segment> findGroup = groupRepository.findById(1L);
+                if (findGroup.isEmpty()) {
+                    Segment segment = new Segment(1L,"메가브릿지");
+                    groupRepository.save(segment);
+                }
+
                 Optional<Member> findAdmin = memberRepository.findByUsername("admin");
                 if (findAdmin.isEmpty()) {
+                    Segment group = groupRepository.findBySegmentName("메가브릿지");
                     User user = User.createUser("admin", "1234", Set.of( Role.toValue(Role.ROLE_ADMIN)), encoder);
-                    Member admin = Member.createMember("admin", "1234", Role.toValue(Role.ROLE_ADMIN), encoder,user);
+                    Member admin = Member.createMember("admin", "1234", Role.toValue(Role.ROLE_ADMIN), encoder,user, group);
                     memberRepository.save(admin);
                 }
 
                 Optional<Member> findUser = memberRepository.findByUsername("user");
                 if (findUser.isEmpty()) {
+                    Segment group = groupRepository.findBySegmentName("메가브릿지");
                     User user = User.createUser("user", "1234", Set.of( Role.toValue(Role.ROLE_USER)), encoder);
-                    Member member = Member.createMember("user", "1234", Role.toValue(Role.ROLE_USER), encoder,user);
+                    Member member = Member.createMember("user", "1234", Role.toValue(Role.ROLE_USER), encoder, user, group);
                     memberRepository.save(member);
                 }
 
@@ -52,6 +64,7 @@ public class MegaVncApplication {
                     RemotePc base = RemotePc.createRemotePc(100L, "BASE", "1234",admin);
                     remotePcRepository.save(base);
                 }
+
 
                 // test pcs
                 /*

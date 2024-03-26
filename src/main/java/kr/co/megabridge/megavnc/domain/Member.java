@@ -1,5 +1,6 @@
 package kr.co.megabridge.megavnc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +28,10 @@ public class Member {
     @NonNull
     private User userDetail;
 
+    @JsonIgnore
+    @ManyToOne
+    private Segment group;
+
     @PrePersist
     private void createdAt() {
         this.createdAt = new Date();
@@ -37,13 +42,15 @@ public class Member {
             String rawPassword,
             String role,
             PasswordEncoder encoder,
-            User user
+            User user,
+            Segment group
     ) {
         Member member = new Member();
         member.username = username;
         member.password = encoder.encode(rawPassword);
         member.role = role;
         member.userDetail = user;
+        member.group = group;
         //유저 추가
         return member;
     }
