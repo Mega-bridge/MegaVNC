@@ -1,13 +1,16 @@
 package kr.co.megabridge.megavnc.service;
 
 import kr.co.megabridge.megavnc.domain.Member;
+import kr.co.megabridge.megavnc.domain.Segment;
+import kr.co.megabridge.megavnc.dto.ResponseGroupDto;
 import kr.co.megabridge.megavnc.enums.Role;
+import kr.co.megabridge.megavnc.repository.GroupRepository;
 import kr.co.megabridge.megavnc.security.JwtTokenProvider;
 import kr.co.megabridge.megavnc.domain.JwtToken;
 import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -15,35 +18,26 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final GroupRepository groupRepository;
 
-    @Autowired
-    public UserService(
-            MemberRepository memberRepository,
-            PasswordEncoder passwordEncoder,
-            AuthenticationManagerBuilder authenticationManagerBuilder,
-            JwtTokenProvider jwtTokenProvider
-    ) {
-        this.memberRepository = memberRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
-
-    public void register(String username, String password) {
+    public void register(String username, String password, String groupName) {
+        Segment group = groupRepository.findBySegmentName(groupName);
         User user = User.createUser(username, password, Set.of(Role.toValue(Role.ROLE_USER)), passwordEncoder);
-        Member member = Member.createMember(username,password,Role.toValue(Role.ROLE_USER),passwordEncoder,user);
+        Member member = Member.createMember(username,password,Role.toValue(Role.ROLE_USER),passwordEncoder,user,group);
         memberRepository.save(member);
     }
 
@@ -64,6 +58,15 @@ public class UserService {
         Member member = optionalMember.get();
         member.setPassword(passwordEncoder.encode(newPassword));
         memberRepository.save(member);
+    }
+    public List<ResponseGroupDto> findAllGroup(){
+        List<Segment> segments = groupRepository.findAll();
+        List<ResponseGroupDto> ResponseGroupDtos = new ArrayList<>();
+        for (Segment segment : segments){
+            ResponseGroupDto responseGroupDto = new ResponseGroupDto(segment.getId(), segment.getSegmentName());
+            ResponseGroupDtos.add(responseGroupDto);
+        }
+        return ResponseGroupDtos;
     }
 
     public JwtToken getJwtToken(String username, String password) {

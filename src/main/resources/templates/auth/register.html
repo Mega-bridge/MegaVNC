@@ -18,28 +18,46 @@
         <div class="h4 text-center mb-5 fw-bold">MegaVNC 회원가입</div>
 
         <form method="post" th:action="@{/register}" th:object="${user}">
-            <div th:if="${#fields.hasErrors('username')}" class="card text-bg-danger mb-3">
-                <div th:errors="*{username}" class="card-body"></div>
+
+
+            <div class="form-group mb-3">
+                <label for="group">그룹</label>
+                <div th:if="${#fields.hasErrors('groupName')}" class="text-danger">
+                    <div th:errors="*{groupName}" class="card-body"></div>
+                </div>
+                <select class="form-control" id="group" name="groupName">
+                    <option value="defaultGroup">--그룹을 선택해 주세요--</option>
+                    <option th:each="group : ${groups}" th:value="${group.groupName}" th:text="${group.getGroupName()}" th:selected="${group.groupName == selectedGroup}"></option>
+                </select>
             </div>
 
-            <div th:if="${#fields.hasErrors('passwordConfirm')}" class="card text-bg-danger mb-3">
-                <div th:errors="*{passwordConfirm}" class="card-body"></div>
-            </div>
 
             <div class="mb-3">
-                <label for="username" class="form-label">사용자명</label>
-                <input type="text" id="username" name="username" autofocus="autofocus" class="form-control">
+                <label for="username" >사용자명</label>
+                <div th:if="${#fields.hasErrors('username')}" class="text-danger">
+                    <div th:errors="*{username}" class="card-body"></div>
+                </div>
+                <input type="text" id="username" name="username" autofocus="autofocus" class="form-control" th:value="${username}">
             </div>
 
+
             <div class="mb-3">
-                <label for="password" class="form-label">비밀번호</label>
-                <input type="password" id="password" name="password" class="form-control">
+                <label for="password" >비밀번호</label>
+                <div th:if="${#fields.hasErrors('password')}" class="text-danger">
+                    <div th:errors="*{password}" class="card-body"></div>
+                </div>
+                <input type="password" id="password" name="password" class="form-control" th:value="${password}">
             </div>
+
 
             <div class="mb-5">
-                <label for="passwordConfirm" class="form-label">비밀번호 확인</label>
-                <input type="password" id="passwordConfirm" name="passwordConfirm" class="form-control">
+                <label for="passwordConfirm" >비밀번호 확인</label>
+                <div th:if="${#fields.hasErrors('passwordConfirm')}" class="text-danger">
+                    <div th:errors="*{passwordConfirm}" class="card-body"></div>
+                </div>
+                <input type="password" id="passwordConfirm" name="passwordConfirm" class="form-control" th:value="${passwordConfirm}">
             </div>
+
 
             <div class="d-grid mb-3">
                 <button type="submit" class="btn btn-primary">회원가입</button>

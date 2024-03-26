@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 public class UserRegisterDto {
 
     @NotBlank
+    private String groupName;
+
+    @NotBlank
     private String username;
 
     @NotBlank
