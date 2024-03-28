@@ -1,15 +1,19 @@
 package kr.co.megabridge.megavnc.api;
 
 import kr.co.megabridge.megavnc.domain.RemotePc;
+import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.dto.RequestRemotePcDto;
-import kr.co.megabridge.megavnc.dto.ResponseRemotePcDto;
+import kr.co.megabridge.megavnc.dto.ResponseRemotePcApiDto;
 import kr.co.megabridge.megavnc.service.RemotePcService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Controller
@@ -20,9 +24,9 @@ public class RemotePcController {
     private final RemotePcService remotePcService;
 
     @PostMapping
-    public ResponseEntity<ResponseRemotePcDto>  getRepeaterIdByPcName(@RequestBody RequestRemotePcDto requestRemotePcDto){
+    public ResponseEntity<ResponseRemotePcApiDto>  getRepeaterIdByPcName(@RequestBody RequestRemotePcDto requestRemotePcDto){
 
-        ResponseRemotePcDto remotePc = remotePcService.findRemotePcByPcName(requestRemotePcDto);
+        ResponseRemotePcApiDto remotePc = remotePcService.findRemotePcByPcName(requestRemotePcDto);
         //배정 처리
         return  ResponseEntity.ok(remotePc);
     }

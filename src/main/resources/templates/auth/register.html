@@ -19,19 +19,6 @@
 
         <form method="post" th:action="@{/register}" th:object="${user}">
 
-
-            <div class="form-group mb-3">
-                <label for="group">그룹</label>
-                <div th:if="${#fields.hasErrors('groupName')}" class="text-danger">
-                    <div th:errors="*{groupName}" class="card-body"></div>
-                </div>
-                <select class="form-control" id="group" name="groupName">
-                    <option value="defaultGroup">--그룹을 선택해 주세요--</option>
-                    <option th:each="group : ${groups}" th:value="${group.groupName}" th:text="${group.getGroupName()}" th:selected="${group.groupName == selectedGroup}"></option>
-                </select>
-            </div>
-
-
             <div class="mb-3">
                 <label for="username" >사용자명</label>
                 <div th:if="${#fields.hasErrors('username')}" class="text-danger">

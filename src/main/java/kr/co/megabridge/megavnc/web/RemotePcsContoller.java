@@ -1,25 +1,29 @@
 package kr.co.megabridge.megavnc.web;
 
-import jakarta.servlet.http.HttpServletResponse;
-import kr.co.megabridge.megavnc.domain.Member;
+
+import kr.co.megabridge.megavnc.domain.Group;
 import kr.co.megabridge.megavnc.domain.RemotePc;
 import kr.co.megabridge.megavnc.domain.User;
+import kr.co.megabridge.megavnc.dto.ResponseRemotePcDto;
+import kr.co.megabridge.megavnc.dto.responseDeleteDto;
+import kr.co.megabridge.megavnc.enums.Status;
 import kr.co.megabridge.megavnc.service.RemotePcService;
-import kr.co.megabridge.megavnc.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,28 +31,37 @@ import java.util.Optional;
 public class RemotePcsContoller {
 
     private final RemotePcService remotePcService;
-    private final UserService userService;
+
 
 
     @GetMapping
-    public String showRemotePcs(@AuthenticationPrincipal User user, Model model) {
+    public String showRemotePcs(@AuthenticationPrincipal User user, @RequestParam(value = "selectedGroup", required = false) String selectedGroupName ,Model model) {
+        List<Group> groups =  remotePcService.findGroupByMember(user);
 
-        Iterable<RemotePc> remotePcs = remotePcService.findByOwner(user);
+        List<ResponseRemotePcDto> remotePcs = new ArrayList<>();
+        if( selectedGroupName == null || selectedGroupName.equals("All Group"))
+        {
+            remotePcs.addAll(remotePcService.findByGroups(groups));
+
+        }
+        else {
+            remotePcs.addAll(remotePcService.findByGroupName(selectedGroupName,user));
+        }
+
 
         model.addAttribute("remotePcs", remotePcs);
         model.addAttribute("user", user);
+        model.addAttribute("groups",groups);
+        model.addAttribute("selectedGroup", selectedGroupName);
 
         return "remote-pcs";
     }
 
     @GetMapping("/{id}")
-    public String showViewer(@PathVariable Long id, @AuthenticationPrincipal User user, Model model, HttpServletResponse response) {
-        RemotePc remotePc = remotePcService.findById(id);
+    public String showViewer(@AuthenticationPrincipal User user,@PathVariable Long id, Model model) {
+        RemotePc remotePc = remotePcService.findById(user,id);
 
-        if (!remotePc.getOwner().getUsername().equals(user.getUsername())) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return "403";
-        }
+
         model.addAttribute("user", user);
 
         Long repeaterId = remotePc.getRepeaterId();
@@ -75,18 +88,23 @@ public class RemotePcsContoller {
     }
 
     @PostMapping("/register-pc")
-    public String registerRemotePc(@AuthenticationPrincipal User user, @RequestParam String accessPassword,
-                                   @RequestParam String remotePcName) {
-        Optional<Member> member = userService.authUser(user.getUsername(), user.getPassword());
-        if (member.isEmpty()) {
-            throw new UsernameNotFoundException("유저 " + user.getUsername() + "이 존재하지 않습니다");
-        }
-         remotePcService.registerRemotePc(remotePcName, accessPassword, member.get());
+    public String registerRemotePc( @RequestParam String accessPassword,
+                                   @RequestParam String remotePcName, @RequestParam  String groupName) {
 
+         String encodedGroupName = UriUtils.encode(groupName, StandardCharsets.UTF_8);
+         remotePcService.registerRemotePc(remotePcName, accessPassword,groupName);
 
-        return "redirect:/";
+        return "redirect:/remote-pcs?selectedGroup="+encodedGroupName;
     }
 
+    //원래 삭제요청을 get방식으로 하는 것은 바람직 하지 않다. 그러나 html에서 폼을 폼안에 넣는게 안된다고 해서 일단 이렇게 했음//다른 방법을 찾아 봐야 함
+    @GetMapping ("/delete/{id}")
+    public String deleteRemotePc(@AuthenticationPrincipal User user, @PathVariable Long id){
+        //user로 그룹 조회해서 권한검사
+        responseDeleteDto responseDto = remotePcService.deletePc(user, id);
+        String encodedGroupName = UriUtils.encode(responseDto.getGroupName(), StandardCharsets.UTF_8);
 
+        return "redirect:/remote-pcs?selectedGroup="+encodedGroupName;
+    }
 
 }

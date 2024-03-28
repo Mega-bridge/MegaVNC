@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserRegisterDto {
 
-    @NotBlank
-    private String groupName;
 
     @NotBlank
     private String username;

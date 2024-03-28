@@ -1,7 +1,7 @@
 package kr.co.megabridge.megavnc.service;
 
 import kr.co.megabridge.megavnc.domain.Member;
-import kr.co.megabridge.megavnc.domain.Segment;
+import kr.co.megabridge.megavnc.domain.Group;
 import kr.co.megabridge.megavnc.dto.ResponseGroupDto;
 import kr.co.megabridge.megavnc.enums.Role;
 import kr.co.megabridge.megavnc.repository.GroupRepository;
@@ -34,10 +34,9 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final GroupRepository groupRepository;
 
-    public void register(String username, String password, String groupName) {
-        Segment group = groupRepository.findBySegmentName(groupName);
+    public void register(String username, String password) {
         User user = User.createUser(username, password, Set.of(Role.toValue(Role.ROLE_USER)), passwordEncoder);
-        Member member = Member.createMember(username,password,Role.toValue(Role.ROLE_USER),passwordEncoder,user,group);
+        Member member = Member.createMember(username,password,Role.toValue(Role.ROLE_USER),passwordEncoder,user);
         memberRepository.save(member);
     }
 
@@ -56,14 +55,15 @@ public class UserService {
             throw new UsernameNotFoundException("Username '" + user.getUsername() + "' not found.");
         }
         Member member = optionalMember.get();
+        //FIXME :세터 사용 금지
         member.setPassword(passwordEncoder.encode(newPassword));
         memberRepository.save(member);
     }
     public List<ResponseGroupDto> findAllGroup(){
-        List<Segment> segments = groupRepository.findAll();
+        List<Group> groups = groupRepository.findAll();
         List<ResponseGroupDto> ResponseGroupDtos = new ArrayList<>();
-        for (Segment segment : segments){
-            ResponseGroupDto responseGroupDto = new ResponseGroupDto(segment.getId(), segment.getSegmentName());
+        for (Group group : groups){
+            ResponseGroupDto responseGroupDto = new ResponseGroupDto(group.getId(), group.getGroupName());
             ResponseGroupDtos.add(responseGroupDto);
         }
         return ResponseGroupDtos;

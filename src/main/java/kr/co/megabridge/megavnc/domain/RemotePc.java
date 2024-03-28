@@ -1,14 +1,15 @@
 package kr.co.megabridge.megavnc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import kr.co.megabridge.megavnc.enums.Status;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.io.Serializable;
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @Entity(name = "remote_pc")
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class RemotePc {
@@ -20,11 +21,10 @@ public class RemotePc {
     @Column(unique = true)
     private Long repeaterId;
 
-    @Column(unique = true)
+
     private String name;
 
-    @ManyToOne
-    private Member owner;
+
 
     private Date createdAt;
 
@@ -32,13 +32,21 @@ public class RemotePc {
     private String accessPassword;
 
 
-    public static RemotePc createRemotePc(Long repeaterId, String name, String accessPassword ,Member owner) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Group group;
+
+    public static RemotePc createRemotePc(
+            Long repeaterId,
+            String name,
+            String accessPassword,
+            Group group
+    ) {
         RemotePc remotePc = new RemotePc();
         remotePc.repeaterId = repeaterId;
         remotePc.name = name;
-        remotePc.owner = owner;
         remotePc.status = Status.OFFLINE_NON_ASSIGNED;
         remotePc.accessPassword = accessPassword;
+        remotePc.group = group;
         return remotePc;
     }
     public void cancelAssignment(){

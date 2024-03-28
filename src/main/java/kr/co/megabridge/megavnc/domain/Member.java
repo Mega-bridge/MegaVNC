@@ -7,7 +7,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Date;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class Member {
     private Date createdAt;
@@ -28,9 +29,6 @@ public class Member {
     @NonNull
     private User userDetail;
 
-    @JsonIgnore
-    @ManyToOne
-    private Segment group;
 
     @PrePersist
     private void createdAt() {
@@ -42,15 +40,13 @@ public class Member {
             String rawPassword,
             String role,
             PasswordEncoder encoder,
-            User user,
-            Segment group
+            User user
     ) {
         Member member = new Member();
         member.username = username;
         member.password = encoder.encode(rawPassword);
         member.role = role;
         member.userDetail = user;
-        member.group = group;
         //유저 추가
         return member;
     }

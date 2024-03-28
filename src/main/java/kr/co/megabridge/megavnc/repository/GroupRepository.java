@@ -1,13 +1,15 @@
 package kr.co.megabridge.megavnc.repository;
 
 
-import kr.co.megabridge.megavnc.domain.Segment;
+import kr.co.megabridge.megavnc.domain.Group;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface GroupRepository extends JpaRepository<Segment, Long> {
+import java.util.Optional;
 
-    Segment findBySegmentName(String groupName);
+@Repository
+public interface GroupRepository extends JpaRepository<Group, Long> {
+
+    Optional<Group> findByGroupName(String groupName);
 
 }

@@ -25,13 +25,11 @@ public class RegisterController {
     @GetMapping
     public String showRegister(Model model) {
         model.addAttribute("user", new UserRegisterDto());
-        model.addAttribute("groups",userService.findAllGroup());
         return "auth/register";
     }
 
     @PostMapping
     public String processRegister(@ModelAttribute("user") @Valid UserRegisterDto user, BindingResult bindingResult, Model model) {
-        model.addAttribute("selectedGroup", user.getGroupName());
         model.addAttribute("username", user.getUsername());
         model.addAttribute("password", user.getPassword());
         model.addAttribute("passwordConfirm", user.getPasswordConfirm());
@@ -51,19 +49,13 @@ public class RegisterController {
              model.addAttribute("passwordConfirm",null);
         }
 
-        if (user.getGroupName().equals("defaultGroup")) {
-            bindingResult.rejectValue(
-                    "groupName",
-                    "error.user",
-                    "그룹을 선택해 주세요");
-        }
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("groups", userService.findAllGroup());
             return "auth/register";
         }
 
-        userService.register(user.getUsername(), user.getPassword(),user.getGroupName());
+        userService.register(user.getUsername(), user.getPassword());
 
         return "redirect:/login?registered";
     }
