@@ -1,40 +1,26 @@
 package kr.co.megabridge.megavnc.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.RememberMeConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final LoginSuccessHandler successHandler;
-    private final JwtTokenProvider tokenProvider;
     private final SecurityUserDetailsService userDetailsService;
 
-    @Autowired
-    public SecurityConfig(
-            LoginSuccessHandler successHandler,
-            JwtTokenProvider tokenProvider,
-            SecurityUserDetailsService userDetailsService
-    ) {
-        this.successHandler = successHandler;
-        this.tokenProvider = tokenProvider;
-        this.userDetailsService = userDetailsService;
-    }
+
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -45,31 +31,10 @@ public class SecurityConfig {
                         new AntPathRequestMatcher("/api/**"));
     }
 
-    /*
-    @Bean
-    @Order(1)
-    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher(new AntPathRequestMatcher("/api/**"))
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers(new AntPathRequestMatcher("/api/auth/login"))
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
-                .addFilterBefore(
-                        new JwtAuthenticationFilter(tokenProvider),
-                        UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
-     */
+
 
     @Bean
-    // @Order(2)
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(request -> request
@@ -99,3 +64,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+

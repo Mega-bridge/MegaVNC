@@ -1,14 +1,13 @@
 package kr.co.megabridge.megavnc.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.util.Date;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 public class Member {
     private Date createdAt;
@@ -16,17 +15,14 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(unique = true)
-    @NonNull
-    private String username;
-
-    @NonNull
-    private String password;
 
     @NonNull
     private String role;
 
     @NonNull
+    private String username;
+
+
     private User userDetail;
 
 
@@ -37,14 +33,11 @@ public class Member {
 
     public static Member createMember(
             String username,
-            String rawPassword,
             String role,
-            PasswordEncoder encoder,
             User user
     ) {
         Member member = new Member();
         member.username = username;
-        member.password = encoder.encode(rawPassword);
         member.role = role;
         member.userDetail = user;
         //유저 추가

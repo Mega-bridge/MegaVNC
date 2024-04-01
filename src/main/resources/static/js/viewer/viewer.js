@@ -1,9 +1,10 @@
 import RFB from "./noVNC-1.4.0/core/rfb.js";
 
-let rfb, repeaterId, accessPassword, connectButton, disconnectButton, screen, fullscreenButton, pasteButton;
+let rfb, repeaterId, accessPassword, connectButton, disconnectButton, screen, fullscreenButton, pasteButton,status;
 let captureButton, qualityLevelInput, qualityLevel = 6, shutdownButton;
 
 window.onload = function() {
+    status = document.getElementById("status").value
     repeaterId = document.getElementById("repeaterId").value;
     accessPassword = document.getElementById("accessPassword").value;
    // connectButton = document.getElementById("connect");
@@ -22,7 +23,17 @@ window.onload = function() {
     qualityLevelInput.addEventListener("input", handleQualityLevel);
     shutdownButton.addEventListener("click", handleShutdown);
     //connectButton.addEventListener("click",handleConnect)
-    handleConnect();
+    if(status === "ACTIVE"){
+        window.alert("다른 PC에서 사용중입니다.");
+        window.location.href = "/remote-pcs";
+    }
+    else if(status === "OFFLINE_ASSIGNED"){
+        handleConnect();
+        window.alert("클라이언트의 접속을 기다려 주세요.");
+    }
+    else{
+        handleConnect();
+    }
 };
 
 function handleConnect() {

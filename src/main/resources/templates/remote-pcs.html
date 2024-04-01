@@ -7,14 +7,24 @@
 <body class="bg-body-secondary">
 <header th:replace="~{/fragments/nav :: nav (${user.username})}"></header>
 
+
+
+
+
+<div th:if="${error}" class="card text-bg-danger mb-3">
+    <div class="card-body" th:text="${errorMessage}"></div>
+</div>
+
+
+
 <div class="container py-5">
-    <form method="post" th:action="@{/remote-pcs/register-pc}">
+    <form method="post" th:action="@{/remote-pcs/register-pc}" th:object="${RegisterRemotePcDto}" >
         <div class="form-group mb-3">
             <label for="group" class="visually-hidden">그룹</label>
             <select class="form-control" id="group" name="groupName"
-                    onchange="location.href = 'remote-pcs?selectedGroup=' + this.value;">
+                    onchange="location.href = '/remote-pcs?selectedGroup=' + this.value;">
                 <option th:selected="${selectedGroup == null}" value="All Group">---All Group---</option>
-                <option th:each="group : ${groups}" th:value="${group.groupName}" th:text="${group.groupName}"
+                <option  name = "groupName" th:each="group : ${groups}" th:value="${group.groupName}" th:text="${group.groupName}"
                         th:selected="${group.groupName == selectedGroup}"></option>
             </select>
         </div>
@@ -25,7 +35,6 @@
             <table class="table table-hover align-middle mb-5" id="data-table">
                 <thead>
                 <tr>
-                    <th scope="col">ID</th>
                     <th scope="col">그룹</th>
                     <th scope="col">이름</th>
                     <th scope="col">등록일</th>
@@ -38,19 +47,18 @@
                 <tbody>
                 <tr th:each="remotePc : ${remotePcs}" class="data-row">
 
-                    <td th:text="${remotePc.id}">ID</td>
                     <td th:text="${remotePc.group.groupName}">그룹</td>
                     <td th:text="${remotePc.name}">이름</td>
                     <td th:text="${#dates.format(remotePc.createdAt, 'yyyy-MM-dd HH:mm:ss')}">등록일</td>
                     <th:block th:switch="${#strings.toString(remotePc.status)}">
                         <td th:case="OFFLINE_NON_ASSIGNED" class="text-secondary">오프라인(미배정)</td>
-                        <td th:case="OFFLINE_ASSIGNED" class="text-success">오프라인(배정)</td>
+                        <td th:case="OFFLINE_ASSIGNED" class="text-black">오프라인(배정)</td>
                         <td th:case="STANDBY" class="text-success">온라인(대기중)</td>
                         <td th:case="ACTIVE" class="text-info">온라인(사용중)</td>
                     </th:block>
                     <th:block th:switch="${#strings.toString(remotePc.status)}">
                         <td th:case="OFFLINE_NON_ASSIGNED">
-                            <a class="btn btn-primary disabled">
+                            <a class="btn btn-secondary disabled">
                                 <i class="fa-solid fa-display me-2"></i>접속
                             </a>
                         </td>
@@ -82,17 +90,17 @@
 
 
                         <td th:case="OFFLINE_ASSIGNED">
-                            <a class="btn btn-danger disabled">
+                            <a class="btn btn-secondary disabled">
                                 <i class="fa-solid fa-trash-alt me-2"></i>삭제
                             </a>
                         </td>
                         <td th:case="STANDBY">
-                            <a class="btn btn-danger disabled">
+                            <a class="btn btn-secondary disabled">
                                 <i class="fa-solid fa-trash-alt me-2"></i>삭제
                             </a>
                         </td>
                         <td th:case="ACTIVE">
-                            <a class="btn btn-danger disabled">
+                            <a class="btn btn-secondary disabled">
                                 <i class="fa-solid fa-trash-alt me-2"></i>삭제
                             </a>
                         </td>
@@ -108,12 +116,12 @@
                 <div class="ms-1">
                     <label for="remotePcName" class="sr-only">Remote PC Name</label>
                     <input type="text" id="remotePcName" name="remotePcName" placeholder="PC의 이름을 입력하세요."
-                           class="form-control">
+                           class="form-control" >
                 </div>
                 <div class="ms-1">
                     <label for="accessPassword" class="sr-only">accessPassword</label>
                     <input type="password" id="accessPassword" name="accessPassword" placeholder="접근 비밀번호를 입력하세요."
-                           class="form-control">
+                           class="form-control" >
                 </div>
 
                 <div class="ms-1">

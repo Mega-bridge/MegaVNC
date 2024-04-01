@@ -45,7 +45,6 @@ public class RemotePcController {
 
     @GetMapping("/{repeaterId}")
     public ResponseEntity<RemotePc> getRemotePcByRepeaterId(@PathVariable Long repeaterId) {
-        // TODO: DTO 사용하도록 변경
         Optional<RemotePc> remotePc = remotePcService.findRemotePcByRepeaterId(repeaterId);
 
         if (remotePc.isEmpty()) {

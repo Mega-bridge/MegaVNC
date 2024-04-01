@@ -7,6 +7,9 @@
 <header th:replace="~{/fragments/nav :: nav (${user.username})}"></header>
 <input id="repeaterId" type="hidden" th:value="${repeaterId}" />
 <input id="accessPassword" type="hidden" th:value="${accessPassword}"/>
+<input id="status" type="hidden" th:value="${#strings.toString(status)}"/>
+
+
 
 <div class="container mt-5 mb-3">
     <a th:href="@{/remote-pcs}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left me-2"></i>원격 PC 목록</a>

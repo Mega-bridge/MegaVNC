@@ -1,6 +1,6 @@
 package kr.co.megabridge.megavnc.security;
 
-import jakarta.servlet.ServletException;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             HttpServletRequest request,
             HttpServletResponse response,
             Authentication authentication
-    ) throws IOException, ServletException {
+    ) throws IOException {
         List<String> roles = new ArrayList<>();
         authentication.getAuthorities().forEach(auth -> roles.add(auth.getAuthority()));
 

@@ -21,7 +21,7 @@ spring:
     hibernate:
       ddl-auto: create-drop
 jwt:
-  secret: 5Eiliz6V03PMlE86d6CNDbHTaUyVAaoO
+
 
 tcp:
   server:

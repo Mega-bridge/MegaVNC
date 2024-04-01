@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Getter
-@Setter
 @Entity(name = "remote_pc")
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class RemotePc {
@@ -55,6 +54,7 @@ public class RemotePc {
     public void assign(){
         this.status = Status.OFFLINE_ASSIGNED;
     }
+    public void updateStatus(Status status){this.status = status;}
 
     @PrePersist
     private void createdAt() {

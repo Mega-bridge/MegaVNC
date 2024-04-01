@@ -44,7 +44,7 @@ public class MegaVncApplication {
                 if (findAdmin.isEmpty()) {
                     Group group = groupRepository.findById(1L).get();
                     User user = User.createUser("admin", "1234", Set.of( Role.toValue(Role.ROLE_ADMIN)), encoder);
-                    Member admin = Member.createMember("admin", "1234", Role.toValue(Role.ROLE_ADMIN), encoder,user);
+                    Member admin = Member.createMember( user.getUsername(),Role.toValue(Role.ROLE_ADMIN),user);
                     Member_Group member_group = new Member_Group(1L,admin,group);
                     memberRepository.save(admin);
                     member_groupRepository.save(member_group);
@@ -54,7 +54,7 @@ public class MegaVncApplication {
                 if (findUser.isEmpty()) {
                     Group group = groupRepository.findById(1L).get();
                     User user = User.createUser("user", "1234", Set.of( Role.toValue(Role.ROLE_USER)), encoder);
-                    Member member = Member.createMember("user", "1234", Role.toValue(Role.ROLE_USER), encoder, user);
+                    Member member = Member.createMember(user.getUsername(), Role.toValue(Role.ROLE_USER), user);
                     Member_Group member_group = new Member_Group(2L,member,group);
                     memberRepository.save(member);
                     member_groupRepository.save(member_group);

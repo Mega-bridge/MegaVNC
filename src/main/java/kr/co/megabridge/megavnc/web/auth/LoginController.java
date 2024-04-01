@@ -24,6 +24,7 @@ public class LoginController {
         if (registered != null)
             model.addAttribute("registered", true);
 
+
         return "auth/login";
     }
 }

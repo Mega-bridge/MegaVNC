@@ -28,7 +28,6 @@ public class User implements UserDetails {
     ) {
         User user = new User();
         user.username = username;
-        //Fixme: salt처리안하고 단순 해싱 처리라 보안적으로 안좋음, springSecurity 5.0 이상부터 값에 타입을 지정해야 하기 때문에 단순 스티링으로 저장하면 안됨, 서버가 갑자기 재실행되는 에러가 발생함
         user.password = encoder.encode(rawPassword);
         user.roles = roles;
 
