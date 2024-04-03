@@ -39,7 +39,7 @@ window.onload = function() {
 function handleConnect() {
     rfb = new RFB(
             screen,
-             "wss://192.168.0.235:6080",                   // LOCAL
+             "wss://192.168.0.228:6080",                   // LOCAL
             //"wss://vnc.megabridge.co.kr:6080",          // DEV
             {
                 credentials: { password: accessPassword },

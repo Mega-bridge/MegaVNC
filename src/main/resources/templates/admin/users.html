@@ -1,22 +1,37 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head>
+<head th:replace="~{/fragments/header :: head ('사용자 관리 관리')}">
     <meta charset="UTF-8">
     <title>MegaVNC</title>
 </head>
-<body>
-<header th:replace="~{/fragments/header :: head ('사용자 목록')}"></header>
+<body class="bg-body-secondary">
+<header th:replace="~{/fragments/header :: head ('admin')}"></header>
+<div class="container py-5">
 
-<h1>관리자</h1>
+        <h2 class="fw-bold mb-3 text-primary-emphasis">사용자 및 그룹 관리</h2>
+        <div class="bg-body rounded p-4">
+            <!--사용자 조회 -->
+            <h4 class="fw-bold mb-3 text-primary-emphasis">사용자 목록</h4>
 
-<h2>사용자 목록</h2>
+            <ul>
+                <li th:each="user : ${users}">
+                    <span th:text="${user.id}">ID</span> -
+                    <span th:text="${user.username}">사용자명</span>
 
-<ul>
-    <li th:each="user : ${users}">
-        <span th:text="${user.id}">ID</span> -
-        <span th:text="${user.username}">사용자명</span> -
-        <span th:text="${user.roles}">역할</span>
-    </li>
-</ul>
+                </li>
+            </ul>
+            <!--사용자 삭제 -->
+        </div>
+        <div class="bg-body rounded p-4">
+            <h4 class="fw-bold mb-3 text-primary-emphasis">그룹 목록</h4>
+            <!--그룹 조회 -->
+            <!--그룹 삭제 -->
+            <h4 class="fw-bold mb-3 text-primary-emphasis">그룹 추가</h4>
+            <!--그룹 생성 -->
+        </div>
+        <!--사용자를 그룹에 배정 -->
+    </div>
+
+
 </body>
 </html>

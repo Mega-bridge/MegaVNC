@@ -1,67 +1,41 @@
 package kr.co.megabridge.megavnc.web.admin;
 
-import jakarta.validation.Valid;
 import kr.co.megabridge.megavnc.domain.RemotePc;
-import kr.co.megabridge.megavnc.domain.User;
-import kr.co.megabridge.megavnc.dto.AdminRemotePcRegisterDto;
-import kr.co.megabridge.megavnc.service.RemotePcService;
+import kr.co.megabridge.megavnc.service.AdminRemotePcService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/admin/remote-pcs")
 public class AdminRemotePcsController {
 
-    private final RemotePcService remotePcService;
+    private final AdminRemotePcService adminServiceRemotePcService;
 
-    @Autowired
-    public AdminRemotePcsController(RemotePcService remotePcService) {
-        this.remotePcService = remotePcService;
-    }
+
 
     @GetMapping
-    public String showHostList(Model model) {
-        loadRemotePcs(model);
+    public String showRemotePcs(Model model) {
 
-        model.addAttribute("newRemotePc", new AdminRemotePcRegisterDto());
+        Iterable<RemotePc> remotePcs = adminServiceRemotePcService.findAllPcs();
+        model.addAttribute("remotePcs", remotePcs);
+
 
         return "admin/remote-pcs";
     }
 
-    @PostMapping
-    public String createRemotePc(
-            @ModelAttribute("newRemotePc") @Valid AdminRemotePcRegisterDto newRemotePc,
-            Errors errors,
-            Model model,
-            @AuthenticationPrincipal User user
-    ) {
-        if (errors.hasErrors()) {
-            loadRemotePcs(model);
-            return "admin/remote-pcs";
-        }
-        //TODO: 서비스로직 사용하도록 변경
-
-        // remotePCRepository.save(RemotePc.createRemotePc(newRemotePc.getName(), user));
+    //원래 삭제요청을 get방식으로 하는 것은 바람직 하지 않다. 그러나 html에서 폼을 폼안에 넣는게 안된다고 해서 일단 이렇게 했음//다른 방법을 찾아 봐야 함
+    @GetMapping("/delete/{id}")
+    public String deleteRemotePc( @PathVariable Long id) {
+        //user로 그룹 조회해서 권한검사
+       adminServiceRemotePcService.deletePc(id);
 
         return "redirect:/admin/remote-pcs";
     }
 
-    private void loadRemotePcs(Model model) {
-        List<RemotePc> remotePcs = new ArrayList<>();
-        remotePcService.findAll().forEach(remotePcs::add);
 
-        model.addAttribute("remotePcs", remotePcs);
-    }
 }

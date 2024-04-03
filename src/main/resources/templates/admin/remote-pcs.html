@@ -1,39 +1,73 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head>
+<head th:replace="~{/fragments/header :: head ('원격 PC 관리')}">
     <meta charset="UTF-8">
     <title>MegaVNC</title>
 </head>
-<body>
-<header th:replace="~{/fragments/header :: head ('원격 PC 목록')}"></header>
+<body class="bg-body-secondary">
+<header th:replace="~{/fragments/nav :: nav ('admin')}"></header>
+<div class="container py-5">
+    <h2 class="fw-bold mb-3 text-primary-emphasis">원격 PC 관리</h2>
+    <div class="bg-body rounded p-5">
+        <h4 class="fw-bold mb-3 text-primary-emphasis">원격 PC 목록</h4>
+        <table class="table table-hover align-middle mb-5" id="data-table">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">그룹</th>
+                <th scope="col">이름</th>
+                <th scope="col">등록일</th>
+                <th scope="col">상태</th>
+                <th scope="col">삭제</th>
+            </tr>
+            </thead>
 
-<h1>관리자</h1>
+            <tbody>
+            <tr th:each="remotePc : ${remotePcs}" class="data-row">
+                <td th:text="${remotePc.id}">ID</td>
+                <td th:text="${remotePc.group.groupName}">그룹</td>
+                <td th:text="${remotePc.name}">이름</td>
+                <td th:text="${#dates.format(remotePc.createdAt, 'yyyy-MM-dd HH:mm:ss')}">등록일</td>
+                <th:block th:switch="${#strings.toString(remotePc.status)}">
+                    <td th:case="OFFLINE_NON_ASSIGNED" class="text-secondary">오프라인(미배정)</td>
+                    <td th:case="OFFLINE_ASSIGNED" class="text-black">오프라인(배정)</td>
+                    <td th:case="STANDBY" class="text-success">온라인(대기중)</td>
+                    <td th:case="ACTIVE" class="text-info">온라인(사용중)</td>
+                </th:block>
 
-<h2>원격 PC 목록</h2>
+                <th:block th:switch="${#strings.toString(remotePc.status)}">
+                    <td th:case="OFFLINE_NON_ASSIGNED">
+                        <a th:href="@{/admin/remote-pcs/delete/{id}(id=${remotePc.id})}"
+                           onclick="return confirm('정말로 삭제하시겠습니까?');" class="btn btn-danger ">
+                            <i class="fa-solid fa-trash-alt me-2"></i>삭제
+                        </a>
+                    </td>
 
-<ul>
-    <li th:each="remotePc : ${remotePcs}">
-        <span th:text="${remotePc.id}">ID</span> -
-        <span th:text="${remotePc.name}">이름</span> -
-        <a th:href="@{/viewer(id=${remotePc.id})}">연결</a>
-    </li>
-</ul>
+                    <td th:case="OFFLINE_ASSIGNED">
+                        <a class="btn btn-secondary disabled">
+                            <i class="fa-solid fa-trash-alt me-2"></i>삭제
+                        </a>
+                    </td>
+                    <td th:case="STANDBY">
+                        <a class="btn btn-secondary disabled">
+                            <i class="fa-solid fa-trash-alt me-2"></i>삭제
+                        </a>
+                    </td>
+                    <td th:case="ACTIVE">
+                        <a class="btn btn-secondary disabled">
+                            <i class="fa-solid fa-trash-alt me-2"></i>삭제
+                        </a>
+                    </td>
+                </th:block>
+            </tr>
+            </tbody>
+        </table>
 
-<h2>원격 PC 추가</h2>
-<form method="post" th:object="${newRemotePc}">
-    <div th:if="${#fields.hasErrors()}">
-        아래 오류로 추가할 수 없습니다.
+        <div th:if="${#lists.isEmpty(remotePcs)}" class="mb-5 text-center text-secondary">등록된 원격 PC가 없습니다.</div>
+
+
+
     </div>
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-    <ul>
-        <li>
-            <label for="name">이름: </label>
-            <input type="text" name="name" id="name" th:field="*{name}" />
-            <span th:if="${#fields.hasErrors('name')}"
-                  th:errors="*{name}">이름 오류</span>
-        </li>
-    </ul>
-    <button>추가</button>
-</form>
+</div>
 </body>
 </html>

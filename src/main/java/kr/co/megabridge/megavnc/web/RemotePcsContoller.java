@@ -61,10 +61,6 @@ public class RemotePcsContoller {
 
 
 
-
-
-
-
     @GetMapping("/{id}")
     public String showViewer(@AuthenticationPrincipal User user, @PathVariable Long id, Model model) {
         RemotePc remotePc = remotePcService.findById(user, id);
@@ -89,7 +85,7 @@ public class RemotePcsContoller {
 
     @GetMapping("/download-server")
     public ResponseEntity<Resource> downloadServer() {
-        Resource file = new ClassPathResource("static/bin/MegaVNC-v0.1.7.zip");
+        Resource file = new ClassPathResource("static/bin/MegaVNC-v0.1.8.zip");
         String contentDisposition = "attachment; filename=\"" +
                 UriUtils.encode(file.getFilename(), StandardCharsets.UTF_8) + "\"";
         return ResponseEntity
@@ -99,7 +95,6 @@ public class RemotePcsContoller {
     }
     @PostMapping("/register-pc")
     public String registerRemotePc(RegisterRemotePcDto registerRemotePcDto) {
-
 
         String encodedGroupName = UriUtils.encode(registerRemotePcDto.getGroupName(), StandardCharsets.UTF_8);
         remotePcService.registerRemotePc(registerRemotePcDto);

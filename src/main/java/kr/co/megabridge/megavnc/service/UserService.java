@@ -38,9 +38,7 @@ public class UserService {
         return member.isEmpty();
     }
 
-    public List<Member> listAllUsers() {
-        return memberRepository.findAll();
-    }
+
 
     public void changePassword(User user, String newPassword) {
         Optional<Member> optionalMember = memberRepository.findByUsername(user.getUsername());

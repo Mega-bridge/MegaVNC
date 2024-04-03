@@ -7,15 +7,9 @@
 <body class="bg-body-secondary">
 <header th:replace="~{/fragments/nav :: nav (${user.username})}"></header>
 
-
-
-
-
 <div th:if="${error}" class="card text-bg-danger mb-3">
     <div class="card-body" th:text="${errorMessage}"></div>
 </div>
-
-
 
 <div class="container py-5">
     <form method="post" th:action="@{/remote-pcs/register-pc}" th:object="${RegisterRemotePcDto}" >
@@ -30,8 +24,6 @@
         </div>
         <div class="bg-body rounded p-4">
             <h4 class="fw-bold mb-3 text-primary-emphasis">원격 PC 목록</h4>
-
-
             <table class="table table-hover align-middle mb-5" id="data-table">
                 <thead>
                 <tr>
