@@ -12,18 +12,58 @@
 </div>
 
 <div class="container py-5">
-    <form method="post" th:action="@{/remote-pcs/register-pc}" th:object="${RegisterRemotePcDto}" >
+    <form method="post" th:action="@{/remote-pcs/register-pc}" th:object="${RegisterRemotePcDto}">
         <div class="form-group mb-3">
             <label for="group" class="visually-hidden">그룹</label>
             <select class="form-control" id="group" name="groupName"
                     onchange="location.href = '/remote-pcs?selectedGroup=' + this.value;">
                 <option th:selected="${selectedGroup == null}" value="All Group">---All Group---</option>
-                <option  name = "groupName" th:each="group : ${groups}" th:value="${group.groupName}" th:text="${group.groupName}"
+                <option name="groupName" th:each="group : ${groups}" th:value="${group.groupName}"
+                        th:text="${group.groupName}"
                         th:selected="${group.groupName == selectedGroup}"></option>
             </select>
         </div>
         <div class="bg-body rounded p-4">
-            <h4 class="fw-bold mb-3 text-primary-emphasis">원격 PC 목록</h4>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-3 text-primary-emphasis">원격 PC 목록</h4>
+                <button class="btn btn-success"  data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">
+                    <i class="fa-solid fa-plus me-2"> 새 원격 PC 추가</i>
+                </button>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">새 원격 PC 추가</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+
+                            <!--이 부분 모달로 -->
+                            <div class="d-flex flex-column justify-content-end">
+                                <div class="ms-1 p-1">
+                                    <label for="remotePcName" class="sr-only">Remote PC Name</label>
+                                    <input type="text" id="remotePcName" name="remotePcName" placeholder="PC의 이름을 입력하세요."
+                                           class="form-control">
+                                </div>
+                                <div class="ms-1 p-1">
+                                    <label for="accessPassword" class="sr-only">accessPassword</label>
+                                    <input type="password" id="accessPassword" name="accessPassword"
+                                           placeholder="접근 비밀번호를 입력하세요."
+                                           class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">추가</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
             <table class="table table-hover align-middle mb-5" id="data-table">
                 <thead>
                 <tr>
@@ -93,24 +133,7 @@
 
             <div th:if="${#lists.isEmpty(remotePcs)}" class="mb-5 text-center text-secondary">등록된 원격 PC가 없습니다.</div>
 
-            <div class="d-flex flex-row justify-content-end">
-                <div class="ms-1">
-                    <label for="remotePcName" class="sr-only">Remote PC Name</label>
-                    <input type="text" id="remotePcName" name="remotePcName" placeholder="PC의 이름을 입력하세요."
-                           class="form-control" >
-                </div>
-                <div class="ms-1">
-                    <label for="accessPassword" class="sr-only">accessPassword</label>
-                    <input type="password" id="accessPassword" name="accessPassword" placeholder="접근 비밀번호를 입력하세요."
-                           class="form-control" >
-                </div>
 
-                <div class="ms-1">
-                    <button type="submit" class="btn btn-success">
-                        <i class="fa-solid fa-plus me-2"></i>새 원격 PC 추가
-                    </button>
-                </div>
-            </div>
         </div>
     </form>
 </div>
