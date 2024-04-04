@@ -29,27 +29,22 @@
                 <td th:text="${remotePc.name}">이름</td>
                 <td th:text="${#dates.format(remotePc.createdAt, 'yyyy-MM-dd HH:mm:ss')}">등록일</td>
                 <th:block th:switch="${#strings.toString(remotePc.status)}">
-                    <td th:case="OFFLINE_NON_ASSIGNED" class="text-secondary">오프라인(미배정)</td>
-                    <td th:case="OFFLINE_ASSIGNED" class="text-black">오프라인(배정)</td>
+                    <td th:case="OFFLINE" class="text-black">오프라인</td>
                     <td th:case="STANDBY" class="text-success">온라인(대기중)</td>
                     <td th:case="ACTIVE" class="text-info">온라인(사용중)</td>
                 </th:block>
 
                 <th:block th:switch="${#strings.toString(remotePc.status)}">
-                    <td th:case="OFFLINE_NON_ASSIGNED">
+                    <td th:case="OFFLINE">
                         <a th:href="@{/admin/remote-pcs/delete/{id}(id=${remotePc.id})}"
                            onclick="return confirm('정말로 삭제하시겠습니까?');" class="btn btn-danger ">
                             <i class="fa-solid fa-trash-alt me-2"></i>삭제
                         </a>
                     </td>
 
-                    <td th:case="OFFLINE_ASSIGNED">
-                        <a class="btn btn-secondary disabled">
-                            <i class="fa-solid fa-trash-alt me-2"></i>삭제
-                        </a>
-                    </td>
                     <td th:case="STANDBY">
-                        <a class="btn btn-secondary disabled">
+                        <a th:href="@{/admin/remote-pcs/delete/{id}(id=${remotePc.id})}"
+                           onclick="return confirm('정말로 삭제하시겠습니까?');" class="btn btn-danger ">
                             <i class="fa-solid fa-trash-alt me-2"></i>삭제
                         </a>
                     </td>

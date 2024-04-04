@@ -26,8 +26,8 @@ public class AdminRemotePcService {
 
         Optional<RemotePc> optionalRemotePc =  remotePcRepository.findById(remotePcId);
         RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new RemotePcException(ErrorCode.PC_NOT_FOUND," 페이지를 새로고침 해주세요."));
-        if(remotePc.getStatus() != Status.OFFLINE_NON_ASSIGNED){
-            throw new RemotePcException(ErrorCode.DELETE_ONLY_WHEN_UNASSIGNED,"페이지를 새로고침 해주세요.");
+        if(remotePc.getStatus() == Status.ACTIVE){
+            throw new RemotePcException(ErrorCode.DELETE_NOT_ONLY_WHEN_ACTIVE,"페이지를 새로고침 해주세요.");
         }
 
         remotePcRepository.deleteById(remotePcId);

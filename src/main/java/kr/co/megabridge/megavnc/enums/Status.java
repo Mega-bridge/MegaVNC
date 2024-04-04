@@ -1,9 +1,7 @@
 package kr.co.megabridge.megavnc.enums;
 
 public enum Status {
-    OFFLINE_NON_ASSIGNED("OFFLINE_NON_ASSIGNED"),
-    OFFLINE_ASSIGNED("OFFLINE_ASSIGNED"),
-
+    OFFLINE("OFFLINE"),
     STANDBY("STANDBY"),
     ACTIVE("ACTIVE");
 

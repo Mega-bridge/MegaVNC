@@ -74,7 +74,7 @@ public class MessageService {
                 log.info("SERVER_CONNECT: " + eventMessage.getRepeaterId());
                 break;
             case 3: // SERVER_DISCONNECT
-                remotePcService.setRemotePcStatus(eventMessage.getRepeaterId(), Status.OFFLINE_ASSIGNED);
+                remotePcService.setRemotePcStatus(eventMessage.getRepeaterId(), Status.OFFLINE);
                 log.info("SERVER_DISCONNECT: " + eventMessage.getRepeaterId());
                 break;
             case 4: // VIEWER_SERVER_SESSION_START

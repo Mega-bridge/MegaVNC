@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class RequestRemotePcDto {
 
+    private String groupName;
     private String pcName;
     private String accessPassword;
 

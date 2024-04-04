@@ -11,6 +11,6 @@ public interface RemotePcRepository extends CrudRepository<RemotePc, Long> {
     List<RemotePc> findByGroup(Group group);
     Optional<RemotePc> findTopByOrderByRepeaterIdDesc();
     Optional<RemotePc> findByRepeaterId(Long repeaterId);
-    Optional<RemotePc> findByName(String pcName);
+    List<RemotePc> findByName(String pcName);
     boolean existsByNameAndGroup(String pcName,Group group);
 }

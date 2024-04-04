@@ -1,11 +1,9 @@
 package kr.co.megabridge.megavnc.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import kr.co.megabridge.megavnc.enums.Status;
 import lombok.*;
 
-import java.io.Serializable;
 import java.util.Date;
 
 @Getter
@@ -20,15 +18,15 @@ public class RemotePc {
     @Column(unique = true)
     private Long repeaterId;
 
-
     private String name;
-
-
 
     private Date createdAt;
 
     private Status status;
+
     private String accessPassword;
+
+    private boolean isAssigned;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,17 +41,14 @@ public class RemotePc {
         RemotePc remotePc = new RemotePc();
         remotePc.repeaterId = repeaterId;
         remotePc.name = name;
-        remotePc.status = Status.OFFLINE_NON_ASSIGNED;
+        remotePc.status = Status.OFFLINE;
         remotePc.accessPassword = accessPassword;
         remotePc.group = group;
+        remotePc.isAssigned = false;
         return remotePc;
     }
-    public void cancelAssignment(){
-        this.status = Status.OFFLINE_NON_ASSIGNED;
-    }
-    public void assign(){
-        this.status = Status.OFFLINE_ASSIGNED;
-    }
+
+    public void assign(){this.isAssigned = true;}
     public void updateStatus(Status status){this.status = status;}
 
     @PrePersist

@@ -27,10 +27,6 @@ window.onload = function() {
         window.alert("다른 PC에서 사용중입니다.");
         window.location.href = "/remote-pcs";
     }
-    else if(status === "OFFLINE_ASSIGNED"){
-        handleConnect();
-        window.alert("클라이언트의 접속을 기다려 주세요.");
-    }
     else{
         handleConnect();
     }

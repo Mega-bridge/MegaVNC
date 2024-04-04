@@ -38,9 +38,6 @@ public class RemotePcService {
         this.groupRepository = groupRepository;
     }
 
-    public Iterable<RemotePc> findAll() {
-        return remotePcRepository.findAll();
-    }
 
 
     public List<ResponseRemotePcDto> findByGroups(List<Group> groups) {
@@ -127,46 +124,22 @@ public class RemotePcService {
 
     }
 
-    @Transactional
-    //클라이언드에서 돌아가기버튼 눌렀을 때 pc 상태 미배정으로 바뀌는 기능 추가
-    public void cancelAssignment(RequestRemotePcDto remotePcDto){
-        Optional<RemotePc> optionalRemotePc = remotePcRepository.findByName(remotePcDto.getPcName());
 
-        RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new RemotePcException(ErrorCode.PC_NOT_FOUND));
-        if (!remotePcDto.getAccessPassword().equals(remotePc.getAccessPassword()))
-            throw new RemotePcException(ErrorCode.PASSWORD_NOT_MATCH);
-        remotePc.cancelAssignment();
-        remotePcRepository.save(remotePc);
-    }
-
-    public ResponseRemotePcApiDto findRemotePcByPcName(RequestRemotePcDto remotePcDto){
-
-        Optional<RemotePc> optionalRemotePc = remotePcRepository.findByName(remotePcDto.getPcName());
-        RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new RemotePcException(ErrorCode.PC_NOT_FOUND));
-        if (!remotePcDto.getAccessPassword().equals(remotePc.getAccessPassword()))
-            throw new RemotePcException(ErrorCode.PASSWORD_NOT_MATCH);
-        remotePc.assign();
-        remotePcRepository.save(remotePc);
-        return new ResponseRemotePcApiDto(remotePc.getRepeaterId());
-    }
-
-    public Optional<RemotePc> findRemotePcByRepeaterId(Long repeaterId) {
-        return remotePcRepository.findByRepeaterId(repeaterId);
-    }
 
     @Transactional
     public void setRemotePcStatus(Long repeaterId, Status status) {
         Optional<RemotePc> optionalRemotePc = remotePcRepository.findByRepeaterId(repeaterId);
         RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new RemotePcException(ErrorCode.PC_NOT_FOUND));
         remotePc.updateStatus(status);
+        remotePc.assign();
         remotePcRepository.save(remotePc);
     }
 
     public RemotePc findById(User user,Long id) {
         Optional<RemotePc> optionalRemotePc =  remotePcRepository.findById(id);
         RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new RemotePcException(ErrorCode.PC_NOT_FOUND));
-        if(remotePc.getStatus() == Status.OFFLINE_NON_ASSIGNED){
-            throw new RemotePcException(ErrorCode.UNASSIGNED_STATUS,"페이지를 새로고침 해주세요.");
+        if(remotePc.getStatus() == Status.OFFLINE){
+            throw new RemotePcException(ErrorCode.OFFLINE_STATUS,"페이지를 새로고침 해주세요.");
         }
 
         Optional<Member> optionalMember = memberRepository.findByUsername(user.getUsername());
@@ -186,8 +159,8 @@ public class RemotePcService {
 
         Optional<RemotePc> optionalRemotePc =  remotePcRepository.findById(remotePcId);
         RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new RemotePcException(ErrorCode.PC_NOT_FOUND," 페이지를 새로고침 해주세요."));
-        if(remotePc.getStatus() != Status.OFFLINE_NON_ASSIGNED){
-            throw new RemotePcException(ErrorCode.DELETE_ONLY_WHEN_UNASSIGNED,"페이지를 새로고침 해주세요.");
+        if(remotePc.getStatus() == Status.ACTIVE){
+            throw new RemotePcException(ErrorCode.DELETE_NOT_ONLY_WHEN_ACTIVE,"페이지를 새로고침 해주세요.");
         }
 
         Optional<Member> optionalMember = memberRepository.findByUsername(user.getUsername());
