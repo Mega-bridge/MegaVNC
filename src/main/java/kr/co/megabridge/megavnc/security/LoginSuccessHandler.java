@@ -22,12 +22,12 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         List<String> roles = new ArrayList<>();
         authentication.getAuthorities().forEach(auth -> roles.add(auth.getAuthority()));
 
-        if (roles.contains("ROLE_ADMIN")) {
+       /* if (roles.contains("ROLE_ADMIN")) {
             response.sendRedirect("/admin");
             return;
-        }
+        }*/
 
-        if (roles.contains("ROLE_USER")) {
+        if (roles.contains("ROLE_USER") || roles.contains("ROLE_ADMIN")) {
             response.sendRedirect("/remote-pcs");
             return;
         }

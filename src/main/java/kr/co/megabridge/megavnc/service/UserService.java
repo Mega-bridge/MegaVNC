@@ -25,18 +25,9 @@ public class UserService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final GroupRepository groupRepository;
 
-    public void register(String username, String password) {
-        User user = User.createUser(username, password, Set.of(Role.toValue(Role.ROLE_USER)), passwordEncoder);
-        Member member = Member.createMember(username,Role.toValue(Role.ROLE_USER),user);
-        memberRepository.save(member);
-    }
 
-    public boolean isUsernameUnique(String username) {
-        Optional<Member> member = memberRepository.findByUsername(username);
-        return member.isEmpty();
-    }
+
 
 
 
@@ -48,15 +39,6 @@ public class UserService {
         Member member = optionalMember.get();
         member.getUserDetail().setPassword(passwordEncoder.encode(newPassword));
         memberRepository.save(member);
-    }
-    public List<ResponseGroupDto> findAllGroup(){
-        List<Group> groups = groupRepository.findAll();
-        List<ResponseGroupDto> ResponseGroupDtos = new ArrayList<>();
-        for (Group group : groups){
-            ResponseGroupDto responseGroupDto = new ResponseGroupDto(group.getId(), group.getGroupName());
-            ResponseGroupDtos.add(responseGroupDto);
-        }
-        return ResponseGroupDtos;
     }
 
 

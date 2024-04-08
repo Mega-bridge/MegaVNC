@@ -11,9 +11,13 @@ public class HomeController {
 
     @GetMapping
     public String home(HttpServletRequest request) {
-        if (request.isUserInRole("ADMIN"))
+     /*   if (request.isUserInRole("ADMIN"))
             return "redirect:/admin";
         else if (request.isUserInRole("USER"))
+            return "redirect:/remote-pcs";
+        else
+            return "redirect:/login";*/
+        if (request.isUserInRole("ADMIN")||request.isUserInRole("USER"))
             return "redirect:/remote-pcs";
         else
             return "redirect:/login";

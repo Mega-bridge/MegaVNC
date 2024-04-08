@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/fragments/header :: head ('사용자 관리')}">
+    <meta charset="UTF-8">
+    <title>MegaVNC</title>
+</head>
+<body class="bg-body-secondary">
+<header>
+    <nav th:replace="~{/fragments/nav :: nav ('admin')}"></nav>
+</header>
+<div th:if="${error}" class="card text-bg-danger mb-3">
+    <div class="card-body" th:text="${errorMessage}"></div>
+</div>
+<div class="container py-5">
+
+    <div class="bg-body rounded p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold mb-3 text-primary-emphasis">사용자 목록</h4>
+            <div class="justify-content-end">
+                <button class="btn btn-success p-2" data-bs-toggle="modal" data-bs-target="#userAddModal" type="button">
+                    <i class="fa-solid fa-plus"></i>
+                    <i class="fa-solid fa-user me-2"> 사용자 추가</i>
+                </button>
+            </div>
+        </div>
+
+
+        <!-- 유저 추가 Modal -->
+        <div class="modal fade" id="userAddModal" tabindex="-1" aria-labelledby="userAddModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="userAddModalLabel">사용자 추가</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="post" th:action="@{/admin/users}" th:object="${UserRegisterDto}">
+                        <div class="modal-body">
+                            <div class="d-flex flex-column justify-content-end">
+                                <div class="ms-1 p-1">
+                                    <label for="username">사용자명</label>
+
+                                    <input type="text" id="username" name="username" placeholder="사용할 이름을 입력하세요."
+                                           class="form-control">
+                                </div>
+                                <div class="ms-1 p-1">
+                                    <label for="password">비밀번호</label>
+                                    <div th:if="${#fields.hasErrors('password')}" class="text-danger">
+                                        <div th:errors="*{password}" class="card-body"></div>
+                                    </div>
+                                    <input type="password" id="password" name="password"
+                                           placeholder="비밀번호를 입력하세요."
+                                           class="form-control">
+                                </div>
+                                <div class="ms-1 p-1">
+                                    <label for="passwordConfirm">비밀번호 확인</label>
+                                    <div th:if="${#fields.hasErrors('passwordConfirm')}" class="text-danger">
+                                        <div th:errors="*{passwordConfirm}" class="card-body"></div>
+                                    </div>
+                                    <input type="password" id="passwordConfirm" name="passwordConfirm"
+                                           placeholder="비밀번호를 재 입력하세요."
+                                           class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">추가</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <table class="table table-hover align-middle mb-5">
+            <thead>
+            <tr>
+                <th scope="col">아이디</th>
+                <th scope="col">이름</th>
+                <th scope="col">등록일</th>
+                <th scope="col">그룹 배정</th>
+                <th scope="col">삭제</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="user : ${users}" class="data-row">
+
+                <td th:text="${user.id}">아이디</td>
+                <td th:text="${user.username}">이름</td>
+                <td th:text="${#dates.format(user.createdAt, 'yyyy-MM-dd HH:mm:ss')}">등록일</td>
+                <td>
+                    <a th:href="@{/admin/assign/{memberId}(memberId=${user.id})}" class="btn btn-primary">
+                        <i class="fa-solid fa-users me-2"></i>그룹 배정
+                    </a>
+                </td>
+                <td>
+                    <a th:href="@{/admin/users/delete/{memberId}(memberId=${user.id})}"
+                       onclick="return confirm('정말로 삭제하시겠습니까?');" class="btn btn-danger ">
+                        <i class="fa-solid fa-trash-alt me-2"></i>삭제
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+
+    </div>
+
+</div>
+
+
+</body>
+</html>

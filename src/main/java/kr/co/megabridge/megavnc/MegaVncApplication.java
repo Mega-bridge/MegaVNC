@@ -37,31 +37,30 @@ public class MegaVncApplication {
                 Optional<Group> findGroup = groupRepository.findById(1L);
 
                 if (findGroup.isEmpty() ) {
-                    Group group = new Group(1L,"NoGroup");
-                    Group group2 = new Group(2L,"메가브릿지");
+                    Group group = Group.createGroup("NoGroup");
+                    Group group2 = Group.createGroup("메가브릿지");
                     groupRepository.save(group);
                     groupRepository.save(group2);
                 }
 
                 Optional<Member> findAdmin = memberRepository.findByUsername("admin");
                 if (findAdmin.isEmpty()) {
-                    Group group = groupRepository.findById(1L).get();
-                    Group group2 = groupRepository.findById(2L).get();
+
+                    Group group = groupRepository.findById(2L).get();
                     User user = User.createUser("admin", "1234", Set.of( Role.toValue(Role.ROLE_ADMIN)), encoder);
-                    Member admin = Member.createMember( user.getUsername(),Role.toValue(Role.ROLE_ADMIN),user);
-                    Member_Group member_group = new Member_Group(1L,admin,group);
-                    Member_Group member_group2 = new Member_Group(2L,admin,group2);
+                    Member admin = Member.createMember( user.getUsername(),Role.ROLE_ADMIN,user);
                     memberRepository.save(admin);
+
+                    Member_Group member_group = Member_Group.assignGroup(admin,group);
                     member_groupRepository.save(member_group);
-                    member_groupRepository.save(member_group2);
                 }
 
                 Optional<Member> findUser = memberRepository.findByUsername("user");
                 if (findUser.isEmpty()) {
                     Group group = groupRepository.findById(2L).get();
                     User user = User.createUser("user", "1234", Set.of( Role.toValue(Role.ROLE_USER)), encoder);
-                    Member member = Member.createMember(user.getUsername(), Role.toValue(Role.ROLE_USER), user);
-                    Member_Group member_group = new Member_Group(2L,member,group);
+                    Member member = Member.createMember(user.getUsername(), Role.ROLE_USER, user);
+                    Member_Group member_group = Member_Group.assignGroup(member,group);
                     memberRepository.save(member);
                     member_groupRepository.save(member_group);
                 }

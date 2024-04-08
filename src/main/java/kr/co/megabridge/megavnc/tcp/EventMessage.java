@@ -26,15 +26,5 @@ public class EventMessage {
     }
 
 
-    public static enum EvNum {
-        VIEWER_CONNECT,                 // 0
-        VIEWER_DISCONNECT,              // 1
-        SERVER_CONNECT,                 // 2 // TODO
-        SERVER_DISCONNECT,              // 3 // TODO
-        VIEWER_SERVER_SESSION_START,    // 4 // TODO
-        VIEWER_SERVER_SESSION_END,      // 5 // TODO
-        REPEATER_STARTUP,               // 6
-        REPEATER_SHUTDOWN,              // 7
-        REPEATER_HEARTBEAT              // 8
-    }
+
 }

@@ -1,6 +1,5 @@
 package kr.co.megabridge.megavnc.exception;
 
-import kr.co.megabridge.megavnc.enums.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -15,9 +15,6 @@
             <div class="card-body">사용자명 또는 비밀번호가 올바르지 않습니다.</div>
         </div>
 
-        <div th:if="${registered}" class="card text-bg-success mb-3">
-            <div class="card-body">회원가입이 완료되었습니다.</div>
-        </div>
 
         <form method="post" th:action="@{/login}">
             <div class="mb-3">
@@ -39,9 +36,6 @@
                 <button type="submit" class="btn btn-primary">로그인</button>
             </div>
 
-            <div class="text-center">
-                <a th:href="@{/register}" href="#" class="link-underline link-underline-opacity-0">회원가입</a>
-            </div>
         </form>
 
     </div>

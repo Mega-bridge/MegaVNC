@@ -1,14 +1,12 @@
 package kr.co.megabridge.megavnc.web;
 
 
-import jakarta.validation.Valid;
 import kr.co.megabridge.megavnc.domain.Group;
 import kr.co.megabridge.megavnc.domain.RemotePc;
 import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.dto.RegisterRemotePcDto;
 import kr.co.megabridge.megavnc.dto.ResponseRemotePcDto;
 import kr.co.megabridge.megavnc.dto.ResponseDeleteDto;
-import kr.co.megabridge.megavnc.exception.RemotePcException;
 import kr.co.megabridge.megavnc.service.RemotePcService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
@@ -18,9 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriUtils;
 
 import java.nio.charset.StandardCharsets;

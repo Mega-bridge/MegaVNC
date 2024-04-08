@@ -27,7 +27,8 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold mb-3 text-primary-emphasis">원격 PC 목록</h4>
                 <button class="btn btn-success"  data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">
-                    <i class="fa-solid fa-plus me-2"> 새 원격 PC 추가</i>
+                    <i class="fa-solid fa-plus"></i>
+                    <i class="fa-solid fa-display me-2">  원격 pc 추가</i>
                 </button>
             </div>
             <!-- Modal -->
@@ -43,12 +44,12 @@
                             <!--이 부분 모달로 -->
                             <div class="d-flex flex-column justify-content-end">
                                 <div class="ms-1 p-1">
-                                    <label for="remotePcName" class="sr-only">Remote PC Name</label>
+                                    <label for="remotePcName" >원격 PC 이름</label>
                                     <input type="text" id="remotePcName" name="remotePcName" placeholder="PC의 이름을 입력하세요."
                                            class="form-control">
                                 </div>
                                 <div class="ms-1 p-1">
-                                    <label for="accessPassword" class="sr-only">accessPassword</label>
+                                    <label for="accessPassword">접근 비밀번호</label>
                                     <input type="password" id="accessPassword" name="accessPassword"
                                            placeholder="접근 비밀번호를 입력하세요."
                                            class="form-control">

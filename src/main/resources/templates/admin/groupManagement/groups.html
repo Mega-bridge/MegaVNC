@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/fragments/header :: head ('그룹 관리')}">
+    <meta charset="UTF-8">
+    <title>MegaVNC</title>
+</head>
+<body class="bg-body-secondary">
+<header>
+    <nav th:replace="~{/fragments/nav :: nav ('admin')}"></nav>
+</header>
+<div th:if="${error}" class="card text-bg-danger mb-3">
+    <div class="card-body" th:text="${errorMessage}"></div>
+</div>
+
+<div class="container py-5">
+
+    <div class="bg-body rounded p-4">
+        <div class="bg-body rounded p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-3 text-primary-emphasis">그룹 목록</h4>
+                <div class="justify-content-end">
+                    <button class="btn btn-success p-2" data-bs-toggle="modal" data-bs-target="#groupAddModal"
+                            type="button">
+                        <i class="fa-solid fa-plus"></i>
+                        <i class="fa-solid fa-users me-2"> 그룹 추가</i>
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- 그룹 추가 Modal -->
+            <div class="modal fade" id="groupAddModal" tabindex="-1" aria-labelledby="groupAddModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="groupAddModalLabel">그룹 추가</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form method="post" th:action="@{/admin/groups}" th:object="${GroupRegisterDto}">
+                            <div class="modal-body">
+                                <div class="d-flex flex-column justify-content-end">
+                                    <div class="ms-1 p-1">
+                                        <label for="groupName">그룹명</label>
+                                        <input type="text" id="groupName" name="groupName" placeholder="그룹 이름을 입력하세요."
+                                               class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">추가</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <table class="table table-hover align-middle mb-5">
+                <thead>
+                <tr>
+                    <th scope="col">아이디</th>
+                    <th scope="col">그룹 이름</th>
+                    <th scope="col">등록일</th>
+                    <th scope="col">삭제</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="group : ${groups}" class="data-row">
+
+                    <td th:text="${group.id}">아이디</td>
+                    <td th:text="${group.groupName}">이름</td>
+                    <td th:text="${#dates.format(group.createdAt, 'yyyy-MM-dd HH:mm:ss')}">등록일</td>
+                    <td>
+                        <a th:href="@{/admin/groups/delete/{groupId}(groupId=${group.id})}"
+                           onclick="return confirm('정말로 삭제하시겠습니까?');" class="btn btn-danger ">
+                            <i class="fa-solid fa-trash-alt me-2"></i>삭제
+                        </a>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

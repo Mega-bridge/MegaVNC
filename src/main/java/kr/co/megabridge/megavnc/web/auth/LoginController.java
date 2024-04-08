@@ -15,14 +15,10 @@ public class LoginController {
     @GetMapping
     public String showLogin(
             @RequestParam(required = false) String error,
-            @RequestParam(required = false) String registered,
             Model model
     ) {
         if (error != null)
             model.addAttribute("loginError", true);
-
-        if (registered != null)
-            model.addAttribute("registered", true);
 
 
         return "auth/login";

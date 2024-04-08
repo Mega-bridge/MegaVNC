@@ -5,58 +5,63 @@
     <title>MegaVNC</title>
 </head>
 <body>
-<nav th:fragment="nav (username)" class="navbar bg-body-tertiary shadow-sm">
-    <div class="container">
+
+
+
+<nav th:fragment="nav (username)" class="navbar navbar-expand-lg navbar-light bg-light ">
+
+    <div class="container d-flex flex-row">
+
         <a class="navbar-brand fw-bold text-primary-emphasis" th:href="@{/}">
-            <img th:src="@{/images/mega-logo.png}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top rounded">
+            <img th:src="@{/images/mega-logo.png}" alt="Logo" width="30" height="30"
+                 class="d-inline-block align-text-top rounded">
             MegaVNC
         </a>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item" th:if="${username == 'admin'}">
+                    <a th:href="@{/remote-pcs}" class="nav-link " >원격 PC 관리</a>
+                </li>
+                <li class="nav-item" th:if="${username == 'admin'}">
+                    <a th:href="@{/admin/users}" class="nav-link">사용자 관리</a>
+                </li>
+                <li class="nav-item" th:if="${username == 'admin'}">
+                    <a th:href="@{/admin/groups}" class="nav-link">그룹 관리</a>
+                </li>
+            </ul>
+        </div>
+
+
         <form class="dropdown" method="post" th:action="@{/logout}">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-            <button class="btn btn-light dropdown-toggle text-primary-emphasis" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button class="btn btn-light dropdown-toggle text-primary-emphasis" type="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fa-solid fa-circle-user fs-4"></i>
             </button>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" th:text="|${username}|" href="#">Username</a></li>
 
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" th:href="@{/change-password}">
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" th:href="@{/change-password}" th:if="${username != 'admin'}">
                     <i class="fa-solid fa-key me-2"></i>
                     비밀번호 변경
                 </a></li>
-                <li><button class="dropdown-item" href="#" type="submit">
-                    <i class="fa-solid fa-right-from-bracket me-2"></i>
-                    로그아웃
-                </button></li>
-                <li> <a class="dropdown-item"  th:href="@{/remote-pcs/download-server}" target="_blank">
+                <li>
+                    <button class="dropdown-item" href="#" type="submit">
+                        <i class="fa-solid fa-right-from-bracket me-2"></i>
+                        로그아웃
+                    </button>
+                </li>
+                <li><a class="dropdown-item" th:href="@{/remote-pcs/download-server}" target="_blank">
                     <i class="fa-solid fa-file-download me-2"></i>MegaVNC(install)
                 </a></li>
-
-
-
             </ul>
         </form>
 
-<!--
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Dropdown
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a th:href="@{/change-password}">비밀번호 변경</a></li>
-                    <li>
-                        <form method="post" th:action="@{/logout}">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                            <button type="submit">로그아웃</button>
-                        </form>
-                    </li>
-                </ul>
 
-            </li>
-        </ul>
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">test</ul>
--->
     </div>
 
 </nav>

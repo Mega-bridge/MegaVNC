@@ -2,13 +2,14 @@ package kr.co.megabridge.megavnc.domain;
 
 
 import jakarta.persistence.*;
+import kr.co.megabridge.megavnc.enums.Role;
 import lombok.*;
 
 import java.util.Date;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
     private Date createdAt;
     @Id
@@ -17,12 +18,11 @@ public class Member {
 
 
     @NonNull
-    private String role;
-
+    @Enumerated(EnumType.STRING)
+    private Role role;
     @NonNull
+    @Column(unique = true)
     private String username;
-
-
     private User userDetail;
 
 
@@ -33,14 +33,13 @@ public class Member {
 
     public static Member createMember(
             String username,
-            String role,
+            Role role,
             User user
     ) {
         Member member = new Member();
         member.username = username;
         member.role = role;
         member.userDetail = user;
-        //유저 추가
         return member;
     }
 

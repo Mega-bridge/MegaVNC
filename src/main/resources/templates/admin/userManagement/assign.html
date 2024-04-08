@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/fragments/header :: head ('사용자 배정')}">
+    <meta charset="UTF-8">
+    <title>MegaVNC</title>
+</head>
+<body class="bg-body-secondary">
+<header>
+    <nav th:replace="~{/fragments/nav :: nav ('admin')}"></nav>
+</header>
+<div th:if="${error}" class="card text-bg-danger mb-3">
+    <div class="card-body" th:text="${errorMessage}"></div>
+</div>
+<!--그룹 변경 하려는 유저 정보 표시-->
+<div class="row">
+    <div class="container py-5 col-md-6">
+        <div class="bg-body rounded p-4 ">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-3 text-primary-emphasis">미배정된 그룹 목록</h4>
+                <form id="assignGroupForm" method="post" th:action="@{/admin/assign}"
+                      th:object="${AssignGroupDto}">
+                    <input type="hidden" th:field="*{selectedGroupId}"/>
+                    <input type="hidden" name="selectedUserId" th:value="${user.id}"/>
+                    <button class="btn btn-success p-2" type="submit">
+                        <i class="fa-solid fa-plus"></i>
+                        <i class="fa-solid fa-users me-2"> 그룹 배정</i>
+                    </button>
+                </form>
+            </div>
+            <table class="table table-hover align-middle mb-5">
+                <thead>
+                <tr>
+                    <th scope="col">아이디</th>
+                    <th scope="col">그룹 이름</th>
+                    <th scope="col">등록일</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="group : ${unassignedGroups}" th:onclick="'selectGroup(' + ${group.id} + ')'"
+                    class="table-row">
+                    <td th:text="${group.id}">아이디</td>
+                    <td th:text="${group.groupName}">이름</td>
+                    <td th:text="${#dates.format(group.createdAt, 'yyyy-MM-dd HH:mm:ss')}">등록일</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!--이미 배정된 그룹-->
+    <div class="container py-5 col-md-6">
+        <div class="bg-body rounded p-4">
+            <h4 class="fw-bold mb-3 text-primary-emphasis">배정된 그룹 목록</h4>
+
+            <table class="table align-middle mb-5">
+                <thead>
+                <tr>
+                    <th scope="col">아이디</th>
+                    <th scope="col">그룹 이름</th>
+                    <th scope="col">등록일</th>
+                    <th scope="col" class="text-center">배정 취소</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="group : ${assignedGroups}">
+
+                    <td th:text="${group.id}">아이디</td>
+                    <td th:text="${group.groupName}">이름</td>
+                    <td th:text="${#dates.format(group.createdAt, 'yyyy-MM-dd HH:mm:ss')}">등록일</td>
+                    <td class="text-center">
+                        <a th:href="@{/admin/assign/{memberId}/{groupId}(memberId=${user.id}, groupId=${group.id})}"
+                           class="btn btn-danger ">
+                            <i class="fa-solid fa-times"></i>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+
+<script th:inline="javascript">
+    function selectGroup(groupId) {
+        let tableRows = document.querySelectorAll(".table-row");
+        tableRows.forEach(function (row) {
+            row.classList.remove("table-secondary");
+        });
+
+        let clickedRow = document.querySelector(".table-row[onclick='selectGroup(" + groupId + ")']");
+        clickedRow.classList.add("table-secondary");
+        document.getElementById("selectedGroupId").value = groupId;
+    }
+
+</script>
+
+
+</body>
+</html>

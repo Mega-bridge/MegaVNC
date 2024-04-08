@@ -3,9 +3,9 @@ package kr.co.megabridge.megavnc.service;
 import jakarta.transaction.Transactional;
 import kr.co.megabridge.megavnc.domain.*;
 import kr.co.megabridge.megavnc.dto.*;
-import kr.co.megabridge.megavnc.enums.ErrorCode;
+import kr.co.megabridge.megavnc.exception.ErrorCode;
 import kr.co.megabridge.megavnc.enums.Status;
-import kr.co.megabridge.megavnc.exception.RemotePcException;
+import kr.co.megabridge.megavnc.exception.exceptions.RemotePcException;
 import kr.co.megabridge.megavnc.repository.GroupRepository;
 import kr.co.megabridge.megavnc.repository.MemberRepository;
 import kr.co.megabridge.megavnc.repository.Member_GroupRepository;
@@ -20,7 +20,7 @@ import java.util.*;
 
 @Service
 public class RemotePcService {
-    private static final String defaultGroup = "All Group";
+    private static final String ALL_GROUP = "All Group";
 
     private final RemotePcRepository remotePcRepository;
     private final MemberRepository memberRepository;
@@ -105,7 +105,7 @@ public class RemotePcService {
 
         if (currTop.isPresent())
             nextRepeaterId = currTop.get().getRepeaterId() + 1;
-        if(registerRemotePcDto.getGroupName().equals(defaultGroup)){
+        if(registerRemotePcDto.getGroupName().equals(ALL_GROUP)){
             throw new RemotePcException(ErrorCode.GROUP_NOT_SELECTED , "PC를 추가하려면 상단에서 그룹을 먼저 선택해주세요.");
         }
         Optional<Group> optionalGroup = groupRepository.findByGroupName(registerRemotePcDto.getGroupName());
@@ -161,6 +161,11 @@ public class RemotePcService {
         RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new RemotePcException(ErrorCode.PC_NOT_FOUND," 페이지를 새로고침 해주세요."));
         if(remotePc.getStatus() == Status.ACTIVE){
             throw new RemotePcException(ErrorCode.DELETE_NOT_ONLY_WHEN_ACTIVE,"페이지를 새로고침 해주세요.");
+        }
+
+        if(remotePc.getId()==1L){
+            throw new RemotePcException(ErrorCode.CANNOT_DELETE_DEFAULT_PC);
+
         }
 
         Optional<Member> optionalMember = memberRepository.findByUsername(user.getUsername());
