@@ -8,7 +8,6 @@ import kr.co.megabridge.megavnc.enums.Status;
 import kr.co.megabridge.megavnc.service.RemotePcApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,8 +18,8 @@ public class RemotePcController {
     private final RemotePcApiService remotePcApiService;
 
     @PostMapping
-    public ResponseEntity<ResponseRemotePcApiDto>  getRepeaterIdByPcName(@RequestBody RequestRemotePcDto requestRemotePcDto){
-        ResponseRemotePcApiDto remotePc = remotePcApiService.findRemotePcByPcName(requestRemotePcDto);
+    public ResponseEntity<ResponseRemotePcApiDto> connectSettingRepeater(@RequestBody RequestRemotePcDto requestRemotePcDto){
+        ResponseRemotePcApiDto remotePc = remotePcApiService.connectSettingRepeater(requestRemotePcDto);
         return  ResponseEntity.ok(remotePc);
     }
 

@@ -20,13 +20,13 @@ public class RemotePc {
 
     private String name;
 
-    private Date createdAt;
+    private Date assignedAt;
 
     private Status status;
 
     private String accessPassword;
 
-    private boolean isAssigned;
+    private String ftpHost;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,18 +41,20 @@ public class RemotePc {
         RemotePc remotePc = new RemotePc();
         remotePc.repeaterId = repeaterId;
         remotePc.name = name;
+        remotePc.assignedAt = null;
         remotePc.status = Status.OFFLINE;
         remotePc.accessPassword = accessPassword;
         remotePc.group = group;
-        remotePc.isAssigned = false;
+        remotePc.ftpHost = "";
         return remotePc;
     }
 
-    public void assign(){this.isAssigned = true;}
-    public void updateStatus(Status status){this.status = status;}
-
-    @PrePersist
-    private void createdAt() {
-        this.createdAt = new Date();
+    public void assign(){
+        this.assignedAt = new Date();
     }
+    public void updateStatus(Status status){this.status = status;}
+    public void updateFtpHost(String ftpHost){this.ftpHost = ftpHost;}
+
+
+
 }

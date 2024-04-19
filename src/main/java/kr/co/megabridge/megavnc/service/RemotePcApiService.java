@@ -1,5 +1,6 @@
 package kr.co.megabridge.megavnc.service;
 
+import jakarta.transaction.Transactional;
 import kr.co.megabridge.megavnc.domain.Group;
 import kr.co.megabridge.megavnc.domain.RemotePc;
 import kr.co.megabridge.megavnc.dto.RequestRemotePcDto;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +25,13 @@ public class RemotePcApiService {
 
 
 
-
-    public ResponseRemotePcApiDto findRemotePcByPcName(RequestRemotePcDto remotePcDto){
+    @Transactional
+    public ResponseRemotePcApiDto connectSettingRepeater(RequestRemotePcDto remotePcDto){
+        String ipPattern = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+                + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+                + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+                + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+        Pattern pattern = Pattern.compile(ipPattern);
 
         Optional<Group> optionalGroup = groupRepository.findByGroupName(remotePcDto.getGroupName());
         Group group = optionalGroup.orElseThrow(() -> new RemotePcApiException(ErrorCode.GROUP_NOT_FOUND));
@@ -46,13 +53,18 @@ public class RemotePcApiService {
             throw new RemotePcApiException(ErrorCode.PC_NOT_FOUND,"그룹을 확인해 주세요");
         }
 
-        if (response.isAssigned()){
+        if (response.getAssignedAt() != null){
             throw new RemotePcApiException(ErrorCode.ALREADY_ASSIGNED_PC);
         }
 
         if (!remotePcDto.getAccessPassword().equals(response.getAccessPassword()))
             throw new RemotePcApiException(ErrorCode.PASSWORD_NOT_MATCH);
 
+
+        if (!pattern.matcher(remotePcDto.getFtpHost()).matches()){
+            throw new RemotePcApiException(ErrorCode.NOT_IP_PATTERN);
+        }
+        response.updateFtpHost(remotePcDto.getFtpHost());
         return new ResponseRemotePcApiDto(response.getRepeaterId());
     }
 

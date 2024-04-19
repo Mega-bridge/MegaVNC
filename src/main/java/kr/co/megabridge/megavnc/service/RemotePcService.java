@@ -45,7 +45,7 @@ public class RemotePcService {
         for(Group group : groups){
             List<RemotePc> remotePcs = remotePcRepository.findByGroup(group);
                 for (RemotePc remotePc :remotePcs){
-                   ResponseRemotePcDto response = new ResponseRemotePcDto(remotePc.getId(),remotePc.getGroup(),remotePc.getName(),remotePc.getCreatedAt(),remotePc.getStatus());
+                   ResponseRemotePcDto response = new ResponseRemotePcDto(remotePc.getId(),remotePc.getGroup(),remotePc.getName(),remotePc.getAssignedAt(),remotePc.getStatus());
                     responses.add(response);
             }
         }
@@ -68,7 +68,7 @@ public class RemotePcService {
 
         List<RemotePc> remotePcs = remotePcRepository.findByGroup(group);
         for (RemotePc remotePc :remotePcs){
-            ResponseRemotePcDto response = new ResponseRemotePcDto(remotePc.getId(),remotePc.getGroup(),remotePc.getName(),remotePc.getCreatedAt(),remotePc.getStatus());
+            ResponseRemotePcDto response = new ResponseRemotePcDto(remotePc.getId(),remotePc.getGroup(),remotePc.getName(),remotePc.getAssignedAt(),remotePc.getStatus());
             responses.add(response);
         }
         Collections.sort(responses, Comparator.comparing(ResponseRemotePcDto::getId));
@@ -131,7 +131,9 @@ public class RemotePcService {
         Optional<RemotePc> optionalRemotePc = remotePcRepository.findByRepeaterId(repeaterId);
         RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new RemotePcException(ErrorCode.PC_NOT_FOUND));
         remotePc.updateStatus(status);
-        remotePc.assign();
+        if (status == Status.STANDBY && remotePc.getAssignedAt() == null){
+            remotePc.assign();
+        }
         remotePcRepository.save(remotePc);
     }
 

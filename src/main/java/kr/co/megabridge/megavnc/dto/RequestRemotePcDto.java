@@ -8,5 +8,5 @@ public class RequestRemotePcDto {
     private String groupName;
     private String pcName;
     private String accessPassword;
-
+    private String ftpHost;
 }

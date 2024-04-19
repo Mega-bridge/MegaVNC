@@ -27,6 +27,7 @@ public class SecurityConfig {
         return (web) -> web.ignoring()
                 .requestMatchers(
                         new AntPathRequestMatcher("/css/**"),
+                        new AntPathRequestMatcher("/ftp"),
                         new AntPathRequestMatcher("/images/**"),
                         new AntPathRequestMatcher("/api/**"));
     }
@@ -38,8 +39,6 @@ public class SecurityConfig {
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(request -> request
-                        //.requestMatchers(new AntPathRequestMatcher("/api/**"))
-                        //.permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/register"))
                         .permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/admin/**"))

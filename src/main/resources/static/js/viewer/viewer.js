@@ -1,30 +1,30 @@
 import RFB from "./noVNC-1.4.0/core/rfb.js";
 
-let rfb, repeaterId, accessPassword, connectButton, disconnectButton, screen, fullscreenButton, pasteButton,status;
-let captureButton, qualityLevelInput, qualityLevel = 6, shutdownButton;
+let rfb, repeaterId, accessPassword, disconnectButton, screen, fullscreenButton, pasteButton,status;
+let captureButton, qualityLevelInput, qualityLevel = 6, shutdownButton, uploadForm;
+
 
 window.onload = function() {
     status = document.getElementById("status").value
     repeaterId = document.getElementById("repeaterId").value;
     accessPassword = document.getElementById("accessPassword").value;
-   // connectButton = document.getElementById("connect");
     disconnectButton = document.getElementById("disconnect");
     screen = document.getElementById("screen");
     fullscreenButton = document.getElementById("fullscreen");
     pasteButton = document.getElementById("pasteButton");
     captureButton = document.getElementById("captureButton");
-    qualityLevelInput = document.getElementById("qualityLevelInput");
-    shutdownButton = document.getElementById("shutdownButton");
-    //다 완성 하고 보기
+    uploadForm = document.getElementById("uploadForm");
+    //qualityLevelInput = document.getElementById("qualityLevelInput");
+    //shutdownButton = document.getElementById("shutdownButton");
     disconnectButton.addEventListener("click", handleDisconnect);
     fullscreenButton.addEventListener("click", handleFullscreen);
     pasteButton.addEventListener("click", handlePaste);
     captureButton.addEventListener("click", handleCapture);
-    qualityLevelInput.addEventListener("input", handleQualityLevel);
-    shutdownButton.addEventListener("click", handleShutdown);
-    //connectButton.addEventListener("click",handleConnect)
-    if(status === "ACTIVE"){
-        window.alert("다른 PC에서 사용중입니다.");
+    uploadForm.addEventListener("submit", handleFormSubmit);
+    // qualityLevelInput.addEventListener("input", handleQualityLevel);
+    //shutdownButton.addEventListener("click", handleShutdown);
+    if(status === "OFFLINE"){
+        window.alert("해당 PC는 오프라인 상태 입니다.");
         window.location.href = "/remote-pcs";
     }
     else{
@@ -52,9 +52,38 @@ function handleConnect() {
     rfb.addEventListener("clipboard", handleClipboard);
 }
 
+
+const handleFormSubmit = async (event) =>{
+    event.preventDefault(); // 폼 제출을 중지합니다.
+    const COMMON_URL = 'https://192.168.0.137:8443';
+    const fileInput = document.getElementById("fileInput").files[0];
+    // 폼 데이터를 가져옵니다.
+    let formData = new FormData();
+    formData.append("file", fileInput); // 파일 데이터 추가
+    formData.append("repeaterId", repeaterId); // repeaterId 추가
+
+    const option = {
+        method : 'POST',
+        headers:{
+
+        },
+        body: formData
+    };
+    try {
+        const res = await fetch(`${COMMON_URL}/ftp`, {
+            ...option
+        });
+        alert(await res.text());
+    }catch (error) {
+        alert('Error:'+ error.message);
+    }
+}
+
+
+
+
 function handleDisconnect() {
     rfb.disconnect();
-    window.location.href = "/remote-pcs";
 }
 
 function handleFullscreen() {
@@ -87,6 +116,7 @@ function handleCapture() {
     document.body.removeChild(link);
     link = null;
 }
+/*
 
 function handleQualityLevel() {
     qualityLevel = parseInt(this.value);
@@ -95,4 +125,4 @@ function handleQualityLevel() {
 function handleShutdown() {
     rfb.machineShutdown();
     console.log("sent");
-}
+}*/

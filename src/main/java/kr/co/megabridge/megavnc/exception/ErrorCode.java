@@ -23,9 +23,9 @@ public enum ErrorCode {
     DELETE_NOT_ONLY_WHEN_ACTIVE(400,"R005","PC가 사용중일 때는 삭제가 불가능 합니다. "),
     MISSING_PC_NAME(400,"R006","pc의 이름을 입력해 주세요. "),
     MISSING_ACCESS_PASSWORD(400,"R007","접근 비밀번호를 입력해 주세요. "),
-    ALREADY_ASSIGNED_PC(400,"R008","이미 배정된 pc 입니다. 다른 pc를 선택해 주세요. "),
-    CANNOT_DELETE_DEFAULT_PC(400,"R009","기본 pc는 삭제할 수 없습니다. "),
-
+    CANNOT_DELETE_DEFAULT_PC(400,"R008","기본 pc는 삭제할 수 없습니다. "),
+    NOT_IP_PATTERN(400,"R009","IP의 패턴이 아닙니다. "),
+    ALREADY_ASSIGNED_PC(400,"R010","이미 배정된 pc 입니다. 다른 pc를 선택해 주세요. "),
     //User
     USER_NOT_FOUND(404,"U001","존재하지 않는 사용자 입니다. "),
     ADMIN_CANNOT_DELETE(403,"U002","어드민은 삭제할 수 없습니다. ");

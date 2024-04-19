@@ -81,7 +81,7 @@ public class RemotePcsContoller {
 
     @GetMapping("/download-server")
     public ResponseEntity<Resource> downloadServer() {
-        Resource file = new ClassPathResource("static/bin/MegaVNC-v0.2.0.zip");
+        Resource file = new ClassPathResource("static/bin/MegaVNC-v0.2.1.zip");
         String contentDisposition = "attachment; filename=\"" +
                 UriUtils.encode(file.getFilename(), StandardCharsets.UTF_8) + "\"";
         return ResponseEntity
@@ -89,6 +89,8 @@ public class RemotePcsContoller {
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                 .body(file);
     }
+
+
     @PostMapping("/register-pc")
     public String registerRemotePc(RegisterRemotePcDto registerRemotePcDto) {
 

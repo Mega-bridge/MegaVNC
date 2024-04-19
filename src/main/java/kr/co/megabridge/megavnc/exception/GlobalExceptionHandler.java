@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     private final RemotePcService remotePcService;
     private final AdminUserService adminUserService;
     private final AdminGroupService adminGroupService;
-    private final AdminAssignService adminAssignService;
+
 
 
 
