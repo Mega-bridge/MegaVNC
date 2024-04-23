@@ -22,6 +22,7 @@ public class RemotePc {
 
     private Date assignedAt;
 
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     private String accessPassword;

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{/fragments/header :: head ('원격 PC 목록')}">
+<head th:replace="~{fragments/header :: head ('원격 PC 목록')}">
     <title>MegaVNC</title>
 
 </head>
 <body class="bg-body-secondary">
-<header th:replace="~{/fragments/nav :: nav (${user.username})}"></header>
+<header th:replace="~{fragments/nav :: nav (${user.username})}"></header>
 
 <div th:if="${error}" class="card text-bg-danger mb-3">
     <div class="card-body" th:text="${errorMessage}"></div>

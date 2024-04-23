@@ -3,7 +3,7 @@ package kr.co.megabridge.megavnc.web;
 
 import kr.co.megabridge.megavnc.domain.Group;
 import kr.co.megabridge.megavnc.domain.RemotePc;
-import kr.co.megabridge.megavnc.domain.User;
+import kr.co.megabridge.megavnc.security.User;
 import kr.co.megabridge.megavnc.dto.RegisterRemotePcDto;
 import kr.co.megabridge.megavnc.dto.ResponseRemotePcDto;
 import kr.co.megabridge.megavnc.dto.ResponseDeleteDto;
@@ -81,7 +81,7 @@ public class RemotePcsContoller {
 
     @GetMapping("/download-server")
     public ResponseEntity<Resource> downloadServer() {
-        Resource file = new ClassPathResource("static/bin/MegaVNC-v0.2.1.zip");
+        Resource file = new ClassPathResource("static/bin/MegaVNC-v0.2.2.zip");
         String contentDisposition = "attachment; filename=\"" +
                 UriUtils.encode(file.getFilename(), StandardCharsets.UTF_8) + "\"";
         return ResponseEntity

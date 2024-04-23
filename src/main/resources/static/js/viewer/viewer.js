@@ -35,8 +35,8 @@ window.onload = function() {
 function handleConnect() {
     rfb = new RFB(
             screen,
-             "wss://192.168.0.228:6080",                   // LOCAL
-            //"wss://vnc.megabridge.co.kr:6080",          // DEV
+            // "wss://192.168.0.228:6080",                   // LOCAL
+            "wss://vnc.megabridge.co.kr:6080",          // DEV
             {
                 credentials: { password: accessPassword },
                 repeaterID: repeaterId
@@ -55,7 +55,7 @@ function handleConnect() {
 
 const handleFormSubmit = async (event) =>{
     event.preventDefault(); // 폼 제출을 중지합니다.
-    const COMMON_URL = 'https://192.168.0.137:8443';
+    const COMMON_URL = 'https://vnc.megabridge.co.kr:8443';
     const fileInput = document.getElementById("fileInput").files[0];
     // 폼 데이터를 가져옵니다.
     let formData = new FormData();

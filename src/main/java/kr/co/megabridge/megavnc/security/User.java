@@ -1,12 +1,14 @@
-package kr.co.megabridge.megavnc.domain;
+package kr.co.megabridge.megavnc.security;
 
+import kr.co.megabridge.megavnc.domain.Member;
+import kr.co.megabridge.megavnc.enums.Role;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,14 +23,13 @@ public class User implements UserDetails {
     private Set<String> roles;
 
     public static User createUser(
-            String username,
-            String rawPassword,
-            Set<String> roles,
-            PasswordEncoder encoder
+            Member member
     ) {
         User user = new User();
-        user.username = username;
-        user.password = encoder.encode(rawPassword);
+        user.username = member.getUsername();
+        user.password = member.getPassword();
+        Set<String> roles = new HashSet<>();
+        roles.add(Role.toValue(member.getRole()));
         user.roles = roles;
 
         return user;

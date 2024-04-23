@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.service;
+package kr.co.megabridge.megavnc.web.admin;
 
 import jakarta.transaction.Transactional;
 import kr.co.megabridge.megavnc.domain.Group;
@@ -29,7 +29,7 @@ public class AdminGroupService {
 
   public List<Group> listAllGroups(){
 
-    return  groupRepository.findAllStartWith(2L);
+    return  groupRepository.findAllExceptIdOne();
   }
 
 
@@ -38,7 +38,7 @@ public class AdminGroupService {
       Optional<Group> optionalGroup = groupRepository.findByGroupName(groupName);
       if(optionalGroup.isPresent()){
         if (optionalGroup.get().getId() == 1L){
-          throw new AdminGroupException(ErrorCode.ALREADY_EXIST_GROUP,"'NoGroup'이라는 그룹명을 사용할 수 없습니다.");
+          throw new AdminGroupException(ErrorCode.ALREADY_EXIST_GROUP,"'BaseGroup'이라는 그룹명을 사용할 수 없습니다.");
         }
         throw new AdminGroupException(ErrorCode.ALREADY_EXIST_GROUP);
       }

@@ -3,7 +3,6 @@ package kr.co.megabridge.megavnc.web.admin;
 import jakarta.validation.Valid;
 import kr.co.megabridge.megavnc.domain.Group;
 import kr.co.megabridge.megavnc.dto.*;
-import kr.co.megabridge.megavnc.service.AdminGroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

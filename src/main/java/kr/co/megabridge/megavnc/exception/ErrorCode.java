@@ -26,9 +26,12 @@ public enum ErrorCode {
     CANNOT_DELETE_DEFAULT_PC(400,"R008","기본 pc는 삭제할 수 없습니다. "),
     NOT_IP_PATTERN(400,"R009","IP의 패턴이 아닙니다. "),
     ALREADY_ASSIGNED_PC(400,"R010","이미 배정된 pc 입니다. 다른 pc를 선택해 주세요. "),
+
+
+
     //User
     USER_NOT_FOUND(404,"U001","존재하지 않는 사용자 입니다. "),
-    ADMIN_CANNOT_DELETE(403,"U002","어드민은 삭제할 수 없습니다. ");
+    ADMIN_CANNOT_DELETE(400,"U002","어드민은 삭제할 수 없습니다. ");
 
     private final String code;
     private final String message;

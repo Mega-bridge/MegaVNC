@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
       xmlns:--bs-bg-opacity="http://www.w3.org/1999/xhtml">
-<head th:replace="~{/fragments/header :: head ('원격 PC 뷰어')}">
+<head th:replace="~{fragments/header :: head ('원격 PC 뷰어')}">
     <title>MegaVNC</title>
 
 </head>
 <body class="bg-body-secondary">
-<header th:replace="~{/fragments/nav :: nav (${user.username})}"></header>
+<header th:replace="~{fragments/nav :: nav (${user.username})}"></header>
 
 <input id="accessPassword" type="hidden" th:value="${accessPassword}"/>
 <input id="status" type="hidden" th:value="${#strings.toString(status)}"/>

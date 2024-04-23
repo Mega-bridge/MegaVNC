@@ -48,7 +48,9 @@ dependencies {
 	implementation 'org.postgresql:postgresql:42.5.1'
 	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
 }
-
+bootJar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 tasks.named('bootBuildImage') {
 	builder = 'paketobuildpacks/builder-jammy-base:latest'
 }

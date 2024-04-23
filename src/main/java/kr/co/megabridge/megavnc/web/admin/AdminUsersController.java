@@ -5,7 +5,6 @@ import kr.co.megabridge.megavnc.domain.Member;
 
 import kr.co.megabridge.megavnc.dto.AssignGroupDto;
 import kr.co.megabridge.megavnc.dto.UserRegisterDto;
-import kr.co.megabridge.megavnc.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,8 +26,7 @@ public class AdminUsersController {
         List<Member> users = adminUserService.listAllUsers();
         model.addAttribute("users", users);
         model.addAttribute("UserRegisterDto", new UserRegisterDto());
-        model.addAttribute("AssignUserDto", new AssignGroupDto());
-        model.addAttribute("groups", adminUserService.findAllGroups());
+
 
         return "admin/userManagement/users";
     }

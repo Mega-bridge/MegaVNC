@@ -17,7 +17,7 @@ public class GroupApiService {
     private final GroupRepository groupRepository;
 
     public List<ResponseGroupApiDto> findAllGroups(){
-        List<Group> groups = groupRepository.findAllStartWith(2L);
+        List<Group> groups = groupRepository.findAllExceptIdOne();
         List<ResponseGroupApiDto> responses = new ArrayList<>();
         for( Group group : groups){
             responses.add(new ResponseGroupApiDto(group.getId(), group.getGroupName()));

@@ -15,7 +15,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     Optional<Group> findByGroupName(String groupName);
 
-    @Query("SELECT g FROM segment g WHERE g.id >= :id")
-    List<Group> findAllStartWith(@Param("id") Long id);
+    @Query("SELECT g FROM segment g WHERE g.id != 1L")
+    List<Group> findAllExceptIdOne();
 
 }

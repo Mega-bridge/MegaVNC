@@ -10,6 +10,7 @@ import kr.co.megabridge.megavnc.repository.GroupRepository;
 import kr.co.megabridge.megavnc.repository.MemberRepository;
 import kr.co.megabridge.megavnc.repository.Member_GroupRepository;
 import kr.co.megabridge.megavnc.repository.RemotePcRepository;
+import kr.co.megabridge.megavnc.security.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,7 @@ public class RemotePcService {
         return responses;
     }
 
-    public List<ResponseRemotePcDto> findByGroupName(String groupName ,User user){
+    public List<ResponseRemotePcDto> findByGroupName(String groupName , User user){
         Optional<Group> optionalGroup = groupRepository.findByGroupName(groupName);
         List<ResponseRemotePcDto> responses = new ArrayList<>();
         Group group = optionalGroup.orElseThrow(() -> new RemotePcException(ErrorCode.GROUP_NOT_FOUND,"해당 그룹을 추가해 주세요."));

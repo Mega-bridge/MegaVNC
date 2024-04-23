@@ -17,8 +17,8 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByRole(Role role);
     Optional<Member> findByUsername(String username);
-    @Query("SELECT m FROM Member m WHERE m.id >= :id")
-    List<Member> findAllStartWith(@Param("id") Long id);
+    @Query("SELECT m FROM Member m WHERE m.id != 1L")
+    List<Member> findAllExceptIdOne();
 
 
 

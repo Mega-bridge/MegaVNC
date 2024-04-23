@@ -1,9 +1,7 @@
 package kr.co.megabridge.megavnc.web.admin;
 
 import jakarta.validation.Valid;
-import kr.co.megabridge.megavnc.domain.Group;
 import kr.co.megabridge.megavnc.dto.AssignGroupDto;
-import kr.co.megabridge.megavnc.service.AdminAssignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,8 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor

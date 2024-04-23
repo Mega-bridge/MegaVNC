@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.service;
+package kr.co.megabridge.megavnc.web.admin;
 
 
 import jakarta.transaction.Transactional;

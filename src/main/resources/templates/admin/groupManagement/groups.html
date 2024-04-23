@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{/fragments/header :: head ('그룹 관리')}">
+<head th:replace="~{fragments/header :: head ('그룹 관리')}">
     <meta charset="UTF-8">
     <title>MegaVNC</title>
 </head>
 <body class="bg-body-secondary">
 <header>
-    <nav th:replace="~{/fragments/nav :: nav ('admin')}"></nav>
+    <nav th:replace="~{fragments/nav :: nav ('admin')}"></nav>
 </header>
 <div th:if="${error}" class="card text-bg-danger mb-3">
     <div class="card-body" th:text="${errorMessage}"></div>

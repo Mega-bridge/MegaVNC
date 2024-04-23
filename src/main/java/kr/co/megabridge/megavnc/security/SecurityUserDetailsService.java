@@ -1,7 +1,6 @@
 package kr.co.megabridge.megavnc.security;
 
 import kr.co.megabridge.megavnc.domain.Member;
-import kr.co.megabridge.megavnc.domain.User;
 import kr.co.megabridge.megavnc.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,13 +22,11 @@ public class SecurityUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Member> optionalMember = memberRepository.findByUsername(username);
-        if (!optionalMember.isPresent()){
-            throw new UsernameNotFoundException("Username '" + username + "' not found.");
-        }
-        Member member = optionalMember.get();
-        User user = member.getUserDetail();
-        return user;
+        Member member = memberRepository.findByUsername(username).orElseThrow(() ->  new UsernameNotFoundException("Username '" + username + "' not found."));
+
+        return User.createUser(member);
+
+
     }
 
 
