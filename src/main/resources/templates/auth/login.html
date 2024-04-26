@@ -30,7 +30,7 @@
             <div class="mb-5 form-check">
                 <label class="form-check-label" for="rememberMe">로그인 유지</label>
                 <input type="checkbox" class="form-check-input" name="rememberMe" id="rememberMe">
-              </div>
+            </div>
 
             <div class="d-grid mb-3">
                 <button type="submit" class="btn btn-primary">로그인</button>
@@ -38,8 +38,12 @@
 
         </form>
 
+
     </div>
-    <a href="https://www.megabridge.co.kr/" target="_blank" class="text-secondary">MegaBridge</a>
+    <a class="text-secondary" th:href="@{/remote-pcs/download-server}" target="_blank">
+        <i class="fa-solid fa-file-download me-2"></i>MegaVNC(install)
+    </a>
+    <!--<a href="https://www.megabridge.co.kr/" target="_blank" class="text-secondary">MegaBridge</a>-->
 </div>
 </body>
 </html>
