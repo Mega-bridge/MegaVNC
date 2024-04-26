@@ -53,7 +53,7 @@ public class RemotePcApiService {
             throw new RemotePcApiException(ErrorCode.PC_NOT_FOUND,"그룹을 확인해 주세요");
         }
 
-        if (response.getAssignedAt() != null){
+        if (response.getAssignedAt() != null && !response.getReconnectId().equals(remotePcDto.getReconnectId())){
             throw new RemotePcApiException(ErrorCode.ALREADY_ASSIGNED_PC);
         }
 
@@ -64,7 +64,7 @@ public class RemotePcApiService {
         if (!pattern.matcher(remotePcDto.getFtpHost()).matches()){
             throw new RemotePcApiException(ErrorCode.NOT_IP_PATTERN);
         }
-        response.updateFtpHost(remotePcDto.getFtpHost());
+        response.updateFtpHostAndReconnectId(remotePcDto.getFtpHost(),remotePcDto.getReconnectId());
         return new ResponseRemotePcApiDto(response.getRepeaterId());
     }
 

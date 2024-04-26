@@ -9,4 +9,6 @@ public class RequestRemotePcDto {
     private String pcName;
     private String accessPassword;
     private String ftpHost;
+    private String reconnectId;
+
 }

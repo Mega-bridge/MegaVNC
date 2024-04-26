@@ -29,6 +29,7 @@ public class RemotePc {
 
     private String ftpHost;
 
+    private String reconnectId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Group group;
@@ -47,6 +48,7 @@ public class RemotePc {
         remotePc.accessPassword = accessPassword;
         remotePc.group = group;
         remotePc.ftpHost = "";
+        remotePc.reconnectId = "";
         return remotePc;
     }
 
@@ -54,7 +56,12 @@ public class RemotePc {
         this.assignedAt = new Date();
     }
     public void updateStatus(Status status){this.status = status;}
-    public void updateFtpHost(String ftpHost){this.ftpHost = ftpHost;}
+    public void updateFtpHostAndReconnectId(String ftpHost, String reconnectId){
+        this.ftpHost = ftpHost;
+        if(!reconnectId.equals("default")) {
+            this.reconnectId = reconnectId;
+        }
+    }
 
 
 
