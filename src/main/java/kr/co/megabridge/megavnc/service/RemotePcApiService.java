@@ -10,6 +10,8 @@ import kr.co.megabridge.megavnc.exception.exceptions.RemotePcApiException;
 import kr.co.megabridge.megavnc.repository.GroupRepository;
 import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RemotePcApiService {
 
     private final RemotePcRepository remotePcRepository;
@@ -69,8 +72,15 @@ public class RemotePcApiService {
     }
 
 
+    @Transactional
+    public void disAssignRemotePcByRepeaterId(String reconnectId){
+        Optional<RemotePc> optionalRemotePc = remotePcRepository.findByReconnectId(reconnectId);
+        RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new RemotePcApiException(ErrorCode.PC_NOT_FOUND));
+       log.info("remotePc.getReconnectId()(1) = {}" , remotePc.getReconnectId());
+        remotePc.disAssign();
+        log.info("remotePc.getReconnectId()(2) = {}" , remotePc.getReconnectId());
 
-
+    }
 
 
 

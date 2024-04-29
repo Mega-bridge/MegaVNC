@@ -25,7 +25,8 @@ public enum ErrorCode {
     MISSING_ACCESS_PASSWORD(400,"R007","접근 비밀번호를 입력해 주세요. "),
     CANNOT_DELETE_DEFAULT_PC(400,"R008","기본 pc는 삭제할 수 없습니다. "),
     NOT_IP_PATTERN(400,"R009","IP의 패턴이 아닙니다. "),
-    ALREADY_ASSIGNED_PC(400,"R010","이미 배정된 pc 입니다. 다른 pc를 선택해 주세요. "),
+    ALREADY_ASSIGNED_PC(400,"R010","이미 등록된 pc 입니다. 다른 pc를 선택해 주세요. "),
+    CANNOT_DELETE_ASSIGNED_PC(400,"R011","등록되지 않은 pc만 삭제할 수 있습니다. "),
 
 
 

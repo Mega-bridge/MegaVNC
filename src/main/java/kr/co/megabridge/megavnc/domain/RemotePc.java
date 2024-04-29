@@ -62,6 +62,12 @@ public class RemotePc {
             this.reconnectId = reconnectId;
         }
     }
+    public void disAssign(){
+        this.assignedAt = null;
+        this.status = Status.OFFLINE;
+        this.ftpHost = "";
+        this.reconnectId ="";
+    }
 
 
 
