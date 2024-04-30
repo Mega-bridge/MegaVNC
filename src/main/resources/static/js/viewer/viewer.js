@@ -60,20 +60,22 @@ const handleFormSubmit = async (event) =>{
     // 폼 데이터를 가져옵니다.
     let formData = new FormData();
     formData.append("file", fileInput); // 파일 데이터 추가
-    formData.append("repeaterId", repeaterId); // repeaterId 추가
 
     const option = {
         method : 'POST',
         headers:{
-
         },
         body: formData
     };
     try {
-        const res = await fetch(`${COMMON_URL}/ftp`, {
+        const res = await fetch(`${COMMON_URL}/file`, {
             ...option
         });
-        alert(await res.text());
+        await navigator.clipboard.writeText(`${COMMON_URL}/file/download-files/` + await res.text());
+        await handlePaste();
+        alert("파일 전송이 완료되었습니다.");
+
+
     }catch (error) {
         alert('Error:'+ error.message);
     }
@@ -91,7 +93,7 @@ function handleFullscreen() {
 }
 
 function handleClipboard(event) {
-    navigator.clipboard.writeText(event.detail.text)
+    navigator.clipboard.writeText(event.detail.text);
 }
 
 function handlePaste() {

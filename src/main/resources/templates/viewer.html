@@ -10,7 +10,7 @@
 
 <input id="accessPassword" type="hidden" th:value="${accessPassword}"/>
 <input id="status" type="hidden" th:value="${#strings.toString(status)}"/>
-
+<input id="repeaterId" name="repeaterId" type="hidden" th:value="${repeaterId}"/>
 
 <div class="container mt-5 mb-3">
     <a th:href="@{/remote-pcs}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left me-2"></i>원격 PC 목록</a>
@@ -61,7 +61,7 @@
                     <div style="width: 400px;" class="my-1">
                         <form id="uploadForm" action="/ftp" method="post" enctype="multipart/form-data"
                               class="d-flex flex-row">
-                            <input id="repeaterId" name="repeaterId" type="hidden" th:value="${repeaterId}"/>
+
                             <div class="col me-1">
                                 <input type="file" class="form-control" name="file" id="fileInput">
                             </div>

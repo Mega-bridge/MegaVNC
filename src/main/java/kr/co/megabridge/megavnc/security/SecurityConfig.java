@@ -27,9 +27,10 @@ public class SecurityConfig {
         return (web) -> web.ignoring()
                 .requestMatchers(
                         new AntPathRequestMatcher("/css/**"),
-                        new AntPathRequestMatcher("/ftp"),
                         new AntPathRequestMatcher("/images/**"),
-                        new AntPathRequestMatcher("/api/**"));
+                        new AntPathRequestMatcher("/file/**"),
+                        new AntPathRequestMatcher("/api/**"),
+                        new AntPathRequestMatcher("/remote-pcs/download-server"));
     }
 
 
@@ -41,6 +42,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(new AntPathRequestMatcher("/register"))
                         .permitAll()
+                        //.requestMatchers("/file/**")
+                        // .hasAnyRole("USER","ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/admin/**"))
                         .hasRole("ADMIN")
                         .anyRequest()

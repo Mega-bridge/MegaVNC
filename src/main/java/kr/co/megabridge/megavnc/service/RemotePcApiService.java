@@ -10,7 +10,6 @@ import kr.co.megabridge.megavnc.exception.exceptions.RemotePcApiException;
 import kr.co.megabridge.megavnc.repository.GroupRepository;
 import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -30,11 +29,8 @@ public class RemotePcApiService {
 
     @Transactional
     public ResponseRemotePcApiDto connectSettingRepeater(RequestRemotePcDto remotePcDto){
-        String ipPattern = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
-                + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
-                + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
-                + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
-        Pattern pattern = Pattern.compile(ipPattern);
+
+
 
         Optional<Group> optionalGroup = groupRepository.findByGroupName(remotePcDto.getGroupName());
         Group group = optionalGroup.orElseThrow(() -> new RemotePcApiException(ErrorCode.GROUP_NOT_FOUND));
@@ -63,11 +59,10 @@ public class RemotePcApiService {
         if (!remotePcDto.getAccessPassword().equals(response.getAccessPassword()))
             throw new RemotePcApiException(ErrorCode.PASSWORD_NOT_MATCH);
 
-
-        if (!pattern.matcher(remotePcDto.getFtpHost()).matches()){
-            throw new RemotePcApiException(ErrorCode.NOT_IP_PATTERN);
+        if(!remotePcDto.getReconnectId().equals("default")) {
+            response.updateReconnectId(remotePcDto.getReconnectId());
         }
-        response.updateFtpHostAndReconnectId(remotePcDto.getFtpHost(),remotePcDto.getReconnectId());
+
         return new ResponseRemotePcApiDto(response.getRepeaterId());
     }
 
@@ -76,9 +71,8 @@ public class RemotePcApiService {
     public void disAssignRemotePcByRepeaterId(String reconnectId){
         Optional<RemotePc> optionalRemotePc = remotePcRepository.findByReconnectId(reconnectId);
         RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new RemotePcApiException(ErrorCode.PC_NOT_FOUND));
-       log.info("remotePc.getReconnectId()(1) = {}" , remotePc.getReconnectId());
         remotePc.disAssign();
-        log.info("remotePc.getReconnectId()(2) = {}" , remotePc.getReconnectId());
+
 
     }
 

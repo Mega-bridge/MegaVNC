@@ -27,7 +27,6 @@ public class RemotePc {
 
     private String accessPassword;
 
-    private String ftpHost;
 
     private String reconnectId;
 
@@ -47,7 +46,6 @@ public class RemotePc {
         remotePc.status = Status.OFFLINE;
         remotePc.accessPassword = accessPassword;
         remotePc.group = group;
-        remotePc.ftpHost = "";
         remotePc.reconnectId = "";
         return remotePc;
     }
@@ -56,16 +54,12 @@ public class RemotePc {
         this.assignedAt = new Date();
     }
     public void updateStatus(Status status){this.status = status;}
-    public void updateFtpHostAndReconnectId(String ftpHost, String reconnectId){
-        this.ftpHost = ftpHost;
-        if(!reconnectId.equals("default")) {
-            this.reconnectId = reconnectId;
-        }
+    public void updateReconnectId( String reconnectId){
+        this.reconnectId = reconnectId;
     }
     public void disAssign(){
         this.assignedAt = null;
         this.status = Status.OFFLINE;
-        this.ftpHost = "";
         this.reconnectId ="";
     }
 
