@@ -8,7 +8,7 @@
 <header>
     <nav th:replace="~{fragments/nav :: nav ('admin')}"></nav>
 </header>
-<div th:if="${error}" class="card text-bg-danger mb-3">
+<div th:if="${error}" class="card text-bg-danger mb-3" id="errorMessageCard">
     <div class="card-body" th:text="${errorMessage}"></div>
 </div>
 <div class="container py-5">
@@ -107,7 +107,17 @@
     </div>
 
 </div>
+<script>
+    setTimeout(function() {
+        let card = document.getElementById("errorMessageCard");
+        card.style.transition = "opacity 2s ease";
+        card.style.opacity = 0;
+        setTimeout(function() {
+            card.style.display = "none";
+        }, 2000);
+    }, 5000);
 
+</script>
 
 </body>
 </html>

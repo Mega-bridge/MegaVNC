@@ -4,6 +4,8 @@ import kr.co.megabridge.megavnc.exception.ErrorCode;
 import kr.co.megabridge.megavnc.exception.BusinessException;
 
 public class AdminGroupException extends BusinessException {
+
+
     public AdminGroupException(ErrorCode errorCode, String message) {
         super(errorCode, message);
     }

@@ -8,10 +8,14 @@
 <header>
     <nav th:replace="~{fragments/nav :: nav ('admin')}"></nav>
 </header>
-<div th:if="${error}" class="card text-bg-danger mb-3">
+<div th:if="${error}" class="card text-bg-danger mb-3" id="errorMessageCard">
     <div class="card-body" th:text="${errorMessage}"></div>
 </div>
 <!--그룹 변경 하려는 유저 정보 표시-->
+<div th:if="${first}" class="card text-bg-primary mb-3" id="messageCard">
+    <div class="card-body"  th:text="'배정 대상: \'' + ${user.username} + '\'님의 그룹을 선택하세요.'"></div>
+</div>
+
 <div class="row">
     <div class="container py-5 col-md-6">
         <div class="bg-body rounded p-4 ">
@@ -95,6 +99,24 @@
         clickedRow.classList.add("table-secondary");
         document.getElementById("selectedGroupId").value = groupId;
     }
+
+    setTimeout(function() {
+        let card = document.getElementById("messageCard");
+        card.style.transition = "opacity 2s ease";
+        card.style.opacity = 0;
+        setTimeout(function() {
+            card.style.display = "none";
+        }, 2000);
+    }, 5000);
+
+    setTimeout(function() {
+        let card = document.getElementById("errorMessageCard");
+        card.style.transition = "opacity 2s ease";
+        card.style.opacity = 0;
+        setTimeout(function() {
+            card.style.display = "none";
+        }, 2000);
+    }, 5000);
 
 </script>
 

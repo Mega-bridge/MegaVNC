@@ -20,6 +20,7 @@ public class AdminAssignController {
     public String showAssignGroups(Model model, @PathVariable Long memberId) {
 
         model.addAttribute("user",adminAssignService.findByUserId(memberId));
+        model.addAttribute("first", true);
         model.addAttribute("assignedGroups", adminAssignService.listAssignedGroups(memberId));
         model.addAttribute("unassignedGroups", adminAssignService.listUnassignedGroups(memberId));
         model.addAttribute("AssignGroupDto", new AssignGroupDto());
@@ -27,7 +28,7 @@ public class AdminAssignController {
     }
 
     @PostMapping
-    public String assignGroup(@Valid AssignGroupDto assignGroupDto){
+    public String assignGroup(AssignGroupDto assignGroupDto){
 
         adminAssignService.assignGroup(assignGroupDto);
         return "redirect:/admin/assign/" + assignGroupDto.getSelectedUserId();

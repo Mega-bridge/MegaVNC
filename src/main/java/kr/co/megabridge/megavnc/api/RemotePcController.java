@@ -31,10 +31,9 @@ public class RemotePcController {
         ResponseRepeaterStatusDto responseRepeaterStatusDto = new ResponseRepeaterStatusDto(Status.toValue(remotePc.getStatus()));
         return ResponseEntity.ok(responseRepeaterStatusDto);
     }
+
     @DeleteMapping("/{reconnectId}")
     public ResponseEntity<String> disAssignRemotePc(@PathVariable String reconnectId){
-
-        log.info("@PathVariable  reconnectId = {} " , reconnectId);
         remotePcApiService.disAssignRemotePcByRepeaterId(reconnectId);
         return ResponseEntity.ok("ok");
     }

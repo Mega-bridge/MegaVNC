@@ -3,11 +3,13 @@ package kr.co.megabridge.megavnc.exception;
 
 
 import kr.co.megabridge.megavnc.domain.Group;
+import kr.co.megabridge.megavnc.dto.AssignGroupDto;
 import kr.co.megabridge.megavnc.security.User;
 import kr.co.megabridge.megavnc.dto.RegisterRemotePcDto;
 import kr.co.megabridge.megavnc.dto.ResponseRemotePcDto;
 import kr.co.megabridge.megavnc.dto.UserRegisterDto;
 import kr.co.megabridge.megavnc.exception.exceptions.*;
+import kr.co.megabridge.megavnc.web.admin.AdminAssignService;
 import kr.co.megabridge.megavnc.web.admin.AdminGroupService;
 import kr.co.megabridge.megavnc.web.admin.AdminUserService;
 import kr.co.megabridge.megavnc.service.RemotePcService;
@@ -29,10 +31,11 @@ public class GlobalExceptionHandler {
     private final RemotePcService remotePcService;
     private final AdminUserService adminUserService;
     private final AdminGroupService adminGroupService;
+    private final AdminAssignService adminAssignService;
 
 
 
-
+//RemotePc 페이지에 전달 할 Exception
     @ExceptionHandler(RemotePcException.class)
     protected String handleRemotePcViewException(@AuthenticationPrincipal User user, RemotePcException e , Model model) {
         List<Group> groups = remotePcService.findGroupByMember(user);
@@ -46,14 +49,16 @@ public class GlobalExceptionHandler {
         model.addAttribute("RegisterRemotePcDto",new RegisterRemotePcDto());
         return "remote-pcs";
     }
-    @ExceptionHandler(RemotePcApiException.class)
-    protected ResponseEntity<ErrorResponse> RemotePcApiException(RemotePcApiException e) {
-        log.error("RemotePcApiException", e);
+    //RemotePc Api에 전달 할 Exception
+    @ExceptionHandler(ApiException.class)
+    protected ResponseEntity<ErrorResponse> ApiException(ApiException e) {
+
         final ErrorCode errorCode = e.getErrorCode();
         final ErrorResponse response = ErrorResponse.of(errorCode, e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatus()));
     }
 
+    //어드민 유저 페이지에 전달 할 Exception
     @ExceptionHandler(AdminUserException.class)
     protected String handleAdminUserException( AdminUserException e , Model model) {
         model.addAttribute("error", true);
@@ -63,6 +68,8 @@ public class GlobalExceptionHandler {
 
         return "admin/userManagement/users";
     }
+
+    //어드민 그룹 페이지에 전달 할 Exception
     @ExceptionHandler(AdminGroupException.class)
     protected String handleAdminGroupException( AdminGroupException e , Model model) {
         model.addAttribute("error", true);
@@ -73,7 +80,17 @@ public class GlobalExceptionHandler {
     }
 
 
-
+    //어드민 assign 페이지에 전달 할 Exception
+    @ExceptionHandler(AdminAssignException.class)
+    protected String handleAdminAssignException( AdminAssignException e , Model model){
+        model.addAttribute("error", true);
+        model.addAttribute("errorMessage",  e.getMessage());
+        model.addAttribute("user",adminAssignService.findByUserId(e.getMemberId()));
+        model.addAttribute("assignedGroups", adminAssignService.listAssignedGroups(e.getMemberId()));
+        model.addAttribute("unassignedGroups", adminAssignService.listUnassignedGroups(e.getMemberId()));
+        model.addAttribute("AssignGroupDto", new AssignGroupDto());
+        return "admin/userManagement/assign";
+    }
 
 
 

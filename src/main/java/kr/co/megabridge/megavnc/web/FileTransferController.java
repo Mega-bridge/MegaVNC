@@ -1,7 +1,7 @@
 package kr.co.megabridge.megavnc.web;
 
 import kr.co.megabridge.megavnc.exception.ErrorCode;
-import kr.co.megabridge.megavnc.exception.exceptions.RemotePcApiException;
+import kr.co.megabridge.megavnc.exception.exceptions.ApiException;
 import kr.co.megabridge.megavnc.service.FileTransferService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -33,10 +32,12 @@ public class FileTransferController {
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<String> uploadFile(@RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<String> uploadFile(@RequestPart("file") MultipartFile file)  {
+
         String uniqueFilename = fileTransferService.uploadFile(file);
         return ResponseEntity
                 .ok().body(uniqueFilename);
+
     }
 
 
@@ -49,8 +50,8 @@ public class FileTransferController {
         try {
             file = new UrlResource(fileLocation.toUri()); // 파일을 리소스로 읽어옴
         } catch (MalformedURLException e) {
-            log.error("File not found: {}", filename);
-            throw new RemotePcApiException(ErrorCode.FILE_NOT_FOUND);
+
+            throw new ApiException(ErrorCode.FILE_NOT_FOUND);
         }
 
         String contentDisposition = "attachment; filename=\"" +

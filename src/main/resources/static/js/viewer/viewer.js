@@ -1,10 +1,10 @@
 import RFB from "./noVNC-1.4.0/core/rfb.js";
 
-let rfb, repeaterId, accessPassword, disconnectButton, screen, fullscreenButton, pasteButton,status;
+let rfb, repeaterId, accessPassword, disconnectButton, screen, fullscreenButton, pasteButton, status;
 let captureButton, qualityLevelInput, qualityLevel = 6, shutdownButton, uploadForm;
 
 
-window.onload = function() {
+window.onload = function () {
     status = document.getElementById("status").value
     repeaterId = document.getElementById("repeaterId").value;
     accessPassword = document.getElementById("accessPassword").value;
@@ -23,24 +23,23 @@ window.onload = function() {
     uploadForm.addEventListener("submit", handleFormSubmit);
     // qualityLevelInput.addEventListener("input", handleQualityLevel);
     //shutdownButton.addEventListener("click", handleShutdown);
-    if(status === "OFFLINE"){
+    if (status === "OFFLINE") {
         window.alert("해당 PC는 오프라인 상태 입니다.");
         window.location.href = "/remote-pcs";
-    }
-    else{
+    } else {
         handleConnect();
     }
 };
 
 function handleConnect() {
     rfb = new RFB(
-            screen,
-            // "wss://192.168.0.228:6080",                   // LOCAL
-            "wss://vnc.megabridge.co.kr:6080",          // DEV
-            {
-                credentials: { password: accessPassword },
-                repeaterID: repeaterId
-            }
+        screen,
+        // "wss://192.168.0.228:6080",                   // LOCAL
+        "wss://vnc.megabridge.co.kr:6080",          // DEV
+        {
+            credentials: {password: accessPassword},
+            repeaterID: repeaterId
+        }
     );
     rfb.showDotCursor = true;
     rfb.scaleViewport = true;
@@ -53,35 +52,38 @@ function handleConnect() {
 }
 
 
-const handleFormSubmit = async (event) =>{
+const handleFormSubmit = async (event) => {
     event.preventDefault(); // 폼 제출을 중지합니다.
     const COMMON_URL = 'https://vnc.megabridge.co.kr:8443';
     const fileInput = document.getElementById("fileInput").files[0];
-    // 폼 데이터를 가져옵니다.
-    let formData = new FormData();
-    formData.append("file", fileInput); // 파일 데이터 추가
 
-    const option = {
-        method : 'POST',
-        headers:{
-        },
-        body: formData
-    };
-    try {
+    if(!fileInput){
+        alert("파일을 선택해 주세요");
+    }
+    else {
+        // 폼 데이터를 가져옵니다.
+        let formData = new FormData();
+        formData.append("file", fileInput); // 파일 데이터 추가
+
+        const option = {
+            method: 'POST',
+            headers: {},
+            body: formData
+        };
+
         const res = await fetch(`${COMMON_URL}/file`, {
             ...option
         });
+        if (!res.ok) { // 응답이 성공이 아닌 경우
+            const errorResponse = await res.json();
+            const errorMessage = errorResponse.message;
+            throw new Error('HTTP error, status = ' + errorMessage);
+        }
         await navigator.clipboard.writeText(`${COMMON_URL}/file/download-files/` + await res.text());
         await handlePaste();
         alert("파일 전송이 완료되었습니다.");
-
-
-    }catch (error) {
-        alert('Error:'+ error.message);
     }
 }
-
-
 
 
 function handleDisconnect() {
@@ -109,7 +111,7 @@ function handlePaste() {
 function handleCapture() {
     const current = new Date();
     const datetime = current.getFullYear() + "-" + (current.getMonth() + 1) + "-" + current.getDate() + "_" +
-                     current.getHours() + "-" + current.getMinutes() + "-" + current.getSeconds();
+        current.getHours() + "-" + current.getMinutes() + "-" + current.getSeconds();
     let link = document.createElement("a");
     link.download = "screen-capture_" + datetime;
     link.href = rfb.toDataURL();
@@ -118,6 +120,7 @@ function handleCapture() {
     document.body.removeChild(link);
     link = null;
 }
+
 /*
 
 function handleQualityLevel() {
