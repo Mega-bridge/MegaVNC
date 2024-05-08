@@ -57,6 +57,7 @@ public class RemotePc {
     public void updateReconnectId( String reconnectId){
         this.reconnectId = reconnectId;
     }
+
     public void disAssign(){
         this.assignedAt = null;
         this.status = Status.OFFLINE;

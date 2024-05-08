@@ -26,7 +26,7 @@ public enum ErrorCode {
     CANNOT_DELETE_DEFAULT_PC(400,"R008","기본 pc는 삭제할 수 없습니다. "),
     ALREADY_ASSIGNED_PC(400,"R009","이미 등록된 pc 입니다. 다른 pc를 선택해 주세요. "),
     CANNOT_DELETE_ASSIGNED_PC(400,"R010","등록되지 않은 pc만 삭제할 수 있습니다. "),
-    CANNOT_DISASSIGNED_PC(400,"R011","uuid가 일치하지 않습니다. 관리자에게 문의하여 연결 해제를 마무리하세요."),
+    CANNOT_DISASSIGNED_PC(400,"R011","이미 연결이 해제된 pc입니다."),
 
 
 
@@ -36,8 +36,9 @@ public enum ErrorCode {
 
     //File
     FILE_NOT_FOUND(404,"F001","파일 다운로드 실패 : 파일을 서버에서 찾을 수 없음 "),
-    FILE_CANNOT_UPLOAD(404,"F002","파일 업로드 실패 : 파일을 업로드 할 수 없음 "),
-    FILE_CANNOT_DELETE(400,"F003","파일 다운로드 실패 : 파일을 서버에서 삭제하지 못하였습니다. ");
+    FILE_CANNOT_UPLOAD(400,"F002","파일 업로드 실패 : 파일을 업로드 할 수 없음 "),
+    ENCODING_FAIL(400,"F003","파일 업로드 실패 : 파일명을 해시 할 수 없음"),
+    FILE_CANNOT_DELETE(400,"F004","파일 다운로드 실패 : 파일을 서버에서 삭제하지 못하였습니다. ");
 
     private final String code;
     private final String message;

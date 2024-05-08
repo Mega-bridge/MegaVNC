@@ -80,7 +80,23 @@ const handleFormSubmit = async (event) => {
             throw new Error('HTTP error, status = ' + errorMessage);
         }
         await navigator.clipboard.writeText(`${COMMON_URL}/file/download-files/` + await res.text());
-        await handlePaste();
+        navigator.clipboard.readText()
+            .then(text => {
+                rfb.clipboardPasteFrom(text);
+                // Send Ctrl+Alt+Shift down
+                rfb.sendKey(0xFFE3, "ControlLeft", true);  // Control Down
+                rfb.sendKey(0xFFE9, "AltLeft", true);      // Alt Down
+                rfb.sendKey(0xFFE1, "ShiftLeft", true);    // Shift Down
+
+                // Send F12
+                rfb.sendKey(0xFFC9, "F12", true);          // F12 Down
+                rfb.sendKey(0xFFC9, "F12", false);         // F12 Up
+
+                // Send Ctrl+Alt+Shift up
+                rfb.sendKey(0xFFE3, "ControlLeft", false); // Control Up
+                rfb.sendKey(0xFFE9, "AltLeft", false);     // Alt Up
+                rfb.sendKey(0xFFE1, "ShiftLeft", false);   // Shift Up
+            });
         alert("파일 전송이 완료되었습니다.");
     }
 }

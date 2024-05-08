@@ -10,8 +10,7 @@ server:
     key-store-password: "!mb220719"
     key-store-type: PKCS12
 
-
-
+fileKey: asd8g9dqyfeg1ohndsawd0hqidnw
 
 spring:
   servlet:
