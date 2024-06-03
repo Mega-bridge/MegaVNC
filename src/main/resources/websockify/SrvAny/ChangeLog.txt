@@ -1,0 +1,4 @@
+
+2015/06/02 Change license statement and release program sources.
+2011/10/18 Fix EMail address message error.
+2011/09/07 Fix event log message error.

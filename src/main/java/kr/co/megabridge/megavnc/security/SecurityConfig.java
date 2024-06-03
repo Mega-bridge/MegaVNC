@@ -30,6 +30,7 @@ public class SecurityConfig {
                         new AntPathRequestMatcher("/images/**"),
                         new AntPathRequestMatcher("/file/**"),
                         new AntPathRequestMatcher("/api/**"),
+                        new AntPathRequestMatcher("/favicon.ico"),
                         new AntPathRequestMatcher("/remote-pcs/download-server"));
     }
 

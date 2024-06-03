@@ -1,0 +1,38 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: srvany - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x404 /fo"SrvAny.res" /d "_DEBUG" "S:\VC\SrvAny-2010\SrvAny\src\SrvAny.rc"" 
+Creating temporary file "C:\DOCUME~1\u026169\LOCALS~1\Temp\RSP1B13.tmp" with contents
+[
+/nologo /MLd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Debug/srvany.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"S:\VC\SrvAny-2010\SrvAny\src\service.c"
+"S:\VC\SrvAny-2010\SrvAny\src\srvany.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\u026169\LOCALS~1\Temp\RSP1B13.tmp" 
+Creating temporary file "C:\DOCUME~1\u026169\LOCALS~1\Temp\RSP1B14.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes /pdb:"Debug/srvany.pdb" /machine:I386 /out:"Debug/srvany.exe" /pdbtype:sept 
+".\Debug\service.obj"
+".\Debug\srvany.obj"
+".\SrvAny.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\u026169\LOCALS~1\Temp\RSP1B14.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+service.c
+srvany.c
+Linking...
+
+
+
+<h3>Results</h3>
+srvany.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
