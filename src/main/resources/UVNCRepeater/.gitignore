@@ -1,0 +1,6 @@
+*.out
+*.o
+repeater
+
+cscope.out
+tags
