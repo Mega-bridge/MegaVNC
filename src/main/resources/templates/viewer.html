@@ -6,6 +6,12 @@
 
 </head>
 <body class="bg-body-secondary">
+
+<style>
+    .container{
+        max-width: 984px;
+    }
+</style>
 <header th:replace="~{fragments/nav :: nav (${user.username})}"></header>
 
 <input id="accessPassword" type="hidden" th:value="${accessPassword}"/>
@@ -78,8 +84,7 @@
     </div>
 </div>
 
-
-<div class="container" >
+<div class="container">
         <div id="screen" style="height: 600px" class="bg-secondary-subtle w-100 mw-100"></div>
 </div>
 

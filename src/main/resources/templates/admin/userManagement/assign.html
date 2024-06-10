@@ -7,29 +7,41 @@
 <body class="bg-body-secondary">
 <header>
     <nav th:replace="~{fragments/nav :: nav ('admin')}"></nav>
+
+    <style>
+        .listWrap{
+            width: 35%;
+        }
+        .list{
+            overflow: auto;
+            overflow-x: hidden; /* 가로 스크롤 숨김 */
+            height: 80vh;
+        }
+        .btnWrap{
+            text-align: center;
+            position: absolute;
+            top: 46%;
+            left: 1px;
+        }
+        .btn{
+            width: 100px;
+        }
+    </style>
 </header>
 <div th:if="${error}" class="card text-bg-danger mb-3" id="errorMessageCard">
     <div class="card-body" th:text="${errorMessage}"></div>
 </div>
 <!--그룹 변경 하려는 유저 정보 표시-->
 <div th:if="${first}" class="card text-bg-primary mb-3" id="messageCard">
-    <div class="card-body"  th:text="'배정 대상: \'' + ${user.username} + '\'님의 그룹을 선택하세요.'"></div>
+    <div class="card-body" th:text="'배정 대상: \'' + ${user.username} + '\'님의 그룹을 선택하세요.'"></div>
 </div>
 
 <div class="row">
-    <div class="container py-5 col-md-6">
-        <div class="bg-body rounded p-4 ">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="listWrap container py-5 col-md-6">
+        <div class="list bg-body rounded p-4 ">
+            <div class="d-flex justify-content-between align-items-center mb-3 ">
                 <h4 class="fw-bold mb-3 text-primary-emphasis">미배정된 그룹 목록</h4>
-                <form id="assignGroupForm" method="post" th:action="@{/admin/assign}"
-                      th:object="${AssignGroupDto}">
-                    <input type="hidden" th:field="*{selectedGroupId}"/>
-                    <input type="hidden" name="selectedUserId" th:value="${user.id}"/>
-                    <button class="btn btn-success p-2" type="submit">
-                        <i class="fa-solid fa-plus"></i>
-                        <i class="fa-solid fa-users me-2"> 그룹 배정</i>
-                    </button>
-                </form>
+
             </div>
             <table class="table table-hover align-middle mb-5">
                 <thead>
@@ -47,73 +59,88 @@
                     <td th:text="${group.groupName}">이름</td>
                     <td th:text="${#dates.format(group.createdAt, 'yyyy-MM-dd HH:mm:ss')}">등록일</td>
                 </tr>
+
                 </tbody>
             </table>
         </div>
     </div>
 
     <!--이미 배정된 그룹-->
-    <div class="container py-5 col-md-6">
-        <div class="bg-body rounded p-4">
+    <div class="listWrap container py-5 col-md-6">
+        <div class="list bg-body rounded p-4">
             <h4 class="fw-bold mb-3 text-primary-emphasis">배정된 그룹 목록</h4>
 
-            <table class="table align-middle mb-5">
+            <table class="table table-hover align-middle mb-5">
                 <thead>
                 <tr>
                     <th scope="col">아이디</th>
                     <th scope="col">그룹 이름</th>
                     <th scope="col">등록일</th>
-                    <th scope="col" class="text-center">배정 취소</th>
                 </tr>
                 </thead>
 
                 <tbody>
-                <tr th:each="group : ${assignedGroups}">
+                <tr th:each="group : ${assignedGroups}" th:onclick="'selectGroup(' + ${group.id} + ')'"
+                    class="table-row">
 
                     <td th:text="${group.id}">아이디</td>
                     <td th:text="${group.groupName}">이름</td>
                     <td th:text="${#dates.format(group.createdAt, 'yyyy-MM-dd HH:mm:ss')}">등록일</td>
-                    <td class="text-center">
-                        <a th:href="@{/admin/assign/{memberId}/{groupId}(memberId=${user.id}, groupId=${group.id})}"
-                           class="btn btn-danger ">
-                            <i class="fa-solid fa-times"></i>
-                        </a>
-                    </td>
                 </tr>
                 </tbody>
             </table>
 
         </div>
     </div>
+
+    <!--그룹 배정 버튼 -->
+    <div class="btnWrap">
+        <div>
+            <form id="assignGroupForm" method="post" th:action="@{/admin/assign}"
+                  th:object="${AssignGroupDto}">
+                <input type="hidden" th:field="*{selectedGroupId}"/>
+                <input type="hidden" name="selectedUserId" th:value="${user.id}"/>
+                <button class="btn btn-primary p-2" type="submit">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+
+        <!--그룹 배정 취소 버튼 -->
+        <div class="mt-5">
+            <a id="cancelAssignButton" class="btn btn-primary p-2">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+        </div>
+    </div>
+
 </div>
 
 
 <script th:inline="javascript">
+
     function selectGroup(groupId) {
-        let tableRows = document.querySelectorAll(".table-row");
-        tableRows.forEach(function (row) {
-            row.classList.remove("table-secondary");
-        });
-
-        let clickedRow = document.querySelector(".table-row[onclick='selectGroup(" + groupId + ")']");
-        clickedRow.classList.add("table-secondary");
+        document.querySelectorAll(".table-row").forEach(row => row.classList.remove("table-secondary"));
+        document.querySelector(`.table-row[onclick='selectGroup(${groupId})']`).classList.add("table-secondary");
         document.getElementById("selectedGroupId").value = groupId;
-    }
 
-    setTimeout(function() {
+        const cancelAssignButton = document.getElementById("cancelAssignButton")
+        cancelAssignButton.href = `/admin/assign/${document.querySelector('input[name="selectedUserId"]').value}/${groupId}`;
+    }
+    setTimeout(function () {
         let card = document.getElementById("messageCard");
         card.style.transition = "opacity 2s ease";
         card.style.opacity = 0;
-        setTimeout(function() {
+        setTimeout(function () {
             card.style.display = "none";
         }, 2000);
     }, 5000);
 
-    setTimeout(function() {
+    setTimeout(function () {
         let card = document.getElementById("errorMessageCard");
         card.style.transition = "opacity 2s ease";
         card.style.opacity = 0;
-        setTimeout(function() {
+        setTimeout(function () {
             card.style.display = "none";
         }, 2000);
     }, 5000);
