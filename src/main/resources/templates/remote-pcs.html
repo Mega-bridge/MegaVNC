@@ -2,7 +2,6 @@
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head ('원격 PC 목록')}">
     <title>MegaVNC</title>
-
 </head>
 <body class="bg-body-secondary">
 <header th:replace="~{fragments/nav :: nav (${user.username})}"></header>
@@ -26,13 +25,14 @@
         <div class="bg-body rounded p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold mb-3 text-primary-emphasis">원격 PC 목록</h4>
-                <button class="btn btn-success"  data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">
                     <i class="fa-solid fa-plus"></i>
-                    <i class="fa-solid fa-display me-2">  원격 pc 추가</i>
+                    <i class="fa-solid fa-display me-2"> 원격 pc 추가</i>
                 </button>
             </div>
             <!-- Modal -->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -44,8 +44,9 @@
                             <!--이 부분 모달로 -->
                             <div class="d-flex flex-column justify-content-end">
                                 <div class="ms-1 p-1">
-                                    <label for="remotePcName" >원격 PC 이름</label>
-                                    <input type="text" id="remotePcName" name="remotePcName" placeholder="PC의 이름을 입력하세요."
+                                    <label for="remotePcName">원격 PC 이름</label>
+                                    <input type="text" id="remotePcName" name="remotePcName"
+                                           placeholder="PC의 이름을 입력하세요."
                                            class="form-control">
                                 </div>
                                 <div class="ms-1 p-1">
@@ -64,8 +65,7 @@
             </div>
 
 
-
-            <table class="table table-hover align-middle mb-5" id="data-table">
+            <table class="table table-hover align-middle mb-5" id="remotePcList">
                 <thead>
                 <tr>
                     <th scope="col">그룹</th>
@@ -78,56 +78,47 @@
                 </thead>
 
                 <tbody>
-                <tr th:each="remotePc : ${remotePcs}" class="data-row">
+                <tr th:each="remotePc : ${remotePcs}" class="data-row" th:attr="data-pc-id=${remotePc.id}">
 
                     <td th:text="${remotePc.group.groupName}">그룹</td>
                     <td th:text="${remotePc.name}">이름</td>
-                    <td th:text="${#dates.format(remotePc.assignedAt, 'yyyy-MM-dd HH:mm:ss')}">등록일</td>
-                    <th:block th:switch="${#strings.toString(remotePc.status)}">
-                        <td th:case="OFFLINE" class="text-secondary">오프라인</td>
-                        <td th:case="STANDBY" class="text-success">온라인(대기중)</td>
-                        <td th:case="ACTIVE" class="text-info">온라인(사용중)</td>
-                    </th:block>
-                    <th:block th:switch="${#strings.toString(remotePc.status)}">
-                        <td th:case="OFFLINE">
-                            <a class="btn btn-secondary disabled">
+                    <td class="pc-registeredAt" th:text="${#dates.format(remotePc.assignedAt, 'yyyy-MM-dd HH:mm')}">등록일</td>
+
+                    <td class="pc-status">
+                        <th:block th:switch="${#strings.toString(remotePc.status)}">
+                            <span th:case="OFFLINE" class="text-secondary">오프라인</span>
+                            <span th:case="STANDBY" class="text-success">온라인(대기중)</span>
+                            <span th:case="ACTIVE" class="text-info">온라인(사용중)</span>
+                        </th:block>
+                    </td>
+
+                    <td>
+                        <th:block th:switch="${#strings.toString(remotePc.status)}">
+                            <a th:case="OFFLINE" th:href="@{/remote-pcs/{id}(id=${remotePc.id})}"  class="btn btn-secondary disabled">
                                 <i class="fa-solid fa-display me-2"></i>접속
                             </a>
-                        </td>
-                        <td th:case="STANDBY">
-                            <a th:href="@{/remote-pcs/{id}(id=${remotePc.id})}" class="btn btn-primary">
+                            <a th:case="STANDBY" th:href="@{/remote-pcs/{id}(id=${remotePc.id})}" class="btn btn-primary">
                                 <i class="fa-solid fa-display me-2"></i>접속
                             </a>
-                        </td>
-                        <td th:case="ACTIVE">
-                            <a th:href="@{/remote-pcs/{id}(id=${remotePc.id})}" class="btn btn-primary disabled">
+                            <a th:case="ACTIVE" th:href="@{/remote-pcs/{id}(id=${remotePc.id})}" class="btn btn-primary disabled">
                                 <i class="fa-solid fa-display me-2"></i>접속
                             </a>
-                        </td>
-                    </th:block>
+                        </th:block>
+                    </td>
 
-
-                    <th:block th:switch="${#strings.toString(remotePc.status)}">
-                        <td th:case="OFFLINE">
-                            <a th:href="@{/remote-pcs/delete/{id}(id=${remotePc.id})}"
-                               onclick="return confirm('정말로 삭제하시겠습니까?');" class="btn btn-danger ">
+                    <td>
+                        <th:block th:switch="${#strings.toString(remotePc.status)}">
+                            <a th:case="OFFLINE" th:href="@{/remote-pcs/delete/{id}(id=${remotePc.id})}" onclick="return confirm('정말로 삭제하시겠습니까?');" class="btn btn-danger">
                                 <i class="fa-solid fa-trash-alt me-2"></i>삭제
                             </a>
-                        </td>
-
-                        <td th:case="STANDBY">
-                            <a th:href="@{/remote-pcs/delete/{id}(id=${remotePc.id})}"
-                               onclick="return confirm('정말로 삭제하시겠습니까?');" class="btn btn-danger ">
+                            <a th:case="STANDBY" class="btn btn-danger disabled" th:href="@{/remote-pcs/delete/{id}(id=${remotePc.id})}" onclick="return confirm('정말로 삭제하시겠습니까?');" >
                                 <i class="fa-solid fa-trash-alt me-2"></i>삭제
                             </a>
-                        </td>
-                        <td th:case="ACTIVE">
-                            <a class="btn btn-secondary disabled">
+                            <a th:case="ACTIVE" class="btn btn-danger disabled" th:href="@{/remote-pcs/delete/{id}(id=${remotePc.id})}" onclick="return confirm('정말로 삭제하시겠습니까?');" >
                                 <i class="fa-solid fa-trash-alt me-2"></i>삭제
                             </a>
-                        </td>
-                    </th:block>
-
+                        </th:block>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -139,11 +130,61 @@
     </form>
 </div>
 <script>
-    setTimeout(function() {
+    $(document).ready(function () {
+        // 로컬
+       // const socket = new WebSocket('wss://localhost:8443/ws/status');
+        // 배포
+         const socket = new WebSocket('wss://vnc.megabridge.co.kr:8443/ws/status');
+
+        socket.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            // 각 데이터 항목을 업데이트
+            const row = $(`#remotePcList tr[data-pc-id="${data.id}"]`);
+            const statusCell = row.find('.pc-status');
+            const registeredAtCell = row.find('.pc-registeredAt');
+
+            // 등록일 업데이트
+            if(data.registeredAt === "null"){
+                data.registeredAt = "";
+            }
+            registeredAtCell.text(data.registeredAt);
+
+
+            // 상태 업데이트
+            if (data.status === 'OFFLINE') {
+                statusCell.html('<span class="text-secondary">오프라인</span>');
+                row.find('.btn-primary').addClass('disabled');
+                row.find('.btn-primary').removeClass('btn-primary').addClass('btn-secondary');
+                row.find('.btn-danger').removeClass('disabled');
+            } else if (data.status === 'STANDBY') {
+                statusCell.html('<span class="text-success">온라인(대기중)</span>');
+                row.find('.btn-secondary').removeClass('disabled');
+                row.find('.btn-secondary').removeClass('btn-secondary').addClass('btn-primary');
+                row.find('.btn-primary').removeClass('disabled');
+                row.find('.btn-danger').addClass('disabled');
+            } else if (data.status === 'ACTIVE') {
+                statusCell.html('<span class="text-info">온라인(사용중)</span>');
+                row.find('.btn-primary').addClass('disabled');
+                row.find('.btn-secondary').removeClass('btn-secondary').addClass('btn-primary').addClass('disabled');
+                row.find('.btn-danger').addClass('disabled');
+            }
+
+        };
+
+        socket.onclose = function (event) {
+            console.log('WebSocket closed: ', event);
+        };
+
+        socket.onerror = function (error) {
+            console.error('WebSocket error: ', error);
+        };
+    });
+
+    setTimeout(function () {
         let card = document.getElementById("errorMessageCard");
         card.style.transition = "opacity 2s ease";
         card.style.opacity = 0;
-        setTimeout(function() {
+        setTimeout(function () {
             card.style.display = "none";
         }, 2000);
     }, 5000);

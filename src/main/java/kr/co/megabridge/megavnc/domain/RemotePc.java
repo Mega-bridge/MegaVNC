@@ -59,8 +59,8 @@ public class RemotePc {
     }
 
     public void disAssign(){
+       // this.status = Status.OFFLINE;
         this.assignedAt = null;
-        this.status = Status.OFFLINE;
         this.reconnectId ="";
     }
 
