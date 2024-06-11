@@ -1,21 +1,17 @@
 package kr.co.megabridge.megavnc.tcp;
 
-import kr.co.megabridge.megavnc.domain.RemotePc;
 import kr.co.megabridge.megavnc.enums.Status;
 import kr.co.megabridge.megavnc.service.RemotePcService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service
+@Component
 public class MessageService {
 
     private final RemotePcService remotePcService;
@@ -82,7 +78,8 @@ public class MessageService {
                 log.info("VIEWER_SERVER_SESSION_START: " + eventMessage.getRepeaterId());
                 break;
             case 5: // VIEWER_SERVER_SESSION_END
-                remotePcService.setRemotePcStatus(eventMessage.getRepeaterId(), Status.STANDBY);
+                //api를 통해 먼저 연결 해제를 시켜버리므로 모든 값이 assinedAt이 null, 즉 여기서 assinedAt이 null 이면 Offline 으로 하면 됨
+                remotePcService.setRemotePcStatusServerViewerSessionOut(eventMessage.getRepeaterId());
                 log.info("VIEWER_SERVER_SESSION_END: " + eventMessage.getRepeaterId());
                 break;
             case 6: // REPEATER_STARTUP // debug // FIXME
