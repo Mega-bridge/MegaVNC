@@ -1,0 +1,67 @@
+.inputWrap{
+    left: 0;
+    right: 0;
+    width: 87.2%;
+    max-width: 1296px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    height: 47vh;
+    margin: 48px auto;
+}
+.firstLine{
+    padding-top: 18px;
+}
+.infoTitle{
+    font-weight: bold;
+    color: #3e3e3e;
+    width: 25%;
+    display: inline-block;
+    margin-top: 15px;
+    margin-left: 60px;
+}
+.selectGroup{
+    color: #3e3e3e;
+    display: inline-block;
+    width: 60%;
+    text-align: center;
+    border-radius: 10px;
+    height: 36px;
+    margin-top: 15px;
+}
+.devisionLine{
+    text-align: center;
+    width: 80%;
+    margin-left: 10%;
+}
+.infoLine{
+    margin-top: 15px;
+}
+.infoInput{
+    width: 60%;
+    border-radius: 10px;
+    border: 1px solid #6b6b6b;
+    height: 36px;
+    text-align: center;
+}
+
+.buttonLine{
+    margin-top: 100px;
+    text-align: center;
+}
+
+.searchButton{
+    font-weight: bold;
+    width: 50%;
+    height: 40px;
+    border-radius: 5px;
+    border: 1px solid #6b6b6b;
+    background-color: #062c63;
+    color: #fff;
+}
+.searchButton:hover {
+    background-color: #fff; /* 호버 시 배경색 변경 */
+    color: #062c63; /* 호버 시 글씨색 변경 */
+}
+.displayNone{
+    display: none;
+}
