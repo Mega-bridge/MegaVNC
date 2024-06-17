@@ -29,6 +29,9 @@
                 <li class="nav-item" th:if="${username == 'admin'}">
                     <a th:href="@{/admin/groups}" class="nav-link">그룹 관리</a>
                 </li>
+                <li class="nav-item" th:if="${username == 'admin'}">
+                    <a th:href="@{/files}" class="nav-link">파일 설치</a>
+                </li>
             </ul>
         </div>
 
