@@ -5,11 +5,12 @@
 </head>
 <body class="bg-body-secondary">
 <script src="/js/remote-pcs/remote-pcs.js"></script>
+<header th:replace="~{fragments/nav :: nav (${user.username})}"></header>
 
-<div class="addPcBackWrap displayNone"onclick="handleBackWrapClick(event)">
-    <div class="addPcWrap">
+<div class="modalBackWrap displayNone" onclick="handleBackWrapClick(event)">
+    <div class="addWrap">
         <button type="button" class="btn-close closeButton" onclick="cancelPc();"></button>
-        <p class="addPcTitle">원격 PC 추가</p>
+        <p class="modalTitleName">원격 PC 추가</p>
 
         <p class="valuesTitle">그룹 선택 <span class="failMessage failMessageGroup"></span></p>
         <select class="addPcSelectGroup">
@@ -20,22 +21,23 @@
         </select>
 
         <p class="valuesTitle">PC 이름 <span class="failMessage failMessagePcName"></span> </p>
-        <input type="text" class="addPcInput pcName">
+        <input type="text" class="modalInput pcName">
 
         <p class="valuesTitle">접근 비밀번호 <span class="failMessage failMessagePassword"></span></p>
-        <input type="password" class="addPcInput pcPassword">
+        <input type="password" class="modalInput pcPassword">
 
-        <button class="btn btn-success addPcButton" onclick="requestRegistPc();" type="button">
+        <p class="ajaxFailMessage"></p>
+
+        <button class="btn btn-success addButton" onclick="requestRegistPc();" type="button">
             <i class="fa-solid fa-plus"></i>
-            <i class="fa-solid fa-display me-2"><span class="addPcButtonText">PC 추가</span></i>
+            <i class="fa-solid fa-display me-2"><span class="addButtonText">PC 추가</span></i>
         </button>
     </div>
 </div>
 
-<header th:replace="~{fragments/nav :: nav (${user.username})}"></header>
-<div th:if="${error}" class="card text-bg-danger mb-3" id="errorMessageCard">
-    <div class="card-body" th:text="${errorMessage}"></div>
-</div>
+<!--<div th:if="${error}" class="card text-bg-danger mb-3" id="errorMessageCard">-->
+<!--    <div class="card-body" th:text="${errorMessage}"></div>-->
+<!--</div>-->
 
 <div class="container py-5">
     <form method="post" th:action="@{/remote-pcs/register-pc}" th:object="${RegisterRemotePcDto}">

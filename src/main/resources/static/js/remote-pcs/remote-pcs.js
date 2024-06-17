@@ -40,11 +40,15 @@ function checkValues(addPcSelectGroup, pcName, pcPassword){
 function registPc(){
     resetRegistInfo();
     resetFailMessage();
-    $('.addPcBackWrap').fadeIn(500);
+    $('.modalBackWrap').fadeIn(500);
+    if($('#group').val() != "All Group"){
+        $('.addPcSelectGroup').val( $('#group').val() );
+    }
+
 }
 
 function cancelPc() {
-    $('.addPcBackWrap').fadeOut(500);
+    $('.modalBackWrap').fadeOut(500);
     resetRegistInfo();
     resetFailMessage();
 }
@@ -56,6 +60,7 @@ function resetRegistInfo(){
 }
 
 function resetFailMessage(){
+    $('.ajaxFailMessage').text('');
     $('.failMessageGroup').text('');
     $('.failMessagePcName').text('');
     $('.failMessagePassword').text('');
@@ -121,7 +126,7 @@ setTimeout(function () {
 }, 5000);
 
 function handleBackWrapClick(event) {
-    if (event.target.classList.contains('addPcBackWrap')) {
+    if (event.target.classList.contains('modalBackWrap')) {
         cancelPc();
     }
 }

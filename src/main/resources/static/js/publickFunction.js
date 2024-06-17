@@ -8,11 +8,7 @@ function ajax(url, param, successMessage) {
         success: function (data) {
             console.log(data);
             if (data === "ok") {
-                Swal.fire({
-                    icon: 'success',
-                    title: '성공',
-                    html: successMessage
-                });
+                location.reload();
             } else {
                 console.log("Response: " + data);
             }
@@ -20,24 +16,21 @@ function ajax(url, param, successMessage) {
         error: function (jqXHR, textStatus, errorThrown) {
             try {
                 if (jqXHR.responseText == "ok") {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '성공',
-                        html: successMessage
-                    }).then((result) => {
-                        location.reload();
-                    })
+                    location.reload();
                 } else {
+                    $('.ajaxFailMessage').text('');
                     var errorResponse = JSON.parse(jqXHR.responseText);
-                    console.log("Error Message: " + errorResponse.message);
-                    console.log("Status: " + errorResponse.status);
-                    console.log("Code: " + errorResponse.code);
+                    var result_code = errorResponse.code;
+                    var result_message = errorResponse.message;
+                    var result_status = errorResponse.status;
 
-                    Swal.fire({
-                        icon: 'error',
-                        title: '실패(' + errorResponse.code + ")",
-                        text: errorResponse.message
-                    });
+                    // result_message 길이 제한
+                    var maxLength = 45;
+                    if (result_message.length > maxLength) {
+                        result_message = result_message.substring(0, maxLength - 3) + '...';
+                    }
+
+                    $('.ajaxFailMessage').text("*" + result_message);
                 }
 
             } catch (e) {

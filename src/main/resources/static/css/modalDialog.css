@@ -1,11 +1,11 @@
-.addPcBackWrap{
+.modalBackWrap{
     background-color: rgba(0,0,0,0.7);
     width: 100vw;
     height: 100vh;
     position: fixed;
     z-index: 30;
 }
-.addPcWrap{
+.addWrap{
     position: relative;
     width: 40%;
     height: 450px;
@@ -17,7 +17,7 @@
     top: 0;
     margin: 2% auto;
 }
-.addPcTitle{
+.modalTitleName{
     text-align: center;
     font-size: 20px;
     font-weight: bold;
@@ -41,7 +41,7 @@
     margin-left: 5%;
 }
 
-.addPcInput{
+.modalInput{
     padding-left: 15px;
     padding-bottom: 3px;
     height: 34px;
@@ -50,12 +50,13 @@
     margin-left: 5%;
     border: 1px solid #6c6c6c;
 }
-.addPcButton{
+.addButton{
+    position: absolute;
     width: 90%;
-    margin-left: 5%;
-    margin-top: 75px;
+    bottom: 30px;
+    left: 5%;
 }
-.addPcButtonText{
+.addButtonText{
     margin-left: 10px;
 }
 
@@ -80,4 +81,12 @@
     position: absolute;
     right: 5%;
     margin-top: 6%;
+}
+
+.ajaxFailMessage{
+    bottom: 70px;
+    margin-left: 7%;
+    font-size: 12px;
+    position: absolute;
+    color: #ca0000;
 }
