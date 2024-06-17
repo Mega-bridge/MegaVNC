@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/groups")
-public class GroupController {
+public class GroupApiController {
 
     private final GroupApiService groupApiService;
 

@@ -43,8 +43,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(new AntPathRequestMatcher("/register"))
                         .permitAll()
-                        //.requestMatchers("/file/**")
-                        // .hasAnyRole("USER","ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/admin/**"))
                         .hasRole("ADMIN")
                         .anyRequest()
