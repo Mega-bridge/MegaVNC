@@ -40,7 +40,7 @@ function checkValues(addPcSelectGroup, pcName, pcPassword){
 function registPc(){
     resetRegistInfo();
     resetFailMessage();
-    $('.modalBackWrap').fadeIn(500);
+    $('.modalBackWrap').fadeIn(200);
     if($('#group').val() != "All Group"){
         $('.addPcSelectGroup').val( $('#group').val() );
     }
@@ -48,7 +48,7 @@ function registPc(){
 }
 
 function cancelPc() {
-    $('.modalBackWrap').fadeOut(500);
+    $('.modalBackWrap').fadeOut(200);
     resetRegistInfo();
     resetFailMessage();
 }

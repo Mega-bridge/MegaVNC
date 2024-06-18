@@ -26,11 +26,11 @@ function resetFailMessage() {
 function registGroup() {
     resetGroupInfo();
     resetFailMessage();
-    $('.modalBackWrap').fadeIn(500);
+    $('.modalBackWrap').fadeIn(200);
 }
 
 function cancelGroup() {
-    $('.modalBackWrap').fadeOut(500);
+    $('.modalBackWrap').fadeOut(200);
     resetGroupInfo();
     resetFailMessage();
 }

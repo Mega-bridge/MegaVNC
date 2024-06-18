@@ -34,11 +34,11 @@ function resetFailMessage() {
 function registUser() {
     resetUsersInfo();
     resetFailMessage();
-    $('.modalBackWrap').fadeIn(500);
+    $('.modalBackWrap').fadeIn(200);
 }
 
 function cancelUser() {
-    $('.modalBackWrap').fadeOut(500);
+    $('.modalBackWrap').fadeOut(200);
     resetUsersInfo();
     resetFailMessage();
 }
