@@ -8,31 +8,42 @@
 <link rel="stylesheet" href="/css/files.css">
 <header th:replace="~{fragments/nav :: nav (${user.username})}"></header>
 
-<div class="inputWrap">
-    <div class="infoLine firstLine">
-        <span class="infoTitle">Group :</span>
-        <select class="selectGroup">
-            <option th:selected="${selectedGroup == null}" value="All Group">---All Group---</option>
-            <option name="groupName" th:each="group : ${groups}" th:value="${group.groupName}"
-                    th:text="${group.groupName}"
-                    th:selected="${group.groupName == selectedGroup}"></option>
-        </select>
-    </div>
+<div class="container py-5 inputWrap">
+    <div class="bg-body rounded p-4">
+        <div class="bg-body rounded p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-3 text-primary-emphasis">파일 조회</h4>
+                <div class="justify-content-end">
+                    <button onclick="excuteSearchQues();" class="btn btn-success p-2" type="button">
+                        <i class="custom-margin-left fa-solid fa-search me-2" aria-hidden="true"> 파일 조회</i>
+                    </button>
+                </div>
+            </div>
 
-    <div class="infoLine">
-        <span class="infoTitle">Pc Name :</span>
-        <input type="text" class="infoInput pcName" placeholder="Pc Name 을 입력해 주세요.">
-    </div>
+            <div class="infoLine firstLine">
+                <span class="infoTitle">Group :</span>
+                <select class="selectGroup">
+                    <option th:selected="${selectedGroup == null}" value="All Group">---All Group---</option>
+                    <option name="groupName" th:each="group : ${groups}" th:value="${group.groupName}"
+                            th:text="${group.groupName}"
+                            th:selected="${group.groupName == selectedGroup}"></option>
+                </select>
+                <span class="searchFailMessage selectGroupFailMessage"></span>
+            </div>
 
-    <div class="infoLine">
-        <span class="infoTitle">Access Password :</span>
-        <input type="text" class="infoInput accessPassword" placeholder="Access Password 을 입력해 주세요.">
-    </div>
+            <div class="infoLine">
+                <span class="infoTitle">Pc Name :</span>
+                <input type="text" class="infoInput pcName" placeholder="Pc Name 을 입력해 주세요.">
+                <span class="searchFailMessage pcNameFailMessage"></span>
+            </div>
 
-    <div class="buttonLine">
-        <button onclick="excuteSearchQues();" class="searchButton">
-            확인
-        </button>
+            <div class="infoLine">
+                <span class="infoTitle">Access Password :</span>
+                <input type="password" class="infoInput accessPassword" placeholder="Access Password 을 입력해 주세요.">
+                <span class="searchFailMessage accessPasswordFailMessage"></span>
+            </div>
+
+        </div>
     </div>
 </div>
 
@@ -44,7 +55,7 @@
                 <h4 class="fw-bold mb-3 text-primary-emphasis">파일 목록</h4>
                 <div class="justify-content-end">
                     <button onclick="goBack()" class="btn btn-success p-2" type="button">
-                        <i class="fa-solid fa-arrow-left me-2" aria-hidden="true"> 뒤로가기</i>
+                        <i class="custom-margin-left fa-solid fa-arrow-left me-2" aria-hidden="true"> 뒤로가기</i>
                     </button>
                 </div>
             </div>
@@ -69,38 +80,25 @@
 <script type="module" th:src="@{/js/viewer/viewer.js}"></script>
 <script>
     function excuteSearchQues(){
+        resetFailMessage();
+
         var selectGroup = $('.selectGroup').val();
         var pcName = $('.pcName').val();
         var accessPassword = $('.accessPassword').val();
 
         if(selectGroup == ''){
+            $('.selectGroupFailMessage').text('*그룹을 선택해 주세요.');
             document.querySelector('.selectGroup').focus();
-            Swal.fire({
-                title: '파일조회 실패',
-                html: "<b>Group</b> 을 선택해 주세요.",
-                icon: 'error',
-                confirmButtonText: '확인'
-            })
             return false;
         }
         if(pcName == ''){
+            $('.pcNameFailMessage').text('*PC이름을 입력해 주세요.');
             document.querySelector('.pcName').focus();
-            Swal.fire({
-                title: '파일조회 실패',
-                html: "<b>Pc Name</b> 을 입력해 주세요.",
-                icon: 'error',
-                confirmButtonText: '확인'
-            })
             return false;
         }
         if(accessPassword == ''){
+            $('.accessPasswordFailMessage').text('*접근 비밀번호를 입력해 주세요.');
             document.querySelector('.accessPassword').focus();
-            Swal.fire({
-                title: '파일조회 실패',
-                html: "<b>Access Password</b> 를 입력해 주세요",
-                icon: 'error',
-                confirmButtonText: '확인'
-            })
             return false;
         }
 
@@ -155,12 +153,18 @@
         }
 
         $('.inputWrap').hide();
-        $('.container').show();
+        $('.displayNone').show();
     }
 
     function goBack(){
         $('.inputWrap').show();
-        $('.container').hide();
+        $('.displayNone').hide();
+    }
+
+    function resetFailMessage(){
+        $('.selectGroupFailMessage').text('');
+        $('.pcNameFailMessage').text('');
+        $('.accessPasswordFailMessage').text('');
     }
 
 </script>
