@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head ('파일 업로드')}">
+    <meta charset="UTF-8">
+    <title>MegaVNC</title>
+</head>
+<body class="bg-body-secondary">
+<link rel="stylesheet" href="/css/files.css">
+<script src="/js/files/files.js"></script>
+<header><nav th:replace="~{fragments/nav :: nav ('admin')}"></nav></header>
+
+<div class="uploadFileWrap">
+    <p class="uploadTitle">파일 업로드</p>
+
+    <button class="btn btn-success p-2 fileBackPageBtn" onclick="location.href='/files/management'" type="button">
+        <i class="fas fa-arrow-left me-2"> 이전페이지</i>
+    </button>
+
+    <p class="uploadNotice">업로드하실 파일을 선택해 주세요.</p>
+
+    <div class="drop-zone" id="drop-zone">
+        <span class="uploadNotice">업로드하실 파일을 드래그/선택 해주세요</span>
+        <img src="/images/add.png" class="fileAddImg" id="fileAddImg">
+        <input type="file" id="file-input" class="hidden-input" multiple>
+    </div>
+    <div id="file-info-container"></div>
+
+    <div class="fileUploadButton">
+        파일 등록
+    </div>
+</div>
+
+<script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInfoContainer = document.getElementById('file-info-container');
+    const fileInput = document.getElementById('file-input');
+    const fileAddImg = document.getElementById('fileAddImg');
+    const uploadMessage = document.getElementById('upload-message');
+    const filesArray = [];
+
+    dropZone.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dropZone.classList.remove('dragover');
+
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+            handleFiles(files);
+        }
+    });
+
+    fileAddImg.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', () => {
+        const files = fileInput.files;
+        if (files.length > 0) {
+            handleFiles(files);
+        }
+    });
+
+    function handleFiles(files) {
+        for (let i = 0; i < files.length; i++) {
+            const fileName = files[i].name;
+            if (filesArray.some(file => file.name === fileName)) {
+                Swal.fire({
+                    icon: "error",
+                    text: "이미 업로드된 파일입니다.",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                filesArray.push(files[i]);
+                displayFileInfo(files[i]);
+            }
+        }
+    }
+
+    function displayFileInfo(file) {
+        const fileInfo = document.createElement('p');
+        fileInfo.className = 'file-info';
+        fileInfo.textContent = `${file.name}`;
+        fileInfoContainer.appendChild(fileInfo);
+    }
+</script>
+</body>
+</html>
