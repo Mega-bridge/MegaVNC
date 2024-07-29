@@ -22,12 +22,23 @@ public class FileController {
     private final RemotePcService remotePcService;
 
     @GetMapping
+    @RequestMapping("/download")
     public String showFiles(@AuthenticationPrincipal User user, Model model) {
-        List<Group> groups = remotePcService.findGroupByMember(user);
-        log.info("username = {}", user.getUsername());
-        model.addAttribute("user", user);
-        model.addAttribute("groups", groups);
-        return "files";
+//        List<Group> groups = remotePcService.findGroupByMember(user);
+//        log.info("username = {}", user.getUsername());
+//        model.addAttribute("user", user);
+//        model.addAttribute("groups", groups);
+        return "downloadFiles";
+    }
+
+    @GetMapping
+    @RequestMapping("/management")
+    public String upload(@AuthenticationPrincipal User user, Model model) {
+//        List<Group> groups = remotePcService.findGroupByMember(user);
+//        log.info("username = {}", user.getUsername());
+//        model.addAttribute("user", user);
+//        model.addAttribute("groups", groups);
+        return "/admin/fileManagement/fileManagement";
     }
 
 }

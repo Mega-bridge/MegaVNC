@@ -1,3 +1,4 @@
+/********** downloadFiles *********/
 .inputWrap{
     /*left: 0;*/
     /*right: 0;*/
@@ -79,4 +80,84 @@
     margin-left: 10px;
     font-size: 12px;
     color: #dd0000;
+}
+/********** fileManagement *********/
+.fileMenuWrap{
+    background-color: #ffffff;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 800px;
+    height: 470px;
+    left: 0;
+    right: 0;
+    margin: 4% auto;
+    text-align: center;
+}
+.uploadFileBox{
+    background-color: #6ca3ff;
+    width: 30%;
+    height: 380px;
+    float: left;
+    margin-left: 15%;
+    margin-top: 50px;
+    position: relative;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+.uploadFileBox:hover {
+    cursor: pointer; /* 마우스를 올리면 커서를 클릭 가능한 커서로 변경 */
+    transform: scale(1.1); /* 요소를 1.1배로 키움 */
+}
+.fileListBox{
+    background-color: #6ca3ff;
+    width: 30%;
+    height: 380px;
+    float: right;
+    margin-right: 15%;
+    margin-top: 50px;
+    position: relative;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+.fileListBox:hover {
+    cursor: pointer; /* 마우스를 올리면 커서를 클릭 가능한 커서로 변경 */
+    transform: scale(1.1); /* 요소를 1.1배로 키움 */
+}
+.lavelNumber{
+    background-color: #6ca3ff;
+    position: absolute;
+    left: 0;
+    right: 0;
+    border: 5px solid #fff;
+    font-size: 35px;
+    color: #fff;
+    border-radius: 50%;
+    width: 31%;
+    height: 18%;
+    margin-top: -15%;
+    margin-left: 34.5%;
+}
+.fileMenuName{
+    color: #fff;
+    font-size: 25px;
+    margin-top: 20%;
+    border-bottom: 5px solid #fff;
+}
+.menuNotice{
+    color: #fff;
+    font-size: 16px;
+    text-align: left;
+    padding: 10px;
+}
+.triangle-up {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    bottom: 0;
+    margin: 0 auto;
+    border-left: 40px solid transparent;
+    border-right: 40px solid transparent;
+    border-bottom: 40px solid #ffffff;
 }
