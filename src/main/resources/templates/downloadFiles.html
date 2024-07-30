@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:--bs-bg-opacity="http://www.w3.org/1999/xhtml">
+<head th:replace="~{fragments/header :: head ('파일 다운로드')}">
+    <title>MegaVNC</title>
+</head>
+<body class="bg-body-secondary">
+<link rel="stylesheet" href="/css/files.css">
+<script src="/js/files/files.js"></script>
+<script src="/js/sweetAlert2.min.js"></script>
+
+<div class="container py-5"> <!-- class displayNone -->
+    <div class="bg-body rounded p-4">
+        <div class="bg-body rounded p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-3 text-primary-emphasis">파일 목록</h4>
+                <div class="justify-content-end">
+<!--                    <button onclick="goBack()" class="btn btn-success p-2" type="button">-->
+<!--                        <i class="custom-margin-left fa-solid fa-arrow-left me-2" aria-hidden="true"> 뒤로가기</i>-->
+<!--                    </button>-->
+                </div>
+            </div>
+
+            <table id="file-table-body" class="table table-hover align-middle mb-5">
+                <thead>
+                <tr>
+                    <th scope="col">아이디</th>
+                    <th scope="col">파일명</th>
+                    <th scope="col">등록일</th>
+                    <th scope="col">다운로드</th>
+                </tr>
+                </thead>
+
+                <tbody id="table-body"></tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+<script type="module" th:src="@{/js/viewer/viewer.js}"></script>
+<script src="/js/sweetAlert2.min.js"></script>
+<script>
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = '';
+
+    for (let i = 0; i < 5; i++) {
+        // 새로운 행 생성
+        const newRow = document.createElement('tr');
+        newRow.classList.add('data-row');
+
+        // 각 열 생성 및 추가
+        const idCell = document.createElement('td');
+        idCell.textContent = i+1;
+        newRow.appendChild(idCell);
+
+        const groupNameCell = document.createElement('td');
+        groupNameCell.textContent = 'filesDown' + i + ".exe";
+        newRow.appendChild(groupNameCell);
+
+        const dateCell = document.createElement('td');
+        dateCell.textContent = '2024-06-14 09:24:26';
+        newRow.appendChild(dateCell);
+
+        const downloadCell = document.createElement('td');
+        const downloadLink = document.createElement('a');
+        // downloadLink.href = 'https://www.naver.com';
+        downloadLink.target = '_blank';
+        downloadLink.classList.add('btn', 'btn-primary');
+        downloadLink.innerHTML = '<i class="fa-solid fa-download" me-2" aria-hidden="true"></i>다운로드';
+        // downloadLink.onclick = function(event) {
+        //     event.preventDefault();
+        //     // window.open(downloadLink.href, '_blank');
+        //     Swal.fire({
+        //         position: "top-end",
+        //         icon: "success",
+        //         title: "Downloading . . .",
+        //         showConfirmButton: false,
+        //         timer: 1500
+        //     });
+        // };
+        downloadCell.appendChild(downloadLink);
+        newRow.appendChild(downloadCell);
+
+        // 새로운 행을 tbody에 추가
+        tbody.appendChild(newRow);
+    }
+</script>
+</body>
+</html>

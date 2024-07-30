@@ -5,6 +5,7 @@ import kr.co.megabridge.megavnc.domain.Group;
 
 import kr.co.megabridge.megavnc.domain.Member;
 import kr.co.megabridge.megavnc.domain.Member_Group;
+import kr.co.megabridge.megavnc.dto.ResponseGroupApiDto;
 import kr.co.megabridge.megavnc.enums.Role;
 import kr.co.megabridge.megavnc.exception.ErrorCode;
 import kr.co.megabridge.megavnc.exception.exceptions.AdminGroupException;
@@ -34,7 +35,8 @@ public class AdminGroupService {
 
 
     @Transactional
-    public void register(String groupName){
+    public void register(ResponseGroupApiDto responseGroupApiDto){
+      String groupName = responseGroupApiDto.getGroupName();
       Optional<Group> optionalGroup = groupRepository.findByGroupName(groupName);
       if(optionalGroup.isPresent()){
         if (optionalGroup.get().getId() == 1L){
