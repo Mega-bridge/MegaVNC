@@ -2,7 +2,6 @@ package kr.co.megabridge.megavnc.filetransfer;
 
 import kr.co.megabridge.megavnc.domain.FileInfo;
 import kr.co.megabridge.megavnc.domain.RemotePc;
-import kr.co.megabridge.megavnc.exception.BusinessException;
 import kr.co.megabridge.megavnc.exception.ErrorCode;
 import kr.co.megabridge.megavnc.exception.exceptions.ApiException;
 import kr.co.megabridge.megavnc.repository.FileInfoRepository;
@@ -15,6 +14,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriUtils;
@@ -50,10 +50,14 @@ public class FileTransferService {
     private  String FILE_KEY;
     private static final String ADMIN_REQUEST = "ADMIN_REQUEST";
 
+    @Transactional
     public String uploadFile(MultipartFile file, Long repeaterId)  {
         try {
-            RemotePc remotePc = remotePcRepository.findByRepeaterId(repeaterId).orElseThrow(() -> new ApiException(ErrorCode.PC_NOT_FOUND));
-            String reconnectId = (repeaterId ==null) ? ADMIN_REQUEST: Optional.ofNullable(remotePc.getReconnectId()).orElseThrow(() -> new ApiException(ErrorCode.DISASSIGNED_PC));
+            String reconnectId = ADMIN_REQUEST;
+            if(repeaterId != null) {
+                RemotePc remotePc = remotePcRepository.findByRepeaterId(repeaterId).orElseThrow(() -> new ApiException(ErrorCode.PC_NOT_FOUND));
+                reconnectId =  Optional.ofNullable(remotePc.getReconnectId()).orElseThrow(() -> new ApiException(ErrorCode.DISASSIGNED_PC));
+            }
             Path directory = Paths.get(uploadDir);
 
             if (!Files.exists(directory)) {
@@ -85,10 +89,8 @@ public class FileTransferService {
         }
     }
 
-    //todo: 파일정보 조회 서비스
-    //todo : 파일 삭제 서비스
 
-    public ResponseEntity<Resource> downloadServer(String encodedFilename){
+    public ResponseEntity<Resource> downloadFile(String encodedFilename){
         String uploadDir = "uploads/";
         Path fileLocation = Paths.get(uploadDir).toAbsolutePath().resolve(encodedFilename);
 
@@ -111,6 +113,14 @@ public class FileTransferService {
 
         return responseEntity;
     }
+
+
+    //todo: 파일정보 조회 서비스
+    //todo : 파일 삭제 서비스
+
+
+    ////////////////////////////////////////////////////////////
+    /*private 매서드*/
 
     private String encodeAES256(String data){
         try {

@@ -38,6 +38,7 @@
     const uploadMessage = document.getElementById('upload-message');
     const filesArray = [];
     const COMMON_URL = 'https://vnc.megabridge.co.kr:8443';
+    //const COMMON_URL = 'https://localhost:8080';
 
     dropZone.addEventListener('dragover', (event) => {
         event.preventDefault();
@@ -93,7 +94,7 @@
         fileInfoContainer.appendChild(fileInfo);
     }
 
-    function filesUpload(){
+    async function filesUpload() {
         Swal.fire({
             title: '',
             text: filesArray.length + "개 파일을 업로드 하시겠습니까?",
@@ -105,27 +106,35 @@
         }).then(async (result) => {
             if (result.isConfirmed) {
                 for (let i = 0; i < filesArray.length; i++) {
+                    const formData = new FormData();
+                    formData.append('file', filesArray[i]);
+
                     const option = {
                         method: 'POST',
-                        headers: {},
-                        body: filesArray[i]
+                        body: formData
                     };
 
-                    const res = await fetch(`${COMMON_URL}/file`, {
-                        ...option
-                    });
-                    if (!res.ok) { // 응답이 성공이 아닌 경우
-                        const errorResponse = await res.json();
-                        const errorMessage = errorResponse.message;
-                        throw new Error('HTTP error, status = ' + errorMessage);
+                    try {
+                        const res = await fetch(`${COMMON_URL}/file`, {
+                            ...option
+                        });
+
+                        if (!res.ok) { // 응답이 성공이 아닌 경우
+                            const errorResponse = await res.json();
+                            const errorMessage = errorResponse.message;
+                            throw new Error('HTTP error, status = ' + errorMessage);
+                            return false;
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', error.message, 'error');
                         return false;
                     }
                 }
-                Swal.fire('success');
+                Swal.fire('Success', '파일이 성공적으로 업로드되었습니다.', 'success');
             }
-        })
-
+        });
     }
+
 </script>
 </body>
 </html>

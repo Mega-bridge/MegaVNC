@@ -30,10 +30,10 @@ public class FileTransferController {
 
 
     @GetMapping("/download-files/{encodedFilename}")
-    public ResponseEntity<Resource> downloadServer(@PathVariable String encodedFilename) {
+    public ResponseEntity<Resource> downloadFile(@PathVariable String encodedFilename) {
 
 
-        return fileTransferService.downloadServer(encodedFilename);
+        return fileTransferService.downloadFile(encodedFilename);
 
 
 
