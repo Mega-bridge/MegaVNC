@@ -43,4 +43,10 @@ public class FileController {
         return "/admin/fileManagement/uploadFile";
     }
 
+    @GetMapping
+    @RequestMapping("/list")
+    public String list(@AuthenticationPrincipal User user, Model model) {
+        return "/admin/fileManagement/fileList";
+    }
+
 }

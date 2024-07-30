@@ -88,8 +88,8 @@
     background-color: #ffffff;
     border-radius: 10px;
     width: 90%;
-    max-width: 800px;
-    height: 470px;
+    max-width: 900px;
+    height: 600px;
     left: 0;
     right: 0;
     margin: 4% auto;
@@ -101,7 +101,7 @@
     height: 380px;
     float: left;
     margin-left: 15%;
-    margin-top: 50px;
+    margin-top: 100px;
     position: relative;
     border-radius: 10px;
     transition: transform 0.3s ease;
@@ -116,7 +116,7 @@
     height: 380px;
     float: right;
     margin-right: 15%;
-    margin-top: 50px;
+    margin-top: 100px;
     position: relative;
     border-radius: 10px;
     transition: transform 0.3s ease;
@@ -134,10 +134,10 @@
     font-size: 35px;
     color: #fff;
     border-radius: 50%;
-    width: 31%;
+    width: 29%;
     height: 18%;
     margin-top: -15%;
-    margin-left: 34.5%;
+    margin-left: 35.5%;
 }
 .fileMenuName{
     color: #fff;
