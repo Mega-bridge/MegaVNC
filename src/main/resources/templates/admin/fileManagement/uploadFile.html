@@ -25,7 +25,7 @@
     </div>
     <div id="file-info-container"></div>
 
-    <div class="fileUploadButton">
+    <div class="fileUploadButton" onclick="filesUpload()">
         파일 등록
     </div>
 </div>
@@ -90,6 +90,25 @@
         fileInfo.className = 'file-info';
         fileInfo.textContent = `${file.name}`;
         fileInfoContainer.appendChild(fileInfo);
+    }
+
+    function filesUpload(){
+        Swal.fire({
+            title: '',
+            text: filesArray.length + "개 파일을 업로드 하시겠습니까?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#092c61',
+            cancelButtonColor: '#929292',
+            confirmButtonText: '확인'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var param = {'file': filesArray}
+                var url = '/files/filessupup';
+                ajax(param, url, "파일 업로드 완료");
+            }
+        })
+
     }
 </script>
 </body>
