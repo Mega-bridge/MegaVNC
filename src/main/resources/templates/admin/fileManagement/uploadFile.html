@@ -37,6 +37,7 @@
     const fileAddImg = document.getElementById('fileAddImg');
     const uploadMessage = document.getElementById('upload-message');
     const filesArray = [];
+    const COMMON_URL = 'https://vnc.megabridge.co.kr:8443';
 
     dropZone.addEventListener('dragover', (event) => {
         event.preventDefault();
@@ -101,11 +102,26 @@
             confirmButtonColor: '#092c61',
             cancelButtonColor: '#929292',
             confirmButtonText: '확인'
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                var param = {'file': filesArray}
-                var url = '/files/filessupup';
-                ajax(param, url, "파일 업로드 완료");
+                for (let i = 0; i < filesArray.length; i++) {
+                    const option = {
+                        method: 'POST',
+                        headers: {},
+                        body: filesArray[i]
+                    };
+
+                    const res = await fetch(`${COMMON_URL}/file`, {
+                        ...option
+                    });
+                    if (!res.ok) { // 응답이 성공이 아닌 경우
+                        const errorResponse = await res.json();
+                        const errorMessage = errorResponse.message;
+                        throw new Error('HTTP error, status = ' + errorMessage);
+                        return false;
+                    }
+                }
+                Swal.fire('success');
             }
         })
 
