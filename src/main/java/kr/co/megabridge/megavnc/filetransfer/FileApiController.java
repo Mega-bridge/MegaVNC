@@ -12,9 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/file")
 @Slf4j
-public class FileTransferController {
+public class FileApiController {
 
-    private final FileTransferService fileTransferService;
+    private final FileService fileService;
 
 
 
@@ -23,7 +23,7 @@ public class FileTransferController {
     public ResponseEntity<String> uploadFile(@RequestPart("file") MultipartFile file,
                                              @RequestParam(required = false) Long repeaterId)  {
 
-        String encodedFilename = fileTransferService.uploadFile(file, repeaterId);
+        String encodedFilename = fileService.uploadFile(file, repeaterId);
         return ResponseEntity
                 .ok().body(encodedFilename);
     }
@@ -33,7 +33,7 @@ public class FileTransferController {
     public ResponseEntity<Resource> downloadFile(@PathVariable String encodedFilename) {
 
 
-        return fileTransferService.downloadFile(encodedFilename);
+        return fileService.downloadFile(encodedFilename);
 
 
 

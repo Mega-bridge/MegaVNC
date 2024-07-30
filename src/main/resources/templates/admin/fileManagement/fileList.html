@@ -25,24 +25,25 @@
             <table class="table table-hover align-middle mb-5">
                 <thead>
                 <tr>
-                    <th scope="col">아이디</th>
-                    <th scope="col">그룹 이름</th>
-                    <th scope="col">등록일</th>
-                    <th scope="col">삭제</th>
+                    <th scope="col">파일이름</th>
+                    <th scope="col">업로드 날짜</th>
+                    <th scope="col">파일크기</th>
+            <!--       <th scope="col">삭제</th>-->
+
                 </tr>
                 </thead>
 
                 <tbody>
-                <tr th:each="group : ${files}" class="data-row">
-                    <td th:text="${files.id}">아이디</td>
-                    <td th:text="${files.groupName}">이름</td>
-                    <td th:text="${#dates.format(files.createdAt, 'yyyy-MM-dd HH:mm:ss')}">등록일</td>
-                    <td>
+                <tr th:each="file : ${files}" class="data-row">
+                    <td th:text="${file.fileName}">파일이름</td>
+                    <td th:text="${#dates.format(file.createdAt, 'yyyy-MM-dd HH:mm:ss')}">업로드 날짜</td>
+                    <td th:text="${file.fileSize}">파일크기</td>
+                 <!--   <td>
                         <a th:href="@{/admin/groups/delete/{groupId}(groupId=${files.id})}"
                            onclick="confirmFileDelete();" class="btn btn-danger ">
                             <i class="fa-solid fa-trash-alt me-2"></i>삭제
                         </a>
-                    </td>
+                    </td>-->
 
                 </tr>
                 </tbody>

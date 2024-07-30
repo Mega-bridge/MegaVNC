@@ -34,13 +34,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class FileTransferService {
+public class FileService {
 
     private final FileInfoRepository fileInfoRepository;
     private final RemotePcRepository remotePcRepository;
@@ -66,13 +67,14 @@ public class FileTransferService {
 
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-            String uniqueFileName =UriUtils.encode(timestamp+"_"+fileName, StandardCharsets.UTF_8);
+            String uniqueFileName = timestamp + "_" + fileName;
+            String encodedFileName =UriUtils.encode(uniqueFileName, StandardCharsets.UTF_8);
 
             //파일명 암호화
-            String encodedFileName = encodeAES256(uniqueFileName);
+            String encryptedFileName = encodeAES256(encodedFileName);
 
             //파일 경로 지정
-            Path filePath = directory.resolve(encodedFileName);
+            Path filePath = directory.resolve(encryptedFileName);
 
             //파일 올리기
             Files.copy(file.getInputStream(), filePath);
@@ -81,7 +83,7 @@ public class FileTransferService {
             //파일 정보 db에 저장
             FileInfo fileInfo = FileInfo.createFileInfo(uniqueFileName, filePath.toString(), file.getSize(), reconnectId);
             fileInfoRepository.save(fileInfo);
-            return encodedFileName;
+            return encryptedFileName;
 
 
         } catch (IOException e) {
@@ -90,9 +92,9 @@ public class FileTransferService {
     }
 
 
-    public ResponseEntity<Resource> downloadFile(String encodedFilename){
+    public ResponseEntity<Resource> downloadFile(String encryptedFilename){
         String uploadDir = "uploads/";
-        Path fileLocation = Paths.get(uploadDir).toAbsolutePath().resolve(encodedFilename);
+        Path fileLocation = Paths.get(uploadDir).toAbsolutePath().resolve(encryptedFilename);
 
         Resource file;
         try {
@@ -102,7 +104,7 @@ public class FileTransferService {
         }
 
         String contentDisposition = "attachment; filename=\"" +
-                UriUtils.encode(encodedFilename, StandardCharsets.UTF_8) + "\"";
+                UriUtils.encode(encryptedFilename, StandardCharsets.UTF_8) + "\"";
 
         ResponseEntity<Resource> responseEntity = ResponseEntity
                 .ok()
@@ -115,7 +117,13 @@ public class FileTransferService {
     }
 
 
-    //todo: 파일정보 조회 서비스
+    //todo: 파일정보 전체 조회 서비스
+    public List<FileInfo> findAll(){
+        return fileInfoRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+
+    //todo: 관리자 조회 및, reconnectId로 필터링 조회
     //todo : 파일 삭제 서비스
 
 
