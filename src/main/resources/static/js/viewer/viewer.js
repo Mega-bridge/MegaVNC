@@ -55,6 +55,7 @@ function handleConnect() {
 const handleFormSubmit = async (event) => {
     event.preventDefault(); // 폼 제출을 중지합니다.
     const COMMON_URL = 'https://vnc.megabridge.co.kr:8443';
+    //const COMMON_URL = 'https://localhost:8080';
     const fileInput = document.getElementById("fileInput").files[0];
 
     if(!fileInput){
@@ -79,24 +80,7 @@ const handleFormSubmit = async (event) => {
             const errorMessage = errorResponse.message;
             throw new Error('HTTP error, status = ' + errorMessage);
         }
-        await navigator.clipboard.writeText(`${COMMON_URL}/file/download-files/` + await res.text());
-        navigator.clipboard.readText()
-            .then(text => {
-                rfb.clipboardPasteFrom(text);
-                // Send Ctrl+Alt+Shift down
-                rfb.sendKey(0xFFE3, "ControlLeft", true);  // Control Down
-                rfb.sendKey(0xFFE9, "AltLeft", true);      // Alt Down
-                rfb.sendKey(0xFFE1, "ShiftLeft", true);    // Shift Down
 
-                // Send F12
-                rfb.sendKey(0xFFC9, "F12", true);          // F12 Down
-                rfb.sendKey(0xFFC9, "F12", false);         // F12 Up
-
-                // Send Ctrl+Alt+Shift up
-                rfb.sendKey(0xFFE3, "ControlLeft", false); // Control Up
-                rfb.sendKey(0xFFE9, "AltLeft", false);     // Alt Up
-                rfb.sendKey(0xFFE1, "ShiftLeft", false);   // Shift Up
-            });
         alert("파일 전송이 완료되었습니다.");
     }
 }
