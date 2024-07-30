@@ -1,7 +1,12 @@
 package kr.co.megabridge.megavnc.filetransfer;
 
+import kr.co.megabridge.megavnc.domain.FileInfo;
+import kr.co.megabridge.megavnc.domain.RemotePc;
+import kr.co.megabridge.megavnc.exception.BusinessException;
 import kr.co.megabridge.megavnc.exception.ErrorCode;
 import kr.co.megabridge.megavnc.exception.exceptions.ApiException;
+import kr.co.megabridge.megavnc.repository.FileInfoRepository;
+import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Optional;
 
 
 @Service
@@ -36,13 +42,18 @@ import java.util.Base64;
 @RequiredArgsConstructor
 public class FileTransferService {
 
+    private final FileInfoRepository fileInfoRepository;
+    private final RemotePcRepository remotePcRepository;
     @Value("uploads/")
     private String uploadDir;
     @Value("${fileKey}")
     private  String FILE_KEY;
+    private static final String ADMIN_REQUEST = "ADMIN_REQUEST";
 
-    public String uploadFile(MultipartFile file)  {
+    public String uploadFile(MultipartFile file, Long repeaterId)  {
         try {
+            RemotePc remotePc = remotePcRepository.findByRepeaterId(repeaterId).orElseThrow(() -> new ApiException(ErrorCode.PC_NOT_FOUND));
+            String reconnectId = (repeaterId ==null) ? ADMIN_REQUEST: Optional.ofNullable(remotePc.getReconnectId()).orElseThrow(() -> new ApiException(ErrorCode.DISASSIGNED_PC));
             Path directory = Paths.get(uploadDir);
 
             if (!Files.exists(directory)) {
@@ -53,7 +64,8 @@ public class FileTransferService {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
             String uniqueFileName =UriUtils.encode(timestamp+"_"+fileName, StandardCharsets.UTF_8);
 
-           String encodedFileName = encodeAES256(uniqueFileName);
+            //파일명 암호화
+            String encodedFileName = encodeAES256(uniqueFileName);
 
             //파일 경로 지정
             Path filePath = directory.resolve(encodedFileName);
@@ -61,7 +73,10 @@ public class FileTransferService {
             //파일 올리기
             Files.copy(file.getInputStream(), filePath);
 
-            //파일명 암호화
+
+            //파일 정보 db에 저장
+            FileInfo fileInfo = FileInfo.createFileInfo(uniqueFileName, filePath.toString(), file.getSize(), reconnectId);
+            fileInfoRepository.save(fileInfo);
             return encodedFileName;
 
 
@@ -69,6 +84,9 @@ public class FileTransferService {
             throw new ApiException(ErrorCode.FILE_CANNOT_UPLOAD,": "+e.getMessage());
         }
     }
+
+    //todo: 파일정보 조회 서비스
+    //todo : 파일 삭제 서비스
 
     public ResponseEntity<Resource> downloadServer(String encodedFilename){
         String uploadDir = "uploads/";

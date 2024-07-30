@@ -71,7 +71,7 @@ const handleFormSubmit = async (event) => {
             body: formData
         };
 
-        const res = await fetch(`${COMMON_URL}/file`, {
+        const res = await fetch(`${COMMON_URL}/file?repeaterId=${repeaterId}`, {
             ...option
         });
         if (!res.ok) { // 응답이 성공이 아닌 경우

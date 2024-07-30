@@ -69,7 +69,7 @@ public class RemotePcApiService {
     @Transactional
     public void disAssignRemotePcByRepeaterId(String reconnectId){
         Optional<RemotePc> optionalRemotePc = remotePcRepository.findByReconnectId(reconnectId);
-        RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new ApiException(ErrorCode.CANNOT_DISASSIGNED_PC));
+        RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new ApiException(ErrorCode.CANNOT_DISASSIGN_PC));
         remotePc.disAssign();
 
     }

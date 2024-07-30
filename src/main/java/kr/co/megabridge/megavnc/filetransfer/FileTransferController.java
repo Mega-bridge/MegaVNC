@@ -20,12 +20,12 @@ public class FileTransferController {
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<String> uploadFile(@RequestPart("file") MultipartFile file)  {
+    public ResponseEntity<String> uploadFile(@RequestPart("file") MultipartFile file,
+                                             @RequestParam(required = false) Long repeaterId)  {
 
-        String encodedFilename = fileTransferService.uploadFile(file);
+        String encodedFilename = fileTransferService.uploadFile(file, repeaterId);
         return ResponseEntity
                 .ok().body(encodedFilename);
-
     }
 
 

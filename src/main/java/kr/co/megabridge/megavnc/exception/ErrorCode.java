@@ -26,7 +26,8 @@ public enum ErrorCode {
     CANNOT_DELETE_DEFAULT_PC(400,"R008","기본 pc는 삭제할 수 없습니다. "),
     ALREADY_ASSIGNED_PC(400,"R009","이미 등록된 pc 입니다. 다른 pc를 선택해 주세요. "),
     CANNOT_DELETE_ASSIGNED_PC(400,"R010","등록되지 않은 pc만 삭제할 수 있습니다. "),
-    CANNOT_DISASSIGNED_PC(400,"R011","이미 연결이 해제된 pc입니다."),
+    CANNOT_DISASSIGN_PC(400,"R011","이미 연결이 해제된 pc입니다."),
+    DISASSIGNED_PC(400,"R012","연결되지 않은 PC 입니다."),
 
 
 
