@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface FileInfoRepository extends JpaRepository<FileInfo, String> {
 
-    List<FileInfo> findAllByOrderByCreatedAtDesc();
+    List<FileInfo> findAllByReconnectIdOrderByCreatedAtDesc(String reconnectId);
 }

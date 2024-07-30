@@ -40,7 +40,7 @@ public class FileController {
     @GetMapping
     @RequestMapping("/list")
     public String list(Model model) {
-        model.addAttribute("files", fileService.findAll());;
+        model.addAttribute("files", fileService.findAllByAdmin());;
         return "admin/fileManagement/fileList";
     }
 

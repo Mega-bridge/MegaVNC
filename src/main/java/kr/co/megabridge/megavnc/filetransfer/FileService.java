@@ -117,9 +117,9 @@ public class FileService {
     }
 
 
-    //todo: 파일정보 전체 조회 서비스
-    public List<FileInfo> findAll(){
-        return fileInfoRepository.findAllByOrderByCreatedAtDesc();
+    //todo: 어드민이 보낸 조회 서비스
+    public List<FileInfo> findAllByAdmin(){
+        return fileInfoRepository.findAllByReconnectIdOrderByCreatedAtDesc(ADMIN_REQUEST);
     }
 
 
