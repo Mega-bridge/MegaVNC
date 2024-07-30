@@ -6,6 +6,7 @@ import kr.co.megabridge.megavnc.domain.Member;
 import kr.co.megabridge.megavnc.dto.AssignGroupDto;
 import kr.co.megabridge.megavnc.dto.UserRegisterDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -36,18 +37,4 @@ public class AdminUsersController {
         adminUserService.deleteUser(memberId);
         return "redirect:/admin/users";
     }
-
-    @PostMapping
-    public String createUser(@ModelAttribute("user") @Valid UserRegisterDto user, Model model ){
-        model.addAttribute("username", user.getUsername());
-        model.addAttribute("password", user.getPassword());
-        model.addAttribute("passwordConfirm", user.getPasswordConfirm());
-
-        adminUserService.register(user.getUsername(), user.getPassword());
-
-        return "redirect:/admin/users";
-    }
-
-
-
 }

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head ('파일 관리')}">
+    <meta charset="UTF-8">
+    <title>MegaVNC</title>
+</head>
+<body class="bg-body-secondary">
+<script src="/js/groups/groups.js"></script>
+<header><nav th:replace="~{fragments/nav :: nav ('admin')}"></nav></header>
+
+<div class="container py-5">
+
+    <div class="bg-body rounded p-4">
+        <div class="bg-body rounded p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-3 text-primary-emphasis">파일 목록</h4>
+                <div class="justify-content-end">
+                    <button class="btn btn-success p-2" onclick="location.href='/files/upload'" type="button">
+                        <i class="fa-solid fa-plus"></i>
+                        <i class="fa-solid fa-file me-2"> 파일 추가</i>
+                    </button>
+                </div>
+            </div>
+
+            <table class="table table-hover align-middle mb-5">
+                <thead>
+                <tr>
+                    <th scope="col">아이디</th>
+                    <th scope="col">그룹 이름</th>
+                    <th scope="col">등록일</th>
+                    <th scope="col">삭제</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="group : ${files}" class="data-row">
+                    <td th:text="${files.id}">아이디</td>
+                    <td th:text="${files.groupName}">이름</td>
+                    <td th:text="${#dates.format(files.createdAt, 'yyyy-MM-dd HH:mm:ss')}">등록일</td>
+                    <td>
+                        <a th:href="@{/admin/groups/delete/{groupId}(groupId=${files.id})}"
+                           onclick="confirmFileDelete();" class="btn btn-danger ">
+                            <i class="fa-solid fa-trash-alt me-2"></i>삭제
+                        </a>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+</div>
+<script>
+    function confirmFileDelete(){
+
+        Swal.fire({
+            title: '',
+            text: "[" + "file01.exe" + "]파일을 삭제 하시겠습니까?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#6ca3ff',
+            cancelButtonColor: '#929292',
+            confirmButtonText: '확인'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+            }
+        })
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+.modalBackWrap{
+    background-color: rgba(0,0,0,0.7);
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    z-index: 30;
+}
+.addWrap{
+    position: relative;
+    width: 40%;
+    height: 450px;
+    background-color: #fff;
+    border-radius: 10px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    margin: 2% auto;
+}
+.modalTitleName{
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #393939;
+    padding-top: 5%;
+}
+.valuesTitle{
+    padding-left: 7%;
+    margin-bottom: 5px;
+    margin-top: 15px;
+    text-align: left;
+    color: #052c65;
+    font-weight: bold;
+}
+.addPcSelectGroup{
+    padding-left: 15px;
+    padding-bottom: 3px;
+    height: 34px;
+    width: 90%;
+    border-radius: 20px;
+    margin-left: 5%;
+}
+
+.modalInput{
+    padding-left: 15px;
+    padding-bottom: 3px;
+    height: 34px;
+    width: 90%;
+    border-radius: 20px;
+    margin-left: 5%;
+    border: 1px solid #6c6c6c;
+}
+.addButton{
+    position: absolute;
+    width: 90%;
+    bottom: 30px;
+    left: 5%;
+}
+.addButtonText{
+    margin-left: 10px;
+}
+
+.cancelPcButton{
+    width: 90%;
+    margin-left: 5%;
+    margin-top: 15px;
+}
+.cancelPcButtonText{
+    margin-left: 10px;
+}
+
+.displayNone{
+    display: none;
+}
+.failMessage{
+    color: #ca0000;
+    font-size: 11px;
+    margin-left: 10px
+}
+.closeButton{
+    position: absolute;
+    right: 5%;
+    margin-top: 6%;
+}
+
+.ajaxFailMessage{
+    bottom: 70px;
+    margin-left: 7%;
+    font-size: 12px;
+    position: absolute;
+    color: #ca0000;
+}

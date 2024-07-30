@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Slf4j
 @RequestMapping("/api/repeater")
-public class RepeaterController {
+public class RepeaterApiController {
 
     @GetMapping("/events")
     public void eventListener(String msg) {

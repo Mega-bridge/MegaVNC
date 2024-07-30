@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head ('파일')}">
+    <meta charset="UTF-8">
+    <title>MegaVNC</title>
+</head>
+<body class="bg-body-secondary">
+<link rel="stylesheet" href="/css/files.css">
+<script src="/js/files/files.js"></script>
+<header><nav th:replace="~{fragments/nav :: nav ('admin')}"></nav></header>
+
+
+<div class="fileMenuWrap">
+
+    <div class="uploadFileBox" onclick="moveFileMenu('/files/upload')">
+        <p class="lavelNumber">1</p>
+        <p class="fileMenuName">File Upload</p>
+        <p class="menuNotice">⦁ 파일 업로드</p>
+        <div class="triangle-up"></div>
+    </div>
+
+    <div class="fileListBox" onclick="moveFileMenu('/files/list')">
+        <p class="lavelNumber">2</p>
+        <p class="fileMenuName">File List</p>
+        <p class="menuNotice">⦁ 파일목록 보기</p>
+        <p class="menuNotice">⦁ 파일 관리(삭제)</p>
+        <div class="triangle-up"></div>
+    </div>
+
+</div>
+
+<script>
+    function moveFileMenu(url){
+        location.href=url;
+    }
+</script>
+
+</body>
+</html>

@@ -4,26 +4,23 @@
     <title></title>
 </head>
 <body>
+<link rel="stylesheet" href="/css/login.css">
+<script src="../../../resources/static/js/login/login.js"></script>
 <div class="bg-body-secondary vh-100 d-flex flex-column align-items-center justify-content-center">
-    <div class="bg-body w-25 p-5 rounded shadow mb-5">
+    <div class="loginBoxWrap bg-body p-5 rounded shadow mb-5">
         <div class="mb-5 d-flex justify-content-center">
             <img th:src="@{/images/mega-logo.png}" src="https://placehold.co/72" alt="" width="72" height="72">
         </div>
         <div class="h4 text-center mb-5 fw-bold">MegaVNC 로그인</div>
 
-        <div th:if="${loginError}" class="card text-bg-danger mb-3">
-            <div class="card-body">사용자명 또는 비밀번호가 올바르지 않습니다.</div>
-        </div>
-
-
         <form method="post" th:action="@{/login}">
             <div class="mb-3">
-                <label for="username" class="form-label">사용자명</label>
+                <label for="username" class="form-label">사용자명</label><span class="failMessage usernameFailMessage">*사용자명을 입력해 주세요.</span>
                 <input type="text" id="username" name="username" autofocus="autofocus" class="form-control">
             </div>
 
             <div class="mb-3">
-                <label for="password" class="form-label">비밀번호</label>
+                <label for="password" class="form-label">비밀번호</label><span class="failMessage passwordFailMessage">*비밀번호를 입력해 주세요.</span>
                 <input type="password" id="password" name="password" class="form-control">
             </div>
 
@@ -32,8 +29,12 @@
                 <input type="checkbox" class="form-check-input" name="rememberMe" id="rememberMe">
             </div>
 
+            <span class="failMessage loginFailMessage">
+                *사용자명 또는 비밀번호가 올바르지 않습니다.
+            </span>
+
             <div class="d-grid mb-3">
-                <button type="submit" class="btn btn-primary">로그인</button>
+                <button onclick="requestLogin(this)" type="button" class="btn btn-primary">로그인</button>
             </div>
 
         </form>
@@ -45,5 +46,36 @@
     </a>
     <!--<a href="https://www.megabridge.co.kr/" target="_blank" class="text-secondary">MegaBridge</a>-->
 </div>
+<script>
+    $(document).ready(function() {
+        if ('[[${loginError}]]' === 'true') {
+            $('.loginFailMessage').show();
+        }
+    });
+
+    function requestLogin(ele){
+        $('.usernameFailMessage').hide();
+        $('.passwordFailMessage').hide();
+        $('.loginFailMessage').hide();
+
+        var username = $('#username').val();
+        var password = $('#password').val();
+
+        if(username == ""){
+            $('.usernameFailMessage').show();
+            return false;
+        }
+        if(password == ""){
+            $('.passwordFailMessage').show();
+            return false;
+        }
+
+        ele.type = 'submit';
+        ele.classList.add('clicked');
+        setTimeout(() => {
+            ele.classList.remove('clicked');
+        }, 200); // 200ms 딜레이
+    }
+</script>
 </body>
 </html>

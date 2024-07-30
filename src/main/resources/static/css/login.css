@@ -1,0 +1,9 @@
+.loginBoxWrap{
+    width: 400px;
+}
+.failMessage{
+    font-size: 11px;
+    color: #ca0000;
+    margin-left: 10px;
+    display: none;
+}
