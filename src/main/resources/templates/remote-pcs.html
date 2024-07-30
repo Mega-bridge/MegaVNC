@@ -4,11 +4,40 @@
     <title>MegaVNC</title>
 </head>
 <body class="bg-body-secondary">
+<script src="/js/remote-pcs/remote-pcs.js"></script>
 <header th:replace="~{fragments/nav :: nav (${user.username})}"></header>
 
-<div th:if="${error}" class="card text-bg-danger mb-3" id="errorMessageCard">
-    <div class="card-body" th:text="${errorMessage}"></div>
+<div class="modalBackWrap displayNone" onclick="handleBackWrapClick(event)">
+    <div class="addWrap">
+        <button type="button" class="btn-close closeButton" onclick="cancelPc();"></button>
+        <p class="modalTitleName">원격 PC 추가</p>
+
+        <p class="valuesTitle">그룹 선택 <span class="failMessage failMessageGroup"></span></p>
+        <select class="addPcSelectGroup">
+            <option th:selected="${selectedGroup == null}" value="">--그룹 선택--</option>
+            <option name="groupName" th:each="group : ${groups}" th:value="${group.groupName}"
+                    th:text="${group.groupName}"
+                    th:selected="${group.groupName == selectedGroup}"></option>
+        </select>
+
+        <p class="valuesTitle">PC 이름 <span class="failMessage failMessagePcName"></span> </p>
+        <input type="text" class="modalInput pcName">
+
+        <p class="valuesTitle">접근 비밀번호 <span class="failMessage failMessagePassword"></span></p>
+        <input type="password" class="modalInput pcPassword">
+
+        <p class="ajaxFailMessage"></p>
+
+        <button class="btn btn-success addButton" onclick="requestRegistPc();" type="button">
+            <i class="fa-solid fa-plus"></i>
+            <i class="fa-solid fa-display me-2"><span class="addButtonText">PC 추가</span></i>
+        </button>
+    </div>
 </div>
+
+<!--<div th:if="${error}" class="card text-bg-danger mb-3" id="errorMessageCard">-->
+<!--    <div class="card-body" th:text="${errorMessage}"></div>-->
+<!--</div>-->
 
 <div class="container py-5">
     <form method="post" th:action="@{/remote-pcs/register-pc}" th:object="${RegisterRemotePcDto}">
@@ -25,45 +54,11 @@
         <div class="bg-body rounded p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold mb-3 text-primary-emphasis">원격 PC 목록</h4>
-                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">
+                <button class="btn btn-success" onclick="registPc();" type="button">
                     <i class="fa-solid fa-plus"></i>
                     <i class="fa-solid fa-display me-2"> 원격 pc 추가</i>
                 </button>
             </div>
-            <!-- Modal -->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-                 aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="exampleModalLabel">새 원격 PC 추가</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-
-                            <!--이 부분 모달로 -->
-                            <div class="d-flex flex-column justify-content-end">
-                                <div class="ms-1 p-1">
-                                    <label for="remotePcName">원격 PC 이름</label>
-                                    <input type="text" id="remotePcName" name="remotePcName"
-                                           placeholder="PC의 이름을 입력하세요."
-                                           class="form-control">
-                                </div>
-                                <div class="ms-1 p-1">
-                                    <label for="accessPassword">접근 비밀번호</label>
-                                    <input type="password" id="accessPassword" name="accessPassword"
-                                           placeholder="접근 비밀번호를 입력하세요."
-                                           class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">추가</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
 
             <table class="table table-hover align-middle mb-5" id="remotePcList">
                 <thead>
@@ -124,72 +119,9 @@
             </table>
 
             <div th:if="${#lists.isEmpty(remotePcs)}" class="mb-5 text-center text-secondary">등록된 원격 PC가 없습니다.</div>
-
-
         </div>
     </form>
 </div>
-<script>
-    $(document).ready(function () {
-        // 로컬
-       // const socket = new WebSocket('wss://localhost:8443/ws/status');
-        // 배포
-         const socket = new WebSocket('wss://vnc.megabridge.co.kr:8443/ws/status');
-
-        socket.onmessage = function (event) {
-            const data = JSON.parse(event.data);
-            // 각 데이터 항목을 업데이트
-            const row = $(`#remotePcList tr[data-pc-id="${data.id}"]`);
-            const statusCell = row.find('.pc-status');
-            const registeredAtCell = row.find('.pc-registeredAt');
-
-            // 등록일 업데이트
-            if(data.registeredAt === "null"){
-                data.registeredAt = "";
-            }
-            registeredAtCell.text(data.registeredAt);
-
-
-            // 상태 업데이트
-            if (data.status === 'OFFLINE') {
-                statusCell.html('<span class="text-secondary">오프라인</span>');
-                row.find('.btn-primary').addClass('disabled');
-                row.find('.btn-primary').removeClass('btn-primary').addClass('btn-secondary');
-                row.find('.btn-danger').removeClass('disabled');
-            } else if (data.status === 'STANDBY') {
-                statusCell.html('<span class="text-success">온라인(대기중)</span>');
-                row.find('.btn-secondary').removeClass('disabled');
-                row.find('.btn-secondary').removeClass('btn-secondary').addClass('btn-primary');
-                row.find('.btn-primary').removeClass('disabled');
-                row.find('.btn-danger').addClass('disabled');
-            } else if (data.status === 'ACTIVE') {
-                statusCell.html('<span class="text-info">온라인(사용중)</span>');
-                row.find('.btn-primary').addClass('disabled');
-                row.find('.btn-secondary').removeClass('btn-secondary').addClass('btn-primary').addClass('disabled');
-                row.find('.btn-danger').addClass('disabled');
-            }
-
-        };
-
-        socket.onclose = function (event) {
-            console.log('WebSocket closed: ', event);
-        };
-
-        socket.onerror = function (error) {
-            console.error('WebSocket error: ', error);
-        };
-    });
-
-    setTimeout(function () {
-        let card = document.getElementById("errorMessageCard");
-        card.style.transition = "opacity 2s ease";
-        card.style.opacity = 0;
-        setTimeout(function () {
-            card.style.display = "none";
-        }, 2000);
-    }, 5000);
-
-</script>
 
 </body>
 </html>

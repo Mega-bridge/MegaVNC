@@ -1,0 +1,261 @@
+/********** downloadFiles *********/
+.inputWrap{
+    /*left: 0;*/
+    /*right: 0;*/
+    /*width: 87.2%;*/
+    /*max-width: 1296px;*/
+    /*background-color: #ffffff;*/
+    /*border-radius: 6px;*/
+    /*height: 47vh;*/
+    /*margin: 48px auto;*/
+}
+.firstLine{
+    padding-top: 18px;
+}
+.infoTitle{
+    font-weight: bold;
+    color: #3e3e3e;
+    width: 25%;
+    display: inline-block;
+    margin-top: 15px;
+}
+.selectGroup{
+    color: #3e3e3e;
+    display: inline-block;
+    width: 58%;
+    text-align: center;
+    border-radius: 10px;
+    height: 36px;
+    margin-top: 15px;
+    margin-left: 44px;
+}
+.devisionLine{
+    text-align: center;
+    width: 80%;
+    margin-left: 10%;
+}
+.infoLine{
+    margin-top: 15px;
+}
+.infoInput{
+    width: 58%;
+    border-radius: 10px;
+    border: 1px solid #6b6b6b;
+    height: 36px;
+    text-align: center;
+    margin-left: 44px;
+}
+
+.buttonLine{
+    margin-top: 100px;
+    text-align: center;
+}
+
+.searchButton{
+    font-weight: bold;
+    width: 50%;
+    height: 40px;
+    border-radius: 5px;
+    border: 1px solid #6b6b6b;
+    background-color: #062c63;
+    color: #fff;
+}
+.searchButton:hover {
+    background-color: #fff; /* 호버 시 배경색 변경 */
+    color: #062c63; /* 호버 시 글씨색 변경 */
+}
+.displayNone{
+    display: none;
+}
+.fileInputTitle{
+    margin-left: 50px;
+    margin-top: 35px;
+}
+.custom-margin-left {
+    margin-left: 6px;
+}
+.searchFailMessage{
+    position: absolute;
+    margin-top: 20px;
+    margin-left: 10px;
+    font-size: 12px;
+    color: #dd0000;
+}
+
+
+/********** fileManagement *********/
+.fileMenuWrap{
+    background-color: #ffffff;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 900px;
+    height: 600px;
+    left: 0;
+    right: 0;
+    margin: 4% auto;
+    text-align: center;
+}
+.uploadFileBox{
+    background-color: #6ca3ff;
+    width: 30%;
+    height: 380px;
+    float: left;
+    margin-left: 15%;
+    margin-top: 100px;
+    position: relative;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+.uploadFileBox:hover {
+    cursor: pointer; /* 마우스를 올리면 커서를 클릭 가능한 커서로 변경 */
+    transform: scale(1.1); /* 요소를 1.1배로 키움 */
+}
+.fileListBox{
+    background-color: #6ca3ff;
+    width: 30%;
+    height: 380px;
+    float: right;
+    margin-right: 15%;
+    margin-top: 100px;
+    position: relative;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+.fileListBox:hover {
+    cursor: pointer; /* 마우스를 올리면 커서를 클릭 가능한 커서로 변경 */
+    transform: scale(1.1); /* 요소를 1.1배로 키움 */
+}
+.lavelNumber{
+    background-color: #6ca3ff;
+    position: absolute;
+    left: 0;
+    right: 0;
+    border: 5px solid #fff;
+    font-size: 35px;
+    color: #fff;
+    border-radius: 50%;
+    width: 29%;
+    height: 18%;
+    margin-top: -15%;
+    margin-left: 35.5%;
+}
+.fileMenuName{
+    color: #fff;
+    font-size: 25px;
+    margin-top: 20%;
+    border-bottom: 5px solid #fff;
+}
+.menuNotice{
+    color: #fff;
+    font-size: 16px;
+    text-align: left;
+    padding: 10px;
+}
+.triangle-up {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    bottom: 0;
+    margin: 0 auto;
+    border-left: 40px solid transparent;
+    border-right: 40px solid transparent;
+    border-bottom: 40px solid #ffffff;
+}
+
+
+/********** uploadFile *********/
+.uploadFileWrap {
+    width: 90%;
+    max-width: 900px;
+    height: 600px;
+    background-color: #fff;
+    border-radius: 10px;
+    left: 0;
+    right: 0;
+    margin: 4% auto;
+    overflow-x: hidden;  /* Hide horizontal scrollbar */
+    overflow-y: scroll;  /* Show vertical scrollbar */
+    position: relative;
+}
+
+/* Custom scrollbar for WebKit-based browsers (Chrome, Safari) */
+.uploadFileWrap::-webkit-scrollbar {
+    width: 6px;  /* Width of the vertical scrollbar */
+}
+
+.uploadFileWrap::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.5);  /* Color of the scrollbar thumb */
+    border-radius: 10px;
+}
+
+.uploadTitle{
+    font-size: 24px;
+    margin-left: 4%;
+    padding-top: 3%;
+    font-weight: bold;
+}
+.uploadNotice{
+    color: #8c8c8c;
+    margin-left: 4%;
+}
+.drop-zone {
+    border: 2px dashed #cccccc;
+    padding: 20px;
+    margin-top: 26px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    height: 280px;
+    width: 92%;
+    margin-left: 4%;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 10px;
+}
+.drop-zone.dragover {
+    background-color: #e9e9e9;
+}
+
+.file-info {
+    color: #333;
+    margin-left: 4%;
+    margin-top: 20px;
+    border: 1px solid #e2e2e2;
+    width: 92%;
+    line-height: 25px;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 5px;
+}
+.fileAddImg{
+    width: 100px;
+    height: 100px;
+    display: block;
+    left: 0;
+    right: 0;
+    margin: 6% auto 0 auto;
+}
+.hidden-input {
+    display: none;
+}
+.fileUploadButton{
+    background-color: #4180ea;
+    border-radius: 5px;
+    width: 30%;
+    margin-left: 35%;
+    color: #fff;
+    text-align: center;
+    line-height: 36px;
+    bottom: 10px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+.fileUploadButton:hover {
+    cursor: pointer; /* 마우스를 올리면 커서를 클릭 가능한 커서로 변경 */
+}
+.fileBackPageBtn{
+    position: absolute;
+    margin-top: -5.5%;
+    right: 4%;
+}

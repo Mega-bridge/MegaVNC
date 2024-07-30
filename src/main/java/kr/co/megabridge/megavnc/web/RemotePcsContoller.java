@@ -30,7 +30,6 @@ public class RemotePcsContoller {
 
     private final RemotePcService remotePcService;
 
-
     @GetMapping
     public String showRemotePcs(@AuthenticationPrincipal User user, @RequestParam(value = "selectedGroup", required = false) String selectedGroupName, Model model) {
         List<Group> groups = remotePcService.findGroupByMember(user);
@@ -88,16 +87,6 @@ public class RemotePcsContoller {
                 .ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                 .body(file);
-    }
-
-
-    @PostMapping("/register-pc")
-    public String registerRemotePc(RegisterRemotePcDto registerRemotePcDto) {
-
-        String encodedGroupName = UriUtils.encode(registerRemotePcDto.getGroupName(), StandardCharsets.UTF_8);
-        remotePcService.registerRemotePc(registerRemotePcDto);
-
-        return "redirect:/remote-pcs?selectedGroup=" + encodedGroupName;
     }
 
     //원래 삭제요청을 get방식으로 하는 것은 바람직 하지 않다. 그러나 html에서 폼을 폼안에 넣는게 안된다고 해서 일단 이렇게 했음//다른 방법을 찾아 봐야 함

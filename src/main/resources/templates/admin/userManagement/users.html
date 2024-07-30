@@ -5,71 +5,47 @@
     <title>MegaVNC</title>
 </head>
 <body class="bg-body-secondary">
-<header>
-    <nav th:replace="~{fragments/nav :: nav ('admin')}"></nav>
-</header>
-<div th:if="${error}" class="card text-bg-danger mb-3" id="errorMessageCard">
-    <div class="card-body" th:text="${errorMessage}"></div>
+<script src="/js/users/users.js"></script>
+<header><nav th:replace="~{fragments/nav :: nav ('admin')}"></nav></header>
+
+<div class="modalBackWrap displayNone" onclick="handleBackWrapClick(event)">
+    <div class="addWrap">
+        <button type="button" class="btn-close closeButton" onclick="cancelUser();"></button>
+        <p class="modalTitleName">사용자 추가</p>
+
+        <p class="valuesTitle">사용자명 <span class="failMessage failMessageUserName"></span></p>
+        <input type="text" class="modalInput userName">
+
+        <p class="valuesTitle">비밀번호 <span class="failMessage failMessageUserPassword"></span></p>
+        <input type="password" class="modalInput userPassword">
+
+        <p class="valuesTitle">비밀번호 확인 <span class="failMessage failMessageCheckUserPassword"></span></p>
+        <input type="password" class="modalInput checkUserPassword">
+
+        <p class="ajaxFailMessage"></p>
+
+        <button class="btn btn-success addButton" onclick="requestRegistUser();" type="button">
+            <i class="fa-solid fa-plus"></i>
+            <i class="fa-solid fa-user me-2"><span class="addButtonText">사용자 추가</span></i>
+        </button>
+    </div>
 </div>
+
+<!--<div th:if="${error}" class="card text-bg-danger mb-3" id="errorMessageCard">-->
+<!--    <div class="card-body" th:text="${errorMessage}"></div>-->
+<!--</div>-->
 <div class="container py-5">
 
     <div class="bg-body rounded p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-bold mb-3 text-primary-emphasis">사용자 목록</h4>
             <div class="justify-content-end">
-                <button class="btn btn-success p-2" data-bs-toggle="modal" data-bs-target="#userAddModal" type="button">
+                <button class="btn btn-success p-2" onclick="registUser();" type="button">
                     <i class="fa-solid fa-plus"></i>
                     <i class="fa-solid fa-user me-2"> 사용자 추가</i>
                 </button>
             </div>
         </div>
-
-
-        <!-- 유저 추가 Modal -->
-        <div class="modal fade" id="userAddModal" tabindex="-1" aria-labelledby="userAddModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="userAddModalLabel">사용자 추가</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form method="post" th:action="@{/admin/users}" th:object="${UserRegisterDto}">
-                        <div class="modal-body">
-                            <div class="d-flex flex-column justify-content-end">
-                                <div class="ms-1 p-1">
-                                    <label for="username">사용자명</label>
-
-                                    <input type="text" id="username" name="username" placeholder="사용할 이름을 입력하세요."
-                                           class="form-control">
-                                </div>
-                                <div class="ms-1 p-1">
-                                    <label for="password">비밀번호</label>
-                                    <div th:if="${#fields.hasErrors('password')}" class="text-danger">
-                                        <div th:errors="*{password}" class="card-body"></div>
-                                    </div>
-                                    <input type="password" id="password" name="password"
-                                           placeholder="비밀번호를 입력하세요."
-                                           class="form-control">
-                                </div>
-                                <div class="ms-1 p-1">
-                                    <label for="passwordConfirm">비밀번호 확인</label>
-                                    <div th:if="${#fields.hasErrors('passwordConfirm')}" class="text-danger">
-                                        <div th:errors="*{passwordConfirm}" class="card-body"></div>
-                                    </div>
-                                    <input type="password" id="passwordConfirm" name="passwordConfirm"
-                                           placeholder="비밀번호를 재 입력하세요."
-                                           class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">추가</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
 
         <table class="table table-hover align-middle mb-5">
             <thead>
@@ -103,21 +79,9 @@
             </tbody>
         </table>
 
-
     </div>
 
 </div>
-<script>
-    setTimeout(function() {
-        let card = document.getElementById("errorMessageCard");
-        card.style.transition = "opacity 2s ease";
-        card.style.opacity = 0;
-        setTimeout(function() {
-            card.style.display = "none";
-        }, 2000);
-    }, 5000);
-
-</script>
 
 </body>
 </html>
