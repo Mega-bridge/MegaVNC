@@ -45,7 +45,7 @@
                     <td th:text="${#dates.format(file.createdAt, 'yyyy-MM-dd HH:mm:ss')}">업로드 날짜</td>
                     <td th:text="${file.fileSize}">파일크기</td>
                     <td>
-                        <a th:href="@{/file/download-files/{fileSeq}(fileSeq=${file.seq})}" class="btn btn-primary ">
+                        <a th:href="@{/files/download-files/{fileSeq}(fileSeq=${file.seq})}" class="btn btn-primary ">
                             <i class="fa-solid fa-download me-2"></i>다운로드
                         </a>
                     </td>

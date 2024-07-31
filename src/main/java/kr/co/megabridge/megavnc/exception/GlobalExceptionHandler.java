@@ -95,12 +95,12 @@ public class GlobalExceptionHandler {
     }
     //어드민 assign 페이지에 전달 할 Exception
     @ExceptionHandler(FileDownloadException.class)
-    protected String handleFileDownloadException( AdminAssignException e , Model model){
+    protected String handleFileDownloadException(){
         return "404";
     }
     //어드민 assign 페이지에 전달 할 Exception
     @ExceptionHandler(FileDeleteException.class)
-    protected String handleFileDeleteException( AdminAssignException e , Model model){
+    protected String handleFileDeleteException( FileDeleteException e , Model model){
         model.addAttribute("error", true);
         model.addAttribute("errorMessage",  e.getMessage());
         model.addAttribute("files", fileService.findAllByReconnectId(null));
