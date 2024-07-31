@@ -10,31 +10,23 @@ server:
     key-store-password: "!mb220719"
     key-store-type: PKCS12
 
+fileKey: asd8g9dqyfeg1ohndsawd0hqidnw
+
 spring:
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 200MB
   datasource:
-    url: jdbc:postgresql://localhost:5432/megavnc
+    url: jdbc:postgresql://192.168.0.253:5432/megavnc
     username: megavncuser
     password: "!mb220719"
+  thymeleaf:
+    prefix: classpath:/templates/
+
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
 
-tcp:
-  server:
-    port: 2002
-
-#### 스키마 생성용
-#    properties:
-#      jakarta:
-#        persistence:
-#          schema-generation:
-#            create-source: metadata
-#            scripts:
-#              action: create
-#              create-target: create.sql

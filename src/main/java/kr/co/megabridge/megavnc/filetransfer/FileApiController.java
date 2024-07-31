@@ -6,6 +6,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 
 @RestController
@@ -20,20 +21,20 @@ public class FileApiController {
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<String> uploadFile(@RequestPart("file") MultipartFile file,
+    public ResponseEntity<Integer> uploadFile(@RequestPart("file") MultipartFile file,
                                              @RequestParam(required = false) Long repeaterId)  {
 
-        String encodedFilename = fileService.uploadFile(file, repeaterId);
+        Integer encodedFilename = fileService.uploadFile(file, repeaterId);
         return ResponseEntity
                 .ok().body(encodedFilename);
     }
 
 
-    @GetMapping("/download-files/{encodedFilename}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String encodedFilename) {
+    @GetMapping("/download-files/{fileSeq}")
+    public ResponseEntity<StreamingResponseBody> downloadFile(@PathVariable Integer fileSeq) {
 
 
-        return fileService.downloadFile(encodedFilename);
+        return fileService.downloadFile(fileSeq);
 
 
 

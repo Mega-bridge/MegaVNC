@@ -16,9 +16,13 @@ import java.util.Date;
 @AllArgsConstructor
 public class FileInfo {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer seq;
+
     private Date createdAt; //파일 업로드 날짜
 
-    @Id
+    @Column(unique = true)
     private String fileName;
 
     private String filePath;
