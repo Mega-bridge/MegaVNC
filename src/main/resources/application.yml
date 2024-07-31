@@ -2,6 +2,11 @@ spring:
   profiles:
     active: dev
 
+file:
+  cleanup:
+    cron: "0 0 9 * * ?" # 매일 9시
+    days: 30 # 30일 이전 파일 삭제
+
 
 tcp:
   server:

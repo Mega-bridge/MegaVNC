@@ -9,8 +9,11 @@ import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -28,10 +31,7 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -45,6 +45,12 @@ public class FileService {
     private String uploadDir;
     @Value("${fileKey}")
     private String FILE_KEY;
+    @Value("${file.cleanup.cron}")
+    private String CRON;
+    @Value("${file.cleanup.days}")
+    private Integer EXPIRED_DATE;
+
+
     private static final String ADMIN_REQUEST = "ADMIN_REQUEST";
 
     //fixme: 파일 확장자 검사 추가
@@ -160,9 +166,29 @@ public class FileService {
     }
 
 
+    /**
+     * 특정 시간이 지나면 특정 기간이 지난 전송 파일 자동으로 삭제
+     * **/
+    @Scheduled(cron = "#{fileCleanupProperties.cron}")
+    @Transactional
+    public void cleanupOldFiles() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR,  - EXPIRED_DATE);
+        Date DaysAgo = calendar.getTime();
+        List<FileInfo> oldFiles = fileInfoRepository.findAllByCreatedAtBeforeAndReconnectIdIsNot(DaysAgo,ADMIN_REQUEST);
+        for (FileInfo fileInfo : oldFiles) {
+            try {
+                Path filePath = Paths.get(fileInfo.getFilePath());
+                Files.deleteIfExists(filePath);
+                fileInfoRepository.delete(fileInfo);
+            } catch (IOException e) {
+                // 예외 처리
+                throw new RuntimeException("파일 삭제 실패: " + fileInfo.getFilePath(), e);
+            }
+        }
+    }
 
 
-    //todo : 특정 시간 지나면 자동삭제
 
     ////////////////////////////////////////////////////////////
     /*private 매서드*/

@@ -30,13 +30,13 @@ public class FileController {
 
     @GetMapping
     @RequestMapping("/management")
-    public String management(@AuthenticationPrincipal User user, Model model) {
+    public String management() {
         return "admin/fileManagement/fileManagement";
     }
 
     @GetMapping
     @RequestMapping("/upload")
-    public String upload(@AuthenticationPrincipal User user, Model model) {
+    public String upload() {
 
         return "admin/fileManagement/uploadFile";
     }
