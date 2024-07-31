@@ -3,10 +3,12 @@ package kr.co.megabridge.megavnc.filetransfer;
 import kr.co.megabridge.megavnc.security.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 
 @Controller
@@ -37,7 +39,6 @@ public class FileController {
     @GetMapping
     @RequestMapping("/upload")
     public String upload() {
-
         return "admin/fileManagement/uploadFile";
     }
 
@@ -54,5 +55,11 @@ public class FileController {
         return "admin/fileManagement/fileList";
 
     }
+
+    @GetMapping("/download-files/{fileSeq}")
+    public ResponseEntity<StreamingResponseBody> downloadFile(@PathVariable Integer fileSeq) {
+        return fileService.downloadFile(fileSeq);
+    }
+
 
 }

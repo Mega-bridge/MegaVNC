@@ -28,7 +28,6 @@ public class SecurityConfig {
                 .requestMatchers(
                         new AntPathRequestMatcher("/css/**"),
                         new AntPathRequestMatcher("/images/**"),
-                        new AntPathRequestMatcher("/file/**"),
                         new AntPathRequestMatcher("/api/**"),
                         new AntPathRequestMatcher("/favicon.ico"),
                         new AntPathRequestMatcher("/remote-pcs/download-server"));
@@ -45,7 +44,7 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/files/download/**"))
                         .permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/file/download-files/**"))
+                        .requestMatchers(new AntPathRequestMatcher("/files/download-files/**"))
                         .permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/files/delete-files/**"))
                         .hasRole("ADMIN")

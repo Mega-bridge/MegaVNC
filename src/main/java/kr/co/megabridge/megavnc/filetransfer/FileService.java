@@ -4,6 +4,8 @@ import kr.co.megabridge.megavnc.domain.FileInfo;
 import kr.co.megabridge.megavnc.domain.RemotePc;
 import kr.co.megabridge.megavnc.exception.ErrorCode;
 import kr.co.megabridge.megavnc.exception.exceptions.ApiException;
+import kr.co.megabridge.megavnc.exception.exceptions.FileDeleteException;
+import kr.co.megabridge.megavnc.exception.exceptions.FileDownloadException;
 import kr.co.megabridge.megavnc.repository.FileInfoRepository;
 import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -98,7 +101,7 @@ public class FileService {
 
     @Transactional
     public ResponseEntity<StreamingResponseBody> downloadFile(Integer fileSeq) {
-        FileInfo fileInfo = fileInfoRepository.findBySeq(fileSeq).orElseThrow(() -> new ApiException(ErrorCode.FILE_NOT_FOUND));
+        FileInfo fileInfo = fileInfoRepository.findBySeq(fileSeq).orElseThrow(() -> new FileDownloadException(ErrorCode.FILE_NOT_FOUND));
         String encryptedFilename = encodeAES256(UriUtils.encode(fileInfo.getFileName(), StandardCharsets.UTF_8));
 
         String uploadDir = "uploads/";
@@ -119,11 +122,11 @@ public class FileService {
                         Files.delete(fileLocation);
 
                     } catch (IOException e) {
-                        throw new ApiException(ErrorCode.FILE_CANNOT_DELETE, e.getMessage());
+                        throw new FileDownloadException(ErrorCode.FILE_CANNOT_DELETE, e.getMessage());
                     }
                 }
             } catch (IOException e) {
-                throw new ApiException(ErrorCode.FILE_NOT_FOUND, ": " + e.getMessage());
+                throw new FileDownloadException(ErrorCode.FILE_NOT_FOUND, ": " + e.getMessage());
             }
         };
         String contentDisposition = "attachment; filename=\"" +
@@ -136,12 +139,12 @@ public class FileService {
     }
 
 
-    //FIXME :  실패시 현재 페이지로 리다이렉트
+
     @Transactional
     public void deleteDistributionFile(Integer fileSeq) {
-        FileInfo fileInfo = fileInfoRepository.findBySeq(fileSeq).orElseThrow(() -> new ApiException(ErrorCode.FILE_NOT_FOUND));
+        FileInfo fileInfo = fileInfoRepository.findBySeq(fileSeq).orElseThrow(() -> new FileDeleteException(ErrorCode.FILE_NOT_FOUND));
         if (!fileInfo.getReconnectId().equals(ADMIN_REQUEST)) {
-            throw new ApiException(ErrorCode.FILE_CANNOT_DELETE,"관리자가 배포한 파일이 아닙니다.");
+            throw new FileDeleteException(ErrorCode.FILE_CANNOT_DELETE,"관리자가 배포한 파일이 아닙니다.");
         }
         fileInfoRepository.delete(fileInfo);
         String encryptedFilename = encodeAES256(UriUtils.encode(fileInfo.getFileName(), StandardCharsets.UTF_8));
@@ -152,7 +155,7 @@ public class FileService {
             Files.delete(fileLocation);
 
         } catch (IOException e) {
-            throw new ApiException(ErrorCode.FILE_CANNOT_DELETE, e.getMessage());
+            throw new FileDeleteException(ErrorCode.FILE_CANNOT_DELETE, e.getMessage());
         }
 
     }

@@ -4,6 +4,7 @@ package kr.co.megabridge.megavnc.exception;
 
 import kr.co.megabridge.megavnc.domain.Group;
 import kr.co.megabridge.megavnc.dto.AssignGroupDto;
+import kr.co.megabridge.megavnc.filetransfer.FileService;
 import kr.co.megabridge.megavnc.security.User;
 import kr.co.megabridge.megavnc.dto.RegisterRemotePcDto;
 import kr.co.megabridge.megavnc.dto.ResponseRemotePcDto;
@@ -32,6 +33,7 @@ public class GlobalExceptionHandler {
     private final AdminUserService adminUserService;
     private final AdminGroupService adminGroupService;
     private final AdminAssignService adminAssignService;
+    private final FileService fileService;
 
 
 
@@ -90,6 +92,20 @@ public class GlobalExceptionHandler {
         model.addAttribute("unassignedGroups", adminAssignService.listUnassignedGroups(e.getMemberId()));
         model.addAttribute("AssignGroupDto", new AssignGroupDto());
         return "admin/userManagement/assign";
+    }
+    //어드민 assign 페이지에 전달 할 Exception
+    @ExceptionHandler(FileDownloadException.class)
+    protected String handleFileDownloadException( AdminAssignException e , Model model){
+        return "404";
+    }
+    //어드민 assign 페이지에 전달 할 Exception
+    @ExceptionHandler(FileDeleteException.class)
+    protected String handleFileDeleteException( AdminAssignException e , Model model){
+        model.addAttribute("error", true);
+        model.addAttribute("errorMessage",  e.getMessage());
+        model.addAttribute("files", fileService.findAllByReconnectId(null));
+
+        return "admin/fileManagement/fileList";
     }
 
 
