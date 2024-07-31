@@ -19,9 +19,13 @@ public class FileController {
 
     @GetMapping
     @RequestMapping("/download")
-    public String showFiles(@RequestParam String reconnectId, Model model) {
-        model.addAttribute("files", fileService.findAllByReconnectId(reconnectId));
-        return "downloadFiles";
+    public String showFiles(@RequestParam(required = false) String reconnectId, Model model) {
+        if (reconnectId == null || reconnectId.trim().isEmpty()) {
+            return "403";
+        }else{
+            model.addAttribute("files", fileService.findAllByReconnectId(reconnectId));
+            return "downloadFiles";
+        }
     }
 
     @GetMapping
