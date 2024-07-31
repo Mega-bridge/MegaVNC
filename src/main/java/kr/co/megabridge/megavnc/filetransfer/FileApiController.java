@@ -32,12 +32,9 @@ public class FileApiController {
 
     @GetMapping("/download-files/{fileSeq}")
     public ResponseEntity<StreamingResponseBody> downloadFile(@PathVariable Integer fileSeq) {
-
-
         return fileService.downloadFile(fileSeq);
-
-
-
     }
+
+
 
 }

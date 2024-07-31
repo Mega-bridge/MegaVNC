@@ -28,8 +28,7 @@
                     <th scope="col">파일이름</th>
                     <th scope="col">업로드 날짜</th>
                     <th scope="col">파일크기</th>
-               <th scope="col">삭제</th>
-
+                     <th scope="col">삭제</th>
                 </tr>
                 </thead>
 
@@ -39,7 +38,7 @@
                     <td th:text="${#dates.format(file.createdAt, 'yyyy-MM-dd HH:mm:ss')}">업로드 날짜</td>
                     <td th:text="${file.fileSize}">파일크기</td>
                      <td>
-                         <a th:href="@{/admin/groups/delete/{groupId}(groupId=${group.id})}"
+                         <a th:href="@{/files/delete-files/{fileSeq}(fileSeq=${file.seq})}"
                             onclick="return confirm('정말로 삭제하시겠습니까?');" class="btn btn-danger ">
                              <i class="fa-solid fa-trash-alt me-2"></i>삭제
                          </a>

@@ -9,11 +9,8 @@ import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -22,10 +19,8 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import org.springframework.web.util.UriUtils;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,7 +47,7 @@ public class FileService {
     private String FILE_KEY;
     private static final String ADMIN_REQUEST = "ADMIN_REQUEST";
 
-
+    //fixme: 파일 확장자 검사 추가
     @Transactional
     public Integer uploadFile(MultipartFile file, Long repeaterId) {
         try {
@@ -135,15 +130,38 @@ public class FileService {
     }
 
 
-    //todo : 공통파일 삭제 서비스
+    //FIXME :  실패시 현재 페이지로 리다이렉트
+    @Transactional
+    public void deleteDistributionFile(Integer fileSeq) {
+        FileInfo fileInfo = fileInfoRepository.findBySeq(fileSeq).orElseThrow(() -> new ApiException(ErrorCode.FILE_NOT_FOUND));
+        if (!fileInfo.getReconnectId().equals(ADMIN_REQUEST)) {
+            throw new ApiException(ErrorCode.FILE_CANNOT_DELETE,"관리자가 배포한 파일이 아닙니다.");
+        }
+        fileInfoRepository.delete(fileInfo);
+        String encryptedFilename = encodeAES256(UriUtils.encode(fileInfo.getFileName(), StandardCharsets.UTF_8));
 
+        String uploadDir = "uploads/";
+        Path fileLocation = Paths.get(uploadDir).toAbsolutePath().resolve(encryptedFilename);
+        try {
+            Files.delete(fileLocation);
 
-    public List<FileInfo> findAllByAdmin() {
-        return fileInfoRepository.findAllByReconnectIdOrderByCreatedAtDesc(ADMIN_REQUEST);
+        } catch (IOException e) {
+            throw new ApiException(ErrorCode.FILE_CANNOT_DELETE, e.getMessage());
+        }
+
+    }
+
+    public List<FileInfo> findAllByReconnectId(String reconnectId) {
+        List<FileInfo> response =  fileInfoRepository.findAllByReconnectIdOrderByCreatedAtDesc(ADMIN_REQUEST);
+        if (reconnectId != null) {
+            response.addAll(fileInfoRepository.findAllByReconnectIdOrderByCreatedAtDesc(reconnectId));
+        }
+        return response;
     }
 
 
-    //todo: reconnectId로 필터링 조회
+
+
     //todo : 특정 시간 지나면 자동삭제
 
     ////////////////////////////////////////////////////////////

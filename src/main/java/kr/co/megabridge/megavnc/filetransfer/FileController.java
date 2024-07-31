@@ -19,8 +19,8 @@ public class FileController {
 
     @GetMapping
     @RequestMapping("/download")
-    public String showFiles(Model model) {
-
+    public String showFiles(@RequestParam String reconnectId, Model model) {
+        model.addAttribute("files", fileService.findAllByReconnectId(reconnectId));
         return "downloadFiles";
     }
 
@@ -40,8 +40,15 @@ public class FileController {
     @GetMapping
     @RequestMapping("/list")
     public String list(Model model) {
-        model.addAttribute("files", fileService.findAllByAdmin());;
+        model.addAttribute("files", fileService.findAllByReconnectId(null));
         return "admin/fileManagement/fileList";
+    }
+
+    @GetMapping("/delete-files/{fileSeq}")
+    public String deleteDistributionFile(@PathVariable Integer fileSeq) {
+        fileService.deleteDistributionFile(fileSeq);
+        return "admin/fileManagement/fileList";
+
     }
 
 }

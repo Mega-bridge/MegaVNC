@@ -47,6 +47,8 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/file/download-files/**"))
                         .permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/files/delete-files/**"))
+                        .hasRole("ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/admin/**"))
                         .hasRole("ADMIN")
                         .anyRequest()
