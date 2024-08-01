@@ -5,9 +5,50 @@
     <title>MegaVNC</title>
 </head>
 <body>
-    <div style="left: 0; right: 0; margin: 10% auto 0 auto; text-align: center">
-        <h1>404 Not Found Error</h1>
-        <img style="width: 350px; height: 350px" src="/images/404.gif" alt="">
-    </div>
+<style>
+    h1 {
+        margin-top: -25%;
+        transition: margin-top 1s ease-in-out, opacity 0.5s ease-in-out;
+        opacity: 0;
+    }
+
+    img {
+        margin-top: 25%;
+        transition: margin-top 1s ease-in-out, opacity 0.5s ease-in-out;
+        opacity: 0;
+    }
+
+    .visible {
+        margin-top: 0;
+        opacity: 1;
+    }
+
+    .container {
+        left: 0;
+        right: 0;
+        margin: 10% auto 0 auto;
+        text-align: center;
+    }
+</style>
+
+<div style="left: 0; right: 0; margin: 10% auto 0 auto; text-align: center">
+    <h1>404 Not Found Error</h1>
+    <img style="width: 350px; height: 350px" src="/images/404.gif" alt="">
+</div>
+
+<script>
+    window.addEventListener('load', function() {
+        const h1Element = document.querySelector('h1');
+        const imgElement = document.querySelector('img');
+
+        if (h1Element) {
+            h1Element.classList.add('visible');
+        }
+
+        if (imgElement) {
+            imgElement.classList.add('visible');
+        }
+    });
+</script>
 </body>
 </html>
