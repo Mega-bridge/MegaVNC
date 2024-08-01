@@ -42,6 +42,13 @@
     function moveFileMenu(url){
         location.href=url;
     }
+
+    window.addEventListener('load', function() {
+        const listElement = document.querySelector('.listWrap');
+        if (listElement) {
+            listElement.style.marginTop = '8%';
+        }
+    });
 </script>
 
 </body>
