@@ -5,55 +5,36 @@
     <title>MegaVNC</title>
 </head>
 <body class="bg-body-secondary">
-<link rel="stylesheet" href="/css/files.css">
+<link rel="stylesheet" href="/css/list.css">
 <script src="/js/files/files.js"></script>
 <header><nav th:replace="~{fragments/nav :: nav ('admin')}"></nav></header>
 
-
-<!--<div class="fileMenuWrap">-->
-
-<!--    <div class="uploadFileBox" onclick="moveFileMenu('/files/upload')">-->
-<!--        <p class="lavelNumber">1</p>-->
-<!--        <p class="fileMenuName">File Upload</p>-->
-<!--        <p class="menuNotice">⦁ 파일 업로드</p>-->
-<!--        <div class="triangle-up"></div>-->
-<!--    </div>-->
-
-<!--    <div class="fileListBox" onclick="moveFileMenu('/files/list')">-->
-<!--        <p class="lavelNumber">2</p>-->
-<!--        <p class="fileMenuName">File List</p>-->
-<!--        <p class="menuNotice">⦁ 파일목록 보기</p>-->
-<!--        <p class="menuNotice">⦁ 파일 관리(삭제)</p>-->
-<!--        <div class="triangle-up"></div>-->
-<!--    </div>-->
-
-<!--</div>-->
-
 <div class="container py-5">
-
     <div class="bg-body rounded p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-bold mb-3 text-primary-emphasis">로그 조회</h4>
         </div>
-
-        <div class="fileMenuWrap">
-
-            <div class="uploadFileBox" onclick="moveFileMenu('/files/upload')">
-                <p class="lavelNumber">1</p>
-                <p class="fileMenuName">Connect Log</p>
-                <p class="menuNotice">⦁ 접속로그 확인</p>
-                <div class="triangle-up"></div>
+        <div class="listWrap">
+            <div class="list" onclick="moveFileMenu('/admin/connectLog')">
+                <div class="imgLineWrap">
+                    <img class="menuImg" src="/images/logs/connect.png">
+                    <br/>
+                    <p class="menuNumber">01</p>
+                </div>
+                <p class="menuTitle">Connect Log</p>
+                <p class="menuNotice">원격 접속/종료 시 기록된 로그를 확인하세요!</p>
             </div>
 
-            <div class="fileListBox" onclick="moveFileMenu('/files/list')">
-                <p class="lavelNumber">2</p>
-                <p class="fileMenuName">Error Log</p>
-                <p class="menuNotice">⦁ 에러로그 확인</p>
-                <div class="triangle-up"></div>
+            <div class="list" onclick="moveFileMenu('/admin/errorLog')">
+                <div class="imgLineWrap">
+                    <img class="menuImg" src="/images/logs/error.png">
+                    <br/>
+                    <p class="menuNumber">02</p>
+                </div>
+                <p class="menuTitle">Error Log</p>
+                <p class="menuNotice">MegaVnc 사용 중 발생한 에러로그를 확인하세요!</p>
             </div>
-
         </div>
-
     </div>
 </div>
 

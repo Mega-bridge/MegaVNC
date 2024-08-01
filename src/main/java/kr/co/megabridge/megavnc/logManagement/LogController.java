@@ -13,8 +13,20 @@ public class LogController {
 
     @GetMapping
     @RequestMapping("/logs")
-    public String upload() {
+    public String logs() {
         return "admin/logManagement/logManagement";
+    }
+
+    @GetMapping
+    @RequestMapping("/connectLog")
+    public String connectLog() {
+        return "admin/logManagement/connectLog";
+    }
+
+    @GetMapping
+    @RequestMapping("/errorLog")
+    public String upload() {
+        return "admin/logManagement/errorLog";
     }
 
 }

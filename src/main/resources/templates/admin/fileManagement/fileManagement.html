@@ -5,56 +5,36 @@
     <title>MegaVNC</title>
 </head>
 <body class="bg-body-secondary">
-<link rel="stylesheet" href="/css/files.css">
+<link rel="stylesheet" href="/css/list.css">
 <script src="/js/files/files.js"></script>
 <header><nav th:replace="~{fragments/nav :: nav ('admin')}"></nav></header>
 
-
-<!--<div class="fileMenuWrap">-->
-
-<!--    <div class="uploadFileBox" onclick="moveFileMenu('/files/upload')">-->
-<!--        <p class="lavelNumber">1</p>-->
-<!--        <p class="fileMenuName">File Upload</p>-->
-<!--        <p class="menuNotice">⦁ 파일 업로드</p>-->
-<!--        <div class="triangle-up"></div>-->
-<!--    </div>-->
-
-<!--    <div class="fileListBox" onclick="moveFileMenu('/files/list')">-->
-<!--        <p class="lavelNumber">2</p>-->
-<!--        <p class="fileMenuName">File List</p>-->
-<!--        <p class="menuNotice">⦁ 파일목록 보기</p>-->
-<!--        <p class="menuNotice">⦁ 파일 관리(삭제)</p>-->
-<!--        <div class="triangle-up"></div>-->
-<!--    </div>-->
-
-<!--</div>-->
-
 <div class="container py-5">
-
     <div class="bg-body rounded p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-bold mb-3 text-primary-emphasis">배포파일 관리</h4>
         </div>
-
-        <div class="fileMenuWrap">
-
-            <div class="uploadFileBox" onclick="moveFileMenu('/files/upload')">
-                <p class="lavelNumber">1</p>
-                <p class="fileMenuName">File Upload</p>
-                <p class="menuNotice">⦁ 파일 업로드</p>
-                <div class="triangle-up"></div>
+        <div class="listWrap">
+            <div class="list" onclick="moveFileMenu('/files/upload')">
+                <div class="imgLineWrap">
+                    <img class="menuImg" src="/images/files/upload.png">
+                    <br/>
+                    <p class="menuNumber">01</p>
+                </div>
+                <p class="menuTitle">File Upload</p>
+                <p class="menuNotice">모든 사용자가 설치 가능한 파일을 업로드 하세요!</p>
             </div>
 
-            <div class="fileListBox" onclick="moveFileMenu('/files/list')">
-                <p class="lavelNumber">2</p>
-                <p class="fileMenuName">File List</p>
-                <p class="menuNotice">⦁ 파일목록 보기</p>
-                <p class="menuNotice">⦁ 파일 관리(삭제)</p>
-                <div class="triangle-up"></div>
+            <div class="list" onclick="moveFileMenu('/files/list')">
+                <div class="imgLineWrap">
+                    <img class="menuImg" src="/images/files/fileList.png">
+                    <br/>
+                    <p class="menuNumber">02</p>
+                </div>
+                <p class="menuTitle">File List</p>
+                <p class="menuNotice">현재 업로드된 파일을 관리하세요!</p>
             </div>
-
         </div>
-
     </div>
 </div>
 

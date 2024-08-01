@@ -1,0 +1,50 @@
+.listWrap{
+    text-align: center;
+    margin-top: 8%;
+}
+.list{
+    background-color: #eaeee4;
+    border-radius: 15px;
+    width: 36%;
+    height: 250px;
+    float: left;
+    margin-left: 9%;
+    transition: transform 0.3s ease;
+}
+.list:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+}
+.imgLineWrap{
+    float: left;
+    width: 30%;
+    height: 100%;
+    text-align: center;
+    padding: 10px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+.menuImg{
+    width: 80%;
+}
+.menuNumber{
+    margin-top: 25%;
+    font-size: 45px;
+    color: #c7c7b8;
+    font-weight: bold;
+}
+.menuTitle{
+    font-size: 30px;
+    font-weight: bold;
+    color: #505050;
+    text-align: left;
+    margin-left: 38%;
+    margin-top: 8%;
+}
+.menuNotice{
+    font-size: 14px;
+    color: #787878;
+    margin-left: 38%;
+    padding-right: 54px;
+    text-align: left;
+}
