@@ -44,10 +44,24 @@
     }
 
     window.addEventListener('load', function() {
-        const listElement = document.querySelector('.listWrap');
-        if (listElement) {
-            listElement.style.marginTop = '8%';
-        }
+        const menuNotices = document.querySelectorAll('.menuNotice');
+        const menuTitles = document.querySelectorAll('.menuTitle');
+        const imgLineWrap = document.querySelectorAll('.imgLineWrap');
+
+        menuNotices.forEach(element => {
+            element.style.marginTop = '0';
+            element.style.opacity = '1'; // opacity도 변경
+        });
+
+        imgLineWrap.forEach(element => {
+            element.style.marginLeft = '10px';
+        });
+
+        setTimeout(() => {
+            menuTitles.forEach(element => {
+                element.style.color = '#505050';
+            });
+        }, 500); // 0.5초 후에 실행
     });
 </script>
 
