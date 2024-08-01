@@ -9,8 +9,6 @@
 <header><nav th:replace="~{fragments/nav :: nav ('admin')}"></nav></header>
 
 <div class="container py-5">
-
-    <div class="bg-body rounded p-4">
         <div class="bg-body rounded p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold mb-3 text-primary-emphasis">배포 파일 목록</h4>
@@ -46,29 +44,7 @@
                 </tr>
                 </tbody>
             </table>
-
-
         </div>
-    </div>
 </div>
-<script>
-    function confirmFileDelete(){
-
-        Swal.fire({
-            title: '',
-            text: "[" + "file01.exe" + "]파일을 삭제 하시겠습니까?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#6ca3ff',
-            cancelButtonColor: '#929292',
-            confirmButtonText: '확인'
-        }).then((result) => {
-            if (result.isConfirmed) {
-
-            }
-        })
-    }
-
-</script>
 </body>
 </html>

@@ -104,19 +104,19 @@
     border-radius: 10px;
     width: 90%;
     max-width: 900px;
-    height: 600px;
+    height: 400px;
     left: 0;
     right: 0;
-    margin: 4% auto;
+    margin: 0 auto;
     text-align: center;
 }
 .uploadFileBox{
     background-color: #6ca3ff;
-    width: 30%;
+    width: 28%;
     height: 380px;
     float: left;
     margin-left: 15%;
-    margin-top: 100px;
+    margin-top: 10px;
     position: relative;
     border-radius: 10px;
     transition: transform 0.3s ease;
@@ -127,11 +127,11 @@
 }
 .fileListBox{
     background-color: #6ca3ff;
-    width: 30%;
+    width: 28%;
     height: 380px;
     float: right;
     margin-right: 15%;
-    margin-top: 100px;
+    margin-top: 10px;
     position: relative;
     border-radius: 10px;
     transition: transform 0.3s ease;
@@ -157,8 +157,11 @@
 .fileMenuName{
     color: #fff;
     font-size: 25px;
-    margin-top: 20%;
+    margin-top: 15%;
     border-bottom: 5px solid #fff;
+    text-align: left;
+    padding-left: 15px;
+    padding-bottom: 10px;
 }
 .menuNotice{
     color: #fff;

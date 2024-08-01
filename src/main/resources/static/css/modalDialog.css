@@ -90,3 +90,15 @@
     position: absolute;
     color: #ca0000;
 }
+.bg-body{
+    height: 75vh;
+    overflow: scroll;
+}
+.bg-body::-webkit-scrollbar {
+    width: 6px;  /* Width of the vertical scrollbar */
+}
+
+.bg-body::-webkit-scrollbar-thumb {
+    background-color: rgb(106, 106, 106);  /* Color of the scrollbar thumb */
+    border-radius: 10px;
+}

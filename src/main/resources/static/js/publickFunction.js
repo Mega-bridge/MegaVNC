@@ -1,6 +1,5 @@
 function ajax(url, param, successMessage) {
     console.log('ajax public Function');
-    Swal.fire(successMessage);
     $.ajax({
         url: url,
         data: JSON.stringify(param),
@@ -10,12 +9,7 @@ function ajax(url, param, successMessage) {
         success: function (data) {
             console.log(data);
             if (data === "ok") {
-                if(url == "/files/fileup" || url == "/files/filesup"){
-                    Swal.fire(successMessage);
-                }else{
-                    location.reload();
-                }
-
+                location.reload();
             } else {
                 console.log("Response: " + data);
             }

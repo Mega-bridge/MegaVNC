@@ -41,16 +41,16 @@
 
 <div class="container py-5">
     <form method="post" th:action="@{/remote-pcs/register-pc}" th:object="${RegisterRemotePcDto}">
-        <div class="form-group mb-3">
-            <label for="group" class="visually-hidden">그룹</label>
-            <select class="form-control" id="group" name="groupName"
-                    onchange="location.href = '/remote-pcs?selectedGroup=' + this.value;">
-                <option th:selected="${selectedGroup == null}" value="All Group">---All Group---</option>
-                <option name="groupName" th:each="group : ${groups}" th:value="${group.groupName}"
-                        th:text="${group.groupName}"
-                        th:selected="${group.groupName == selectedGroup}"></option>
-            </select>
-        </div>
+<!--        <div class="form-group mb-3">-->
+<!--            <label for="group" class="visually-hidden">그룹</label>-->
+<!--            <select class="form-control" id="group" name="groupName"-->
+<!--                    onchange="location.href = '/remote-pcs?selectedGroup=' + this.value;">-->
+<!--                <option th:selected="${selectedGroup == null}" value="All Group">-&#45;&#45;All Group-&#45;&#45;</option>-->
+<!--                <option name="groupName" th:each="group : ${groups}" th:value="${group.groupName}"-->
+<!--                        th:text="${group.groupName}"-->
+<!--                        th:selected="${group.groupName == selectedGroup}"></option>-->
+<!--            </select>-->
+<!--        </div>-->
         <div class="bg-body rounded p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold mb-3 text-primary-emphasis">원격 PC 목록</h4>
@@ -58,6 +58,17 @@
                     <i class="fa-solid fa-plus"></i>
                     <i class="fa-solid fa-display me-2"> 원격 pc 추가</i>
                 </button>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="group" class="visually-hidden">그룹</label>
+                <select class="form-control" id="group" name="groupName"
+                        onchange="location.href = '/remote-pcs?selectedGroup=' + this.value;">
+                    <option th:selected="${selectedGroup == null}" value="All Group">---All Group---</option>
+                    <option name="groupName" th:each="group : ${groups}" th:value="${group.groupName}"
+                            th:text="${group.groupName}"
+                            th:selected="${group.groupName == selectedGroup}"></option>
+                </select>
             </div>
 
             <table class="table table-hover align-middle mb-5" id="remotePcList">
