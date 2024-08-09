@@ -32,13 +32,13 @@
             </thead>
 
             <tbody>
-            <tr th:each="logs : ${logs}" class="data-row">
-                <td th:text="${logs.groupName}">아이디</td>
-                <td th:text="${logs.pcName}">이름</td>
-                <td th:text="${logs.division}">접속/종료</td>
-                <td th:text="${logs.ip}">IP</td>
-                <td th:text="${logs.reconnectId}">Reconnect Id</td>
-                <td th:text="${#dates.format(logs.createdAt, 'yyyy-MM-dd HH:mm:ss')}">로그 일자</td>
+            <tr th:each="errorLogs : ${errorLogs}" class="data-row">
+                <td th:text="${errorLogs.groupName}">아이디</td>
+                <td th:text="${errorLogs.pcName}">이름</td>
+                <td th:text="${errorLogs.division}">접속/종료</td>
+                <td th:text="${errorLogs.ip}">IP</td>
+                <td th:text="${errorLogs.reconnectId}">Reconnect Id</td>
+                <td th:text="${#dates.format(errorLogs.createdAt, 'yyyy-MM-dd HH:mm:ss')}">로그 일자</td>
             </tr>
             </tbody>
         </table>

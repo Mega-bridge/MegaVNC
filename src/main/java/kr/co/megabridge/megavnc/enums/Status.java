@@ -1,5 +1,8 @@
 package kr.co.megabridge.megavnc.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum Status {
     OFFLINE("OFFLINE"),
     STANDBY("STANDBY"),

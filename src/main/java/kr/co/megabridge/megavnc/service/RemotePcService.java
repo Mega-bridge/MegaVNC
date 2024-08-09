@@ -130,10 +130,7 @@ public class RemotePcService {
 
 
     @Transactional
-    public void setRemotePcStatus(Long repeaterId, Status status) {
-        Optional<RemotePc> optionalRemotePc = remotePcRepository.findByRepeaterId(repeaterId);
-        RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new RemotePcException(ErrorCode.PC_NOT_FOUND));
-
+    public void setRemotePcStatus(RemotePc remotePc, Status status) {
 
         remotePc.updateStatus(status);
         if (remotePc.getAssignedAt() == null && status == Status.STANDBY) {
@@ -152,20 +149,7 @@ public class RemotePcService {
         remotePcStatusHandler.sendStatusUpdate(remotePc.getId(), Status.toValue(status), formattedAssignedAt);
     }
 
-    @Transactional
-    public void setRemotePcStatusServerViewerSessionOut(Long repeaterId) {
-        Optional<RemotePc> optionalRemotePc = remotePcRepository.findByRepeaterId(repeaterId);
-        RemotePc remotePc = optionalRemotePc.orElseThrow(() -> new RemotePcException(ErrorCode.PC_NOT_FOUND));
-        if(remotePc.getAssignedAt() == null){
-            setRemotePcStatus(repeaterId, Status.OFFLINE);
 
-        }
-        else {
-            setRemotePcStatus(repeaterId, Status.STANDBY);
-
-
-        }
-    }
 
     public RemotePc findById(User user, Long id) {
         Optional<RemotePc> optionalRemotePc = remotePcRepository.findById(id);

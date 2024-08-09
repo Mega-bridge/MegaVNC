@@ -13,6 +13,10 @@ server:
 fileKey: asd8g9dqyfeg1ohndsawd0hqidnw
 
 spring:
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
   servlet:
     multipart:
       max-file-size: 100MB
@@ -25,8 +29,12 @@ spring:
     prefix: classpath:/templates/
 
 
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: update
+cron:
+  expression: "0 0 9 * * ?"    #매일 오래된 로그가 삭제되는 시각
+log:
+  retention:
+    days: 30                   #로그가 보관되는 날짜
+
+
+
 

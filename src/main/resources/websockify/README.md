@@ -94,7 +94,7 @@ These are not necessary for the basic operation.
 
 * Log files: websockify can save all logging information in a file.
   This functionality is activated with the `--log-file FILE` option
-  where FILE is the file where the logs should be saved.
+  where FILE is the file where the errorLogs should be saved.
 
 * Authentication plugins: websockify can demand authentication for
   websocket connections and, if you use `--web-auth`, also for normal

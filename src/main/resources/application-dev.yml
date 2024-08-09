@@ -28,3 +28,10 @@ spring:
     hibernate:
       ddl-auto: update
 
+
+cron:
+  expression: "0 0 9 * * ?"    #매일 오래된 로그가 삭제되는 시각
+log:
+  retention:
+    days: 30                   #로그가 보관되는 날짜
+

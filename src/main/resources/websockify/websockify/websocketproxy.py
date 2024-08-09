@@ -544,7 +544,7 @@ def websockify_init():
             help="send a ping to the client every INTERVAL seconds")
     parser.add_option("--log-file", metavar="FILE",
             dest="log_file",
-            help="File where logs will be saved")
+            help="File where errorLogs will be saved")
     parser.add_option("--syslog", default=None, metavar="SERVER",
             help="Log to syslog server. SERVER can be local socket, "
                  "such as /dev/log, or a UDP host:port pair.")

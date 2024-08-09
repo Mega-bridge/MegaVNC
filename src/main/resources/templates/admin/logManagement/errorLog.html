@@ -29,10 +29,10 @@
             </thead>
 
             <tbody>
-            <tr th:each="logs : ${logs}" class="data-row">
-                <td th:text="${logs.className}">클래스명</td>
-                <td th:text="${logs.message}">메시지</td>
-                <td th:text="${logs.createdAt}">일자</td>
+            <tr th:each="errorLogs : ${errorLogs}" class="data-row">
+                <td th:text="${errorLogs.className}">클래스명</td>
+                <td th:text="${errorLogs.message}">메시지</td>
+                <td th:text="${errorLogs.createdAt}">일자</td>
             </tr>
             </tbody>
         </table>
