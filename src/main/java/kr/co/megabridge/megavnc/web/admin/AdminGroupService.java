@@ -5,7 +5,7 @@ import kr.co.megabridge.megavnc.domain.Group;
 
 import kr.co.megabridge.megavnc.domain.Member;
 import kr.co.megabridge.megavnc.domain.Member_Group;
-import kr.co.megabridge.megavnc.dto.ResponseGroupApiDto;
+import kr.co.megabridge.megavnc.dto.responses.ResponseGroupApiDto;
 import kr.co.megabridge.megavnc.enums.Role;
 import kr.co.megabridge.megavnc.exception.ErrorCode;
 import kr.co.megabridge.megavnc.exception.exceptions.AdminGroupException;

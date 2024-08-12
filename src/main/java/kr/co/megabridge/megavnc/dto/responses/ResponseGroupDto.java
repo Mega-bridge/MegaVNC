@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.dto;
+package kr.co.megabridge.megavnc.dto.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

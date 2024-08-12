@@ -1,12 +1,9 @@
 package kr.co.megabridge.megavnc.web.admin;
 
-import jakarta.validation.Valid;
 import kr.co.megabridge.megavnc.domain.Member;
 
-import kr.co.megabridge.megavnc.dto.AssignGroupDto;
-import kr.co.megabridge.megavnc.dto.UserRegisterDto;
+import kr.co.megabridge.megavnc.dto.requests.UserRegisterDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

@@ -1,6 +1,6 @@
 package kr.co.megabridge.megavnc.api;
 
-import kr.co.megabridge.megavnc.dto.ResponseGroupApiDto;
+import kr.co.megabridge.megavnc.dto.responses.ResponseGroupApiDto;
 import kr.co.megabridge.megavnc.service.GroupApiService;
 import kr.co.megabridge.megavnc.web.admin.AdminGroupService;
 import lombok.RequiredArgsConstructor;

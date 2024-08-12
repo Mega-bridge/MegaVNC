@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.dto;
+package kr.co.megabridge.megavnc.dto.requests;
 
 import lombok.Data;
 

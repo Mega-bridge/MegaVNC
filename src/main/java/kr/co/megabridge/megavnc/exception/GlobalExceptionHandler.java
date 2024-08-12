@@ -2,13 +2,13 @@ package kr.co.megabridge.megavnc.exception;
 
 
 import kr.co.megabridge.megavnc.domain.Group;
-import kr.co.megabridge.megavnc.dto.AssignGroupDto;
+import kr.co.megabridge.megavnc.dto.requests.AssignGroupDto;
 import kr.co.megabridge.megavnc.filetransfer.FileService;
 import kr.co.megabridge.megavnc.logManagement.LogService;
 import kr.co.megabridge.megavnc.security.User;
-import kr.co.megabridge.megavnc.dto.RegisterRemotePcDto;
-import kr.co.megabridge.megavnc.dto.ResponseRemotePcDto;
-import kr.co.megabridge.megavnc.dto.UserRegisterDto;
+import kr.co.megabridge.megavnc.dto.requests.RegisterRemotePcDto;
+import kr.co.megabridge.megavnc.dto.responses.ResponseRemotePcDto;
+import kr.co.megabridge.megavnc.dto.requests.UserRegisterDto;
 import kr.co.megabridge.megavnc.exception.exceptions.*;
 import kr.co.megabridge.megavnc.web.admin.AdminAssignService;
 import kr.co.megabridge.megavnc.web.admin.AdminGroupService;

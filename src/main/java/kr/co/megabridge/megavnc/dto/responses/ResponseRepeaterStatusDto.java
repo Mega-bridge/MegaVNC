@@ -1,8 +1,7 @@
-package kr.co.megabridge.megavnc.dto;
+package kr.co.megabridge.megavnc.dto.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.ToString;
 
 @AllArgsConstructor
 @Getter

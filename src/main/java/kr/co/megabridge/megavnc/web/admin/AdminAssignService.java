@@ -5,7 +5,7 @@ import jakarta.transaction.Transactional;
 import kr.co.megabridge.megavnc.domain.Group;
 import kr.co.megabridge.megavnc.domain.Member;
 import kr.co.megabridge.megavnc.domain.Member_Group;
-import kr.co.megabridge.megavnc.dto.AssignGroupDto;
+import kr.co.megabridge.megavnc.dto.requests.AssignGroupDto;
 import kr.co.megabridge.megavnc.exception.ErrorCode;
 import kr.co.megabridge.megavnc.exception.exceptions.AdminAssignException;
 import kr.co.megabridge.megavnc.repository.GroupRepository;

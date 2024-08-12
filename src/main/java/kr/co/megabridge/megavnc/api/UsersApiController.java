@@ -1,6 +1,6 @@
 package kr.co.megabridge.megavnc.api;
 
-import kr.co.megabridge.megavnc.dto.*;
+import kr.co.megabridge.megavnc.dto.requests.UserRegisterDto;
 import kr.co.megabridge.megavnc.web.admin.AdminUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

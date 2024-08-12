@@ -2,10 +2,11 @@ package kr.co.megabridge.megavnc.service;
 
 import jakarta.transaction.Transactional;
 import kr.co.megabridge.megavnc.domain.*;
-import kr.co.megabridge.megavnc.dto.*;
+import kr.co.megabridge.megavnc.dto.requests.RegisterRemotePcDto;
+import kr.co.megabridge.megavnc.dto.responses.ResponseDeleteDto;
+import kr.co.megabridge.megavnc.dto.responses.ResponseRemotePcDto;
 import kr.co.megabridge.megavnc.exception.ErrorCode;
 import kr.co.megabridge.megavnc.enums.Status;
-import kr.co.megabridge.megavnc.exception.exceptions.ApiException;
 import kr.co.megabridge.megavnc.exception.exceptions.RemotePcException;
 import kr.co.megabridge.megavnc.repository.GroupRepository;
 import kr.co.megabridge.megavnc.repository.MemberRepository;

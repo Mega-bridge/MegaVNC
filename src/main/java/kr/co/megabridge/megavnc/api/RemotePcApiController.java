@@ -1,18 +1,15 @@
 package kr.co.megabridge.megavnc.api;
 
 import kr.co.megabridge.megavnc.domain.RemotePc;
-import kr.co.megabridge.megavnc.dto.RegisterRemotePcDto;
-import kr.co.megabridge.megavnc.dto.RequestRemotePcDto;
-import kr.co.megabridge.megavnc.dto.ResponseRemotePcApiDto;
-import kr.co.megabridge.megavnc.dto.ResponseRepeaterStatusDto;
+import kr.co.megabridge.megavnc.dto.requests.RegisterRemotePcDto;
+import kr.co.megabridge.megavnc.dto.requests.RequestRemotePcDto;
+import kr.co.megabridge.megavnc.dto.responses.ResponseRemotePcApiDto;
+import kr.co.megabridge.megavnc.dto.responses.ResponseRepeaterStatusDto;
 import kr.co.megabridge.megavnc.enums.Status;
 import kr.co.megabridge.megavnc.service.RemotePcApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriUtils;
-
-import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequiredArgsConstructor

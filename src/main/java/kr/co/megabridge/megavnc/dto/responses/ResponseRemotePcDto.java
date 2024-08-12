@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.dto;
+package kr.co.megabridge.megavnc.dto.responses;
 
 import kr.co.megabridge.megavnc.domain.Group;
 import kr.co.megabridge.megavnc.enums.Status;

@@ -1,4 +1,4 @@
-package kr.co.megabridge.megavnc.dto;
+package kr.co.megabridge.megavnc.dto.requests;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 public class UserRegisterDto {
 
 
-    @NotBlank
+    @NotBlank(message = "이름을 입력해 주세요.")
     private String username;
 
-    @NotBlank
+    @NotBlank(message = "비밀번호를 입력해 주세요.")
     private String password;
 
-    @NotBlank
+    @NotBlank(message = "확인 비밀번호를 입력해 주세요.")
     private String passwordConfirm;
 }

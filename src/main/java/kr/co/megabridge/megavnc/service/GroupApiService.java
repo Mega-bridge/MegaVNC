@@ -2,7 +2,7 @@ package kr.co.megabridge.megavnc.service;
 
 
 import kr.co.megabridge.megavnc.domain.Group;
-import kr.co.megabridge.megavnc.dto.ResponseGroupApiDto;
+import kr.co.megabridge.megavnc.dto.responses.ResponseGroupApiDto;
 import kr.co.megabridge.megavnc.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
