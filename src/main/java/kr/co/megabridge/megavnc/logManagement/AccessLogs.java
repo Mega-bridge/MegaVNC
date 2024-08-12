@@ -3,6 +3,7 @@ package kr.co.megabridge.megavnc.logManagement;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
 public class AccessLogs {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

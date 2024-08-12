@@ -23,16 +23,18 @@
             <thead>
             <tr>
                 <th scope="col">Class Name</th>
+                <th scope="col">에러 발생 라인</th>
                 <th scope="col">메시지</th>
                 <th scope="col">일자</th>
             </tr>
             </thead>
 
             <tbody>
-            <tr th:each="errorLogs : ${errorLogs}" class="data-row">
-                <td th:text="${errorLogs.className}">클래스명</td>
-                <td th:text="${errorLogs.message}">메시지</td>
-                <td th:text="${errorLogs.createdAt}">일자</td>
+            <tr th:each="errorLog : ${errorLogs}" class="data-row">
+                <td th:text="${errorLog.className}">클래스명</td>
+                <td th:text="${errorLog.lineNumber}">라인</td>
+                <td th:text="${errorLog.message}">메시지</td>
+                <td th:text="${errorLog.timestamp}">일자</td>
             </tr>
             </tbody>
         </table>

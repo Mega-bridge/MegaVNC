@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
 
     //RemotePc 페이지에 전달 할 Exception
     @ExceptionHandler(RemotePcException.class)
-    protected String handleRemotePcViewException(@AuthenticationPrincipal User user, RemotePcException e, Model model) {
+    public String handleRemotePcViewException(@AuthenticationPrincipal User user, RemotePcException e, Model model) {
         List<Group> groups = remotePcService.findGroupByMember(user);
 
         List<ResponseRemotePcDto> remotePcs = remotePcService.findByGroups(groups);
@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
 
     //RemotePc Api에 전달 할 Exception
     @ExceptionHandler(ApiException.class)
-    protected ResponseEntity<ErrorResponse> ApiException(ApiException e) {
+    public ResponseEntity<ErrorResponse> ApiException(ApiException e) {
 
         final ErrorCode errorCode = e.getErrorCode();
         final ErrorResponse response = ErrorResponse.of(errorCode, e.getMessage());
@@ -87,7 +87,7 @@ public class GlobalExceptionHandler {
 
     //어드민 유저 페이지에 전달 할 Exception
     @ExceptionHandler(AdminUserException.class)
-    protected String handleAdminUserException(AdminUserException e, Model model) {
+    public String handleAdminUserException(AdminUserException e, Model model) {
         model.addAttribute("error", true);
         model.addAttribute("errorMessage", e.getMessage());
         model.addAttribute("users", adminUserService.listAllUsers());
@@ -102,7 +102,7 @@ public class GlobalExceptionHandler {
 
     //어드민 그룹 페이지에 전달 할 Exception
     @ExceptionHandler(AdminGroupException.class)
-    protected String handleAdminGroupException(AdminGroupException e, Model model) {
+    public String handleAdminGroupException(AdminGroupException e, Model model) {
         model.addAttribute("error", true);
         model.addAttribute("errorMessage", e.getMessage());
         model.addAttribute("groups", adminGroupService.listAllGroups());
@@ -116,7 +116,7 @@ public class GlobalExceptionHandler {
 
     //어드민 assign 페이지에 전달 할 Exception
     @ExceptionHandler(AdminAssignException.class)
-    protected String handleAdminAssignException(AdminAssignException e, Model model) {
+    public String handleAdminAssignException(AdminAssignException e, Model model) {
         model.addAttribute("error", true);
         model.addAttribute("errorMessage", e.getMessage());
         model.addAttribute("user", adminAssignService.findByUserId(e.getMemberId()));
@@ -133,7 +133,7 @@ public class GlobalExceptionHandler {
 
     //어드민 assign 페이지에 전달 할 Exception
     @ExceptionHandler(FileDownloadException.class)
-    protected String handleFileDownloadException(FileDownloadException e) {
+    public String handleFileDownloadException(FileDownloadException e) {
 
         if (e.getErrorCode().getStatus().is5xxServerError()) {
             log.error(e.getMessage());
@@ -144,7 +144,7 @@ public class GlobalExceptionHandler {
 
     //어드민 assign 페이지에 전달 할 Exception
     @ExceptionHandler(FileDeleteException.class)
-    protected String handleFileDeleteException(FileDeleteException e, Model model) {
+    public String handleFileDeleteException(FileDeleteException e, Model model) {
         model.addAttribute("error", true);
         model.addAttribute("errorMessage", e.getMessage());
         model.addAttribute("files", fileService.findAllByReconnectId(null));
@@ -161,10 +161,9 @@ public class GlobalExceptionHandler {
      * 예외처리 안된 에러
      **/
     @ExceptionHandler(Exception.class)
-    protected String handleException(Exception e) {
+    public String handleException(Exception e) {
         log.error(e.getMessage());
         saveErrorLogToDB(e);
-
         return "500";
     }
 
