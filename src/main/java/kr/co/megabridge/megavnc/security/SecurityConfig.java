@@ -29,6 +29,7 @@ public class SecurityConfig {
                 .requestMatchers(
                         new AntPathRequestMatcher("/css/**"),
                         new AntPathRequestMatcher("/images/**"),
+                        new AntPathRequestMatcher("/js/**"),
                         new AntPathRequestMatcher("/api/**"),
                         new AntPathRequestMatcher("/favicon.ico"),
                         new AntPathRequestMatcher("/remote-pcs/download-server"));
