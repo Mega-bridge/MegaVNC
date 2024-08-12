@@ -35,6 +35,7 @@ public enum ErrorCode {
     //User
     USER_NOT_FOUND(HttpStatus.NOT_FOUND,"U001","존재하지 않는 사용자 입니다. "),
     ADMIN_CANNOT_DELETE(HttpStatus.BAD_REQUEST,"U002","어드민은 삭제할 수 없습니다. "),
+    USER_ALREADY_EXIST(HttpStatus.CONFLICT,"U003","이미 존재하는 사용자 이름입니다. "),
 
     //File
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND,"F001","파일 다운로드 실패 : 파일을 서버에서 찾을 수 없음 "),
