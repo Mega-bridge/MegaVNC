@@ -42,7 +42,9 @@ public class GlobalExceptionHandler {
         StackTraceElement[] stackTrace = e.getStackTrace();
         if (stackTrace.length > 0) {
             StackTraceElement element = stackTrace[0];
-            logService.saveErrorLog(e.getMessage(), element.getClassName(), element.getLineNumber());
+            String className = element.getClassName();
+            String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
+            logService.saveErrorLog(e.getMessage(), simpleClassName, element.getLineNumber());
         } else {
             logService.saveErrorLog(e.getMessage(), "N/A", -1);
         }
