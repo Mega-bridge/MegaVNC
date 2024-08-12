@@ -36,7 +36,7 @@
             <tr th:each="errorLog : ${errorLogs}" class="data-row">
                 <td th:text="${errorLog.className}">클래스명</td>
                 <td th:text="${errorLog.lineNumber}">라인</td>
-                <td style="max-width: 500px; overflow: hidden" th:text="${errorLog.message}">메시지</td>
+                <td style="max-width: 500px; overflow: hidden" th:text="${errorLog.message + ' . . .'}">메시지</td>
                 <td th:text="${errorLog.timestamp}">일자</td>
             </tr>
             </tbody>
