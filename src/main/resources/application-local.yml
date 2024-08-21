@@ -16,13 +16,13 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 200MB
   datasource:
-    url: jdbc:postgresql://192.168.0.253:5432/megavnc
+    url: jdbc:postgresql://192.168.0.22:5432/megavnc
     username: megavncuser
     password: "!mb220719"
   thymeleaf:
