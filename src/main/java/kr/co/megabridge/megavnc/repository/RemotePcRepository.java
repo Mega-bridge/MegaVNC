@@ -14,4 +14,5 @@ public interface RemotePcRepository extends CrudRepository<RemotePc, Long> {
     Optional<RemotePc> findByReconnectId(String reconnectId);
     List<RemotePc> findByName(String pcName);
     boolean existsByNameAndGroup(String pcName,Group group);
+    void deleteAllByGroup(Group group);
 }

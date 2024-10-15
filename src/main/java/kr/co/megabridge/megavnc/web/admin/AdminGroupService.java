@@ -12,6 +12,7 @@ import kr.co.megabridge.megavnc.exception.exceptions.AdminGroupException;
 import kr.co.megabridge.megavnc.repository.GroupRepository;
 import kr.co.megabridge.megavnc.repository.MemberRepository;
 import kr.co.megabridge.megavnc.repository.Member_GroupRepository;
+import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class AdminGroupService {
   private final GroupRepository groupRepository;
   private final Member_GroupRepository member_groupRepository;
   private final MemberRepository memberRepository;
+  private final RemotePcRepository remotePcRepository;
 
 
   public List<Group> listAllGroups(){
@@ -58,6 +60,7 @@ public class AdminGroupService {
     if(group.getId()==1L){
       throw new AdminGroupException(ErrorCode.CANNOT_DELETE_DEFAULT_GROUP);
     }
+    remotePcRepository.deleteAllByGroup(group);
     member_groupRepository.deleteAllByGroup(group);
     groupRepository.delete(group);
   }
