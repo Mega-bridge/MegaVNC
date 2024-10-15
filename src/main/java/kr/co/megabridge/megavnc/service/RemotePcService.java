@@ -184,9 +184,9 @@ public class RemotePcService {
             throw new RemotePcException(ErrorCode.CANNOT_DELETE_DEFAULT_PC);
 
         }
-        if (remotePc.getAssignedAt() != null) {
+        /*if (remotePc.getAssignedAt() != null) {
             throw new RemotePcException(ErrorCode.CANNOT_DELETE_ASSIGNED_PC);
-        }
+        }*/
 
         Optional<Member> optionalMember = memberRepository.findByUsername(user.getUsername());
         Member member = optionalMember.orElseThrow(() -> new UsernameNotFoundException("코드를 수정하여 존재하지 않는 멤버에 대한 접근을 막으세요"));

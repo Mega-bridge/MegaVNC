@@ -24,14 +24,14 @@ public class LogController {
     @GetMapping
     @RequestMapping("/connectLogs")
     public String connectLog(Model model) {
-        model.addAttribute("accessLogs", accessLogsRepository.findAll());
+        model.addAttribute("accessLogs", accessLogsRepository.findByOrderByTimestampDesc());
         return "admin/logManagement/connectLog";
     }
 
     @GetMapping
     @RequestMapping("/errorLogs")
     public String upload(Model model) {
-        model.addAttribute("errorLogs",errorLogsRepository.findAll() );
+        model.addAttribute("errorLogs",errorLogsRepository.findByOrderByTimestampDesc() );
         return "admin/logManagement/errorLog";
     }
 

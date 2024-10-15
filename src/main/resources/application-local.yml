@@ -9,8 +9,9 @@ server:
     key-store: classpath:megabridge.keystore
     key-store-password: "!mb220719"
     key-store-type: PKCS12
-
-fileKey: asd8g9dqyfeg1ohndsawd0hqidnw
+file:
+  fileKey: asd8g9dqyfeg1ohndsawd0hqidnw
+  directory: ${user.home}/uploads
 
 spring:
   jpa:

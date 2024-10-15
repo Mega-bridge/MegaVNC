@@ -6,10 +6,14 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface AccessLogsRepository extends JpaRepository<AccessLogs,Long> {
     @Modifying
     @Transactional
     @Query("DELETE FROM AccessLogs l WHERE l.timestamp < :cutoff")
     void deleteLogsOlderThan(LocalDateTime cutoff);
+
+    List<AccessLogs> findByOrderByTimestampDesc();
+
 }

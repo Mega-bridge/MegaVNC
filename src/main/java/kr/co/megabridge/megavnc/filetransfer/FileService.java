@@ -44,9 +44,9 @@ public class FileService {
 
     private final FileInfoRepository fileInfoRepository;
     private final RemotePcRepository remotePcRepository;
-    @Value("uploads/")
+    @Value("${file.directory}")
     private String uploadDir;
-    @Value("${fileKey}")
+    @Value("${file.fileKey}")
     private String FILE_KEY;
     @Value("${file.cleanup.cron}")
     private String CRON;
@@ -104,8 +104,9 @@ public class FileService {
         FileInfo fileInfo = fileInfoRepository.findBySeq(fileSeq).orElseThrow(() -> new FileDownloadException(ErrorCode.FILE_NOT_FOUND));
         String encryptedFilename = encodeAES256(UriUtils.encode(fileInfo.getFileName(), StandardCharsets.UTF_8));
 
-        String uploadDir = "uploads/";
+
         Path fileLocation = Paths.get(uploadDir).toAbsolutePath().resolve(encryptedFilename);
+
 
 
         if (!fileInfo.getReconnectId().equals(ADMIN_REQUEST)) {
@@ -149,7 +150,7 @@ public class FileService {
         fileInfoRepository.delete(fileInfo);
         String encryptedFilename = encodeAES256(UriUtils.encode(fileInfo.getFileName(), StandardCharsets.UTF_8));
 
-        String uploadDir = "uploads/";
+
         Path fileLocation = Paths.get(uploadDir).toAbsolutePath().resolve(encryptedFilename);
         try {
             Files.delete(fileLocation);
