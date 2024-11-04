@@ -37,8 +37,7 @@
     const fileAddImg = document.getElementById('fileAddImg');
     const uploadMessage = document.getElementById('upload-message');
     const filesArray = [];
-    const COMMON_URL = 'https://vnc.megabridge.co.kr:8443';
-    //const COMMON_URL = 'https://localhost:8080';
+    const COMMON_URL = window.location.origin;
 
     dropZone.addEventListener('dragover', (event) => {
         event.preventDefault();
@@ -130,7 +129,15 @@
                         return false;
                     }
                 }
-                Swal.fire('Success', '파일이 성공적으로 업로드되었습니다.', 'success');
+                Swal.fire({
+                    text: '파일이 성공적으로 업로드되었습니다.',
+                    icon: 'success',
+                    confirmButtonColor: '#092c61',
+                    confirmButtonText: '확인'
+                }).then(async (result) => {
+                    location.reload();
+                });
+
             }
         });
     }

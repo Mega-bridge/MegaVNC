@@ -38,7 +38,8 @@
                 <td th:text="${accessLog.division}">접속/종료</td>
                 <td th:text="${accessLog.ip}">IP</td>
                 <td th:text="${accessLog.reconnectId}">Reconnect Id</td>
-                <td th:text="${#dates.format(accessLog.createdAt, 'yyyy-MM-dd HH:mm:ss')}">로그 일자</td>
+                <td th:text="${#temporals.format(accessLog.timestamp, 'yyyy-MM-dd HH:mm:ss')}">로그 일자</td>
+                <!--<td th:text="${#dates.format(accessLog.timestamp, 'yyyy-MM-dd HH:mm:ss')}">로그 일자</td>-->
             </tr>
             </tbody>
         </table>

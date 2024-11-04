@@ -67,12 +67,9 @@ function resetFailMessage(){
 }
 
 $(document).ready(function () {
-    $.ajax({
-        url: '/vnc/websocket-url', // 서버에서 WebSocket URL을 가져옴
-        method: 'GET',
-        success: function (websocketUrl) {
+
             // 성공적으로 URL을 가져오면 WebSocket 연결 시작
-            const socket = new WebSocket(websocketUrl);
+            const socket = new WebSocket("wss://"+window.location.hostname+":"+window.location.port+"/ws/status");
 
             socket.onmessage = function (event) {
                 const data = JSON.parse(event.data);
@@ -114,11 +111,6 @@ $(document).ready(function () {
             socket.onerror = function (error) {
                 console.error('WebSocket error: ', error);
             };
-        },
-        error: function (error) {
-            console.error("WebSocket URL을 가져오는 데 실패했습니다:", error);
-        }
-    });
 });
 
 setTimeout(function () {

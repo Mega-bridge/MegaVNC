@@ -1,5 +1,6 @@
 package kr.co.megabridge.megavnc.logManagement;
 
+import kr.co.megabridge.megavnc.domain.Group;
 import kr.co.megabridge.megavnc.domain.RemotePc;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,6 @@ public class LogService {
     @Transactional
     public void saveErrorLog(String message, String className, int lineNumber) {
         ErrorLogs errorLogs = ErrorLogs.builder()
-
                 .message(message)
                 .className(className)
                 .lineNumber(lineNumber)
@@ -30,11 +30,19 @@ public class LogService {
                 .build();
         errorLogsRepository.save(errorLogs);
     }
+
     @Transactional
-    public void saveAccessLog(RemotePc remotePc,String division,String ip ) {
+    public void saveAccessLog(RemotePc remotePc, String division, String ip) {
+        String groupName;
+        Group group = remotePc.getGroup();
+        if (group == null) {
+            groupName = "존재하지 않는 그룹";
+        } else {
+            groupName = group.getGroupName();
+        }
         AccessLogs accessLogs = AccessLogs.builder()
                 .timestamp(LocalDateTime.now())
-                .groupName(remotePc.getGroup().getGroupName())
+                .groupName(groupName)
                 .pcName(remotePc.getName())
                 .reconnectId(remotePc.getReconnectId())
                 .division(division)
@@ -42,7 +50,6 @@ public class LogService {
                 .build();
         accessLogsRepository.save(accessLogs);
     }
-
 
 
     public void deleteOldLogs() {

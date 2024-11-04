@@ -1,36 +1,29 @@
 package kr.co.megabridge.megavnc.filetransfer;
 
+import kr.co.megabridge.megavnc.security.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/file")
-@Slf4j
 public class FileApiController {
 
     private final FileService fileService;
 
 
-
     @PostMapping
-    @ResponseBody
     public ResponseEntity<Integer> uploadFile(@RequestPart("file") MultipartFile file,
-                                             @RequestParam(required = false) Long repeaterId)  {
+                                              @RequestParam(required = false) Long repeaterId, @AuthenticationPrincipal User user)  {
 
-        Integer encodedFilename = fileService.uploadFile(file, repeaterId);
+        Integer encodedFilename = fileService.uploadFile(file, repeaterId,user);
         return ResponseEntity
                 .ok().body(encodedFilename);
     }
-
-
-
 
 
 }

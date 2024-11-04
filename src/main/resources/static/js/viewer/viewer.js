@@ -32,42 +32,29 @@ window.onload = function () {
 };
 
 function handleConnect() {
-    $.ajax({
-            url: '/vnc/websocket-url',
-            method: 'GET',
-            success: function (websocketUrl) {
-                rfb = new RFB(
-                    screen,
-                    websocketUrl,
-                    {
-                        credentials: {password: accessPassword},
-                        repeaterID: repeaterId
-                    }
-                );
-                rfb.showDotCursor = true;
-                rfb.scaleViewport = true;
-                rfb.qualityLevel = qualityLevel;
-                rfb.addEventListener("securityfailure", () => {
-                    window.alert("접속 암호가 올바르지 않습니다.");
-                });
-
-                rfb.addEventListener("clipboard", handleClipboard);
-            },
-            error:
-
-                function (error) {
-                    console.error("WebSocket URL을 가져오는 데 실패했습니다:", error);
-                }
+    rfb = new RFB(
+        screen,
+        "wss://vnc.megabridge.co.kr:6080",          // DEV
+        {
+            credentials: {password: accessPassword},
+            repeaterID: repeaterId
         }
-    )
-    ;
+    );
+    rfb.showDotCursor = true;
+    rfb.scaleViewport = true;
+    rfb.qualityLevel = qualityLevel;
+    rfb.addEventListener("securityfailure", () => {
+        window.alert("접속 암호가 올바르지 않습니다.");
+    });
+
+    rfb.addEventListener("clipboard", handleClipboard);
 }
+
 
 
 const handleFormSubmit = async (event) => {
     event.preventDefault(); // 폼 제출을 중지합니다.
-    const COMMON_URL = 'https://vnc.megabridge.co.kr:8443';
-    //const COMMON_URL = 'https://localhost:8080';
+    const COMMON_URL = window.location.origin;
     const fileInput = document.getElementById("fileInput").files[0];
 
     if (!fileInput) {

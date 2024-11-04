@@ -14,9 +14,6 @@ file:
   fileKey: asd8g9dqyfeg1ohndsawd0hqidnw
   directory: ${user.home}/uploads
 
-vnc:
-  websocket:
-    url: "wss://vnc.megabridge.co.kr:6080"
 
 spring:
   servlet:

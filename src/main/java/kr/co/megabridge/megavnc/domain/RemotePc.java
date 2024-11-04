@@ -30,7 +30,7 @@ public class RemotePc {
 
     private String reconnectId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Group group;
 
     public static RemotePc createRemotePc(

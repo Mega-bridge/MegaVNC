@@ -1,5 +1,6 @@
 .loginBoxWrap{
-    width: 400px;
+    width: 90%;
+    max-width: 340px;
 }
 .failMessage{
     font-size: 11px;

@@ -91,8 +91,8 @@
     color: #ca0000;
 }
 .bg-body{
-    height: 75vh;
-    overflow: scroll;
+    /*height: 75vh;*/
+    /*overflow: scroll;*/
 }
 .bg-body::-webkit-scrollbar {
     width: 6px;  /* Width of the vertical scrollbar */

@@ -52,7 +52,7 @@ public class FileController {
     @GetMapping("/delete-files/{fileSeq}")
     public String deleteDistributionFile(@PathVariable Integer fileSeq) {
         fileService.deleteDistributionFile(fileSeq);
-        return "admin/fileManagement/fileList";
+        return "redirect:/files/list";
 
     }
 

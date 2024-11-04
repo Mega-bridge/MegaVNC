@@ -53,3 +53,6 @@
     transition: margin-top 0.4s ease-in-out;
     margin-top: -40%;
 }
+.fileBackSpace{
+    height: 75vh;
+}

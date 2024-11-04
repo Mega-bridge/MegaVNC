@@ -11,11 +11,12 @@ import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
+import kr.co.megabridge.megavnc.security.User;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -27,7 +28,6 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -58,12 +58,16 @@ public class FileService {
 
     //fixme: 파일 확장자 검사 추가
     @Transactional
-    public Integer uploadFile(MultipartFile file, Long repeaterId) {
+    public Integer uploadFile(MultipartFile file, Long repeaterId, User user) {
         try {
-            String reconnectId = ADMIN_REQUEST;
+            String reconnectId ;
             if (repeaterId != null) {
                 RemotePc remotePc = remotePcRepository.findByRepeaterId(repeaterId).orElseThrow(() -> new ApiException(ErrorCode.PC_NOT_FOUND));
                 reconnectId = Optional.ofNullable(remotePc.getReconnectId()).orElseThrow(() -> new ApiException(ErrorCode.DISASSIGNED_PC));
+            }else if(user.isAdmin()){
+                reconnectId = ADMIN_REQUEST;
+            } else {
+                throw new ApiException(ErrorCode.PC_NOT_FOUND);
             }
             Path directory = Paths.get(uploadDir);
 

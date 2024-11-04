@@ -148,8 +148,8 @@ public class RemotePcService {
         }
 
         remotePcStatusHandler.sendStatusUpdate(remotePc.getId(), Status.toValue(status), formattedAssignedAt);
+        remotePcRepository.save(remotePc);
     }
-
 
 
     public RemotePc findById(User user, Long id) {
