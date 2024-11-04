@@ -13,6 +13,10 @@ file:
   fileKey: asd8g9dqyfeg1ohndsawd0hqidnw
   directory: ${user.home}/uploads
 
+vnc:
+  websocket:
+    url: "wss://localhost:6080"
+
 spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -23,9 +27,8 @@ spring:
       max-file-size: 100MB
       max-request-size: 200MB
   datasource:
-    url: jdbc:postgresql://192.168.0.22:5432/megavnc
-    username: megavncuser
-    password: "!mb220719"
+    url: jdbc:postgresql://localhost:5432/megavnc
+    username: postgres
   thymeleaf:
     prefix: classpath:/templates/
 

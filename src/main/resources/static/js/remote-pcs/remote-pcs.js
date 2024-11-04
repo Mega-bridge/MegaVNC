@@ -67,53 +67,58 @@ function resetFailMessage(){
 }
 
 $(document).ready(function () {
-    // 로컬
-    // const socket = new WebSocket('wss://localhost:8443/ws/status');
-    // 배포
-    const socket = new WebSocket('wss://vnc.megabridge.co.kr:8443/ws/status');
+    $.ajax({
+        url: '/vnc/websocket-url', // 서버에서 WebSocket URL을 가져옴
+        method: 'GET',
+        success: function (websocketUrl) {
+            // 성공적으로 URL을 가져오면 WebSocket 연결 시작
+            const socket = new WebSocket(websocketUrl);
 
-    socket.onmessage = function (event) {
-        const data = JSON.parse(event.data);
-        // 각 데이터 항목을 업데이트
-        const row = $(`#remotePcList tr[data-pc-id="${data.id}"]`);
-        const statusCell = row.find('.pc-status');
-        const registeredAtCell = row.find('.pc-registeredAt');
+            socket.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+                // 각 데이터 항목을 업데이트
+                const row = $(`#remotePcList tr[data-pc-id="${data.id}"]`);
+                const statusCell = row.find('.pc-status');
+                const registeredAtCell = row.find('.pc-registeredAt');
 
-        // 등록일 업데이트
-        if(data.registeredAt === "null"){
-            data.registeredAt = "";
+                // 등록일 업데이트
+                if (data.registeredAt === "null") {
+                    data.registeredAt = "";
+                }
+                registeredAtCell.text(data.registeredAt);
+
+                // 상태 업데이트
+                if (data.status === 'OFFLINE') {
+                    statusCell.html('<span class="text-secondary">오프라인</span>');
+                    row.find('.btn-primary').addClass('disabled');
+                    row.find('.btn-primary').removeClass('btn-primary').addClass('btn-secondary');
+                    row.find('.btn-danger').removeClass('disabled');
+                } else if (data.status === 'STANDBY') {
+                    statusCell.html('<span class="text-success">온라인(대기중)</span>');
+                    row.find('.btn-secondary').removeClass('disabled');
+                    row.find('.btn-secondary').removeClass('btn-secondary').addClass('btn-primary');
+                    row.find('.btn-primary').removeClass('disabled');
+                    row.find('.btn-danger').addClass('disabled');
+                } else if (data.status === 'ACTIVE') {
+                    statusCell.html('<span class="text-info">온라인(사용중)</span>');
+                    row.find('.btn-primary').addClass('disabled');
+                    row.find('.btn-secondary').removeClass('btn-secondary').addClass('btn-primary').addClass('disabled');
+                    row.find('.btn-danger').addClass('disabled');
+                }
+            };
+
+            socket.onclose = function (event) {
+                console.log('WebSocket closed: ', event);
+            };
+
+            socket.onerror = function (error) {
+                console.error('WebSocket error: ', error);
+            };
+        },
+        error: function (error) {
+            console.error("WebSocket URL을 가져오는 데 실패했습니다:", error);
         }
-        registeredAtCell.text(data.registeredAt);
-
-
-        // 상태 업데이트
-        if (data.status === 'OFFLINE') {
-            statusCell.html('<span class="text-secondary">오프라인</span>');
-            row.find('.btn-primary').addClass('disabled');
-            row.find('.btn-primary').removeClass('btn-primary').addClass('btn-secondary');
-            row.find('.btn-danger').removeClass('disabled');
-        } else if (data.status === 'STANDBY') {
-            statusCell.html('<span class="text-success">온라인(대기중)</span>');
-            row.find('.btn-secondary').removeClass('disabled');
-            row.find('.btn-secondary').removeClass('btn-secondary').addClass('btn-primary');
-            row.find('.btn-primary').removeClass('disabled');
-            row.find('.btn-danger').addClass('disabled');
-        } else if (data.status === 'ACTIVE') {
-            statusCell.html('<span class="text-info">온라인(사용중)</span>');
-            row.find('.btn-primary').addClass('disabled');
-            row.find('.btn-secondary').removeClass('btn-secondary').addClass('btn-primary').addClass('disabled');
-            row.find('.btn-danger').addClass('disabled');
-        }
-
-    };
-
-    socket.onclose = function (event) {
-        console.log('WebSocket closed: ', event);
-    };
-
-    socket.onerror = function (error) {
-        console.error('WebSocket error: ', error);
-    };
+    });
 });
 
 setTimeout(function () {
