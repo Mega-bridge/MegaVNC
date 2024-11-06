@@ -391,12 +391,20 @@ public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 		
 		try {
 			this.setVisible(false);
+
 			viewer.rfb.writeFramebufferUpdateRequest(
 									0,
 									0,
 									viewer.rfb.framebufferWidth,
 									viewer.rfb.framebufferHeight,
 									true);
+
+			if (viewer.rfb != null) {
+				viewer.rfb.close();
+				viewer.rfb = null;
+			}
+			dispose();
+			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

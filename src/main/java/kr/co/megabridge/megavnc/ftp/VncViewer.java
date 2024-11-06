@@ -2,19 +2,14 @@ package kr.co.megabridge.megavnc.ftp;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
 
-public class VncViewer extends JFrame
-        implements Runnable, WindowListener {
-
-    boolean inSeparateFrame = false;
-
+public class VncViewer
+        implements Runnable {
 
     boolean mslogon = false;
 
@@ -31,22 +26,11 @@ public class VncViewer extends JFrame
     RfbProto rfb;
     Thread rfbThread;
 
-    Frame vncFrame;
-    Container vncContainer;
-    GridBagLayout gridbag;
-    ButtonPanel buttonPanel;
-    VncCanvas vc;
     FTPFrame ftp; // KMC: FTP Frame declaration
-
-    String sessionFileName;
-    String cursorUpdatesDef;
-    String eightBitColorsDef;
 
     String host = "192.168.0.23";
     int port = 5900;
     String passwordParam="1234";
-    boolean showControls= true;
-    boolean showOfflineDesktop;
 
 
     // MS-Logon support 2
@@ -59,33 +43,15 @@ public class VncViewer extends JFrame
 
 
     public void init() {
-        setTitle("UltraVNC");
-        setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        if (inSeparateFrame) {
-            vncContainer = this.getContentPane();
-        } else {
-            vncContainer = this.getContentPane();
-        }
-
-        sessionFileName = null;
-        cursorUpdatesDef = null;
-        eightBitColorsDef = null;
-
-        if (inSeparateFrame) {
-            addWindowListener(this);
-        }
-
         ftp = new FTPFrame(this); // KMC: FTPFrame creation
         rfbThread = new Thread(this);
         rfbThread.start();
-
-        setVisible(true);
+        ftp.setVisible(true);
     }
 
-    public void paint(Graphics g) {
+  /*  public void paint(Graphics g) {
         super.paint(g);
-    }
+    }*/
 
     //
     // run() - executed by the rfbThread to deal with the RFB socket.
@@ -93,43 +59,32 @@ public class VncViewer extends JFrame
 
     public void run() {
 
-        gridbag = new GridBagLayout();
-        vncContainer.setLayout(gridbag);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-
-
-        if (showControls) {
-            buttonPanel = new ButtonPanel(this);
-            gridbag.setConstraints(buttonPanel, gbc);
-            vncContainer.add(buttonPanel);
-        }
 
         try {
             connectAndAuthenticate();
 
             doProtocolInitialisation();
 
-            vc = new VncCanvas(this);
-            gbc.weightx = 1.0;
-            gbc.weighty = 1.0;
 
-            JPanel canvasPanel = new JPanel();
-            canvasPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+          rfb.readServerDriveList();
 
-            JScrollPane desktopScrollPane = new JScrollPane(canvasPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            gbc.fill = GridBagConstraints.BOTH;
-            gridbag.setConstraints(desktopScrollPane, gbc);
-            vncContainer.add(desktopScrollPane);
 
-            validate();
+            while (true) {
+                // Read message type from the server.
+                int msgType = rfb.readServerMessageType();
 
-            if (showControls)
-                buttonPanel.enableButtons();
+                // Process the message depending on its type.
+                switch (msgType) {
+                    case RfbProto.rfbFileTransfer:
+                        rfb.readRfbFileTransferMsg();
+                        break;
 
-            vc.processNormalProtocol();
+                    default:
+                        System.out.println("msgType = " + msgType);
+                        break;
+                }
+            }
 
 
 
@@ -145,27 +100,13 @@ public class VncViewer extends JFrame
                     host + ":" + port);
         } catch (EOFException e) {
             e.printStackTrace();
-            if (showOfflineDesktop) {
-                System.out.println("Network error: remote side closed connection");
 
-                if (inSeparateFrame) {
-                    vncFrame.setTitle(rfb.desktopName + " [disconnected]");
-                }
                 if (rfb != null) {
                     rfb.close();
                     rfb = null;
                 }
-                if (showControls && buttonPanel != null) {
-                    buttonPanel.disableButtonsOnDisconnect();
-                    if (inSeparateFrame) {
-                        vncFrame.pack();
-                    } else {
-                        validate();
-                    }
-                }
-            } else {
                 fatalError("Network error: remote side closed connection");
-            }
+
         } catch (IOException e) {
             String str = e.getMessage();
             e.printStackTrace();
@@ -194,30 +135,15 @@ public class VncViewer extends JFrame
     void connectAndAuthenticate() throws Exception {
 
         if (passwordParam != null) {
-            validate();
             if (!tryAuthenticate(usernameParam,passwordParam)) {
                 throw new Exception("VNC authentication failed");
             }
             return;
         }
-
-
         prologueDetectAuthProtocol();
 
 
-        // MS-Logon support end
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.ipadx = 100;
-        gbc.ipady = 50;
-
-        validate();
-
-        tryAuthenticate("", "1234");
 
 
     }
@@ -272,7 +198,7 @@ public class VncViewer extends JFrame
                 if (mslogon) {
                     System.out.println("showing JOptionPane warning.");
                     int n = JOptionPane.showConfirmDialog(
-                            vncFrame, "The current authentication method does not transfer your password securely."
+                            ftp, "The current authentication method does not transfer your password securely."
                                     + "Do you want to continue?",
                             "Warning",
                             JOptionPane.YES_NO_OPTION);
@@ -484,7 +410,7 @@ public class VncViewer extends JFrame
         }
         System.out.println("Disconnect");
 
-        JOptionPane.showMessageDialog(this, "Disconnected", "Info", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(ftp, "Disconnected", "Info", JOptionPane.INFORMATION_MESSAGE);
 
     }
 
@@ -504,60 +430,9 @@ public class VncViewer extends JFrame
             return;
         }
 
-        JOptionPane.showMessageDialog(this, str, "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(ftp, str, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
 
-    //
-    // This method is called before the applet is destroyed.
-    //
 
-    public void destroy() {
-        vncContainer.removeAll();
-
-        if (ftp != null)
-            ftp.dispose();
-        if (rfb != null)
-            rfb.close();
-        if (inSeparateFrame)
-            vncFrame.dispose();
-    }
-
-
-    //
-    // Close application properly on window close event.
-    //
-
-    public void windowClosing(WindowEvent evt) {
-        if (rfb != null)
-            disconnect();
-        dispose();
-        System.exit(0);
-    }
-
-    //
-    // Move the keyboard focus to the password field on window activation.
-    //
-    //
-
-
-    // Ignore window events we're not interested in.
-    //
-    public void windowActivated(WindowEvent evt) {
-    }
-
-    public void windowDeactivated(WindowEvent evt) {
-    }
-
-    public void windowOpened(WindowEvent evt) {
-    }
-
-    public void windowClosed(WindowEvent evt) {
-    }
-
-    public void windowIconified(WindowEvent evt) {
-    }
-
-    public void windowDeiconified(WindowEvent evt) {
-    }
 }
