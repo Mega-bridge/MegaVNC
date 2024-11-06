@@ -6,6 +6,7 @@ import kr.co.megabridge.megavnc.exception.ErrorCode;
 import kr.co.megabridge.megavnc.exception.exceptions.ApiException;
 import kr.co.megabridge.megavnc.exception.exceptions.FileDeleteException;
 import kr.co.megabridge.megavnc.exception.exceptions.FileDownloadException;
+import kr.co.megabridge.megavnc.ftp.VncViewer;
 import kr.co.megabridge.megavnc.repository.FileInfoRepository;
 import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +56,6 @@ public class FileService {
 
 
     private static final String ADMIN_REQUEST = "ADMIN_REQUEST";
-
     //fixme: 파일 확장자 검사 추가
     @Transactional
     public Integer uploadFile(MultipartFile file, Long repeaterId, User user) {
@@ -93,6 +93,7 @@ public class FileService {
 
             //파일 올리기
             Files.copy(file.getInputStream(), filePath);
+
 
             return fileInfo.getSeq();
 
