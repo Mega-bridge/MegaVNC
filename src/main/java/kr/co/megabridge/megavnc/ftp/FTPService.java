@@ -1,111 +1,100 @@
 package kr.co.megabridge.megavnc.ftp;
 
-import javax.swing.*;
-import java.awt.*;
+import kr.co.megabridge.megavnc.exception.ErrorCode;
+import kr.co.megabridge.megavnc.exception.exceptions.ApiException;
+import org.springframework.stereotype.Component;
+
 import java.io.EOFException;
+import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
 
-public class VncViewer
-        implements Runnable {
 
-    boolean mslogon = false;
-
-
-    public static void main(String[] argv) {
-        VncViewer v = new VncViewer();
-        v.mainArgs = argv;
-        v.init();
-
+@Component
+public class FTPService {
+    public FTPService() {
+        passwordParam = "1234";
     }
 
-    String[] mainArgs;
 
-    RfbProto rfb;
-    Thread rfbThread;
+    boolean mslogon = false;
+    private volatile RfbProto rfb;
+    private volatile boolean running;
 
-    FTPFrame ftp; // KMC: FTP Frame declaration
-
-    String host = "192.168.0.23";
-    int port = 5900;
-    String passwordParam="1234";
+    String passwordParam;
 
 
     // MS-Logon support 2
-    String usernameParam="";
+    String usernameParam = "";
     String dm;
     byte[] domain = new byte[256];
     byte[] user = new byte[256];
     byte[] passwd = new byte[32];
     int i;
 
+    public void kingGodGeneralMethod(File file, String FileName) {
+        connect();
+        running = true;
+        Thread thread = new Thread(() -> {
+            try {
+                //rfb 객체에서 파일 전송 메시지 확인
+                while (running) {
+                        if (rfb.readServerMessageType() == RfbProto.rfbFileTransfer) {
+                            rfb.readRfbFileTransferMsg();
 
-    public void init() {
-        ftp = new FTPFrame(this); // KMC: FTPFrame creation
-        rfbThread = new Thread(this);
-        rfbThread.start();
-        ftp.setVisible(true);
+                        }
+                        if (Thread.currentThread().isInterrupted()) {
+                            break;
+                        }
+
+                }
+            } catch (Exception e) {
+                String str = e.getMessage();
+                e.printStackTrace();
+                if (str != null && str.length() != 0) {
+                    fatalError("Error: " + str);
+                } else {
+                    fatalError(e.toString());
+                }
+            } finally {
+                running = false;
+                disconnect();
+            }
+        });
+        thread.start(); // 스레드 시작
+        rfb.doSend(file, FileName, "C:\\Users\\User\\Desktop\\MegaVNC\\"); // 파일 전송
+
+
+
+        //thread.interrupt();
     }
 
-  /*  public void paint(Graphics g) {
-        super.paint(g);
-    }*/
 
-    //
-    // run() - executed by the rfbThread to deal with the RFB socket.
-    //
-
-    public void run() {
-
-
+    public void connect() {
 
         try {
+            //비밀번호 확인
             connectAndAuthenticate();
 
+            //프로토콜 초기화
             doProtocolInitialisation();
-
-
-          rfb.readServerDriveList();
-
-
-            while (true) {
-                // Read message type from the server.
-                int msgType = rfb.readServerMessageType();
-
-                // Process the message depending on its type.
-                switch (msgType) {
-                    case RfbProto.rfbFileTransfer:
-                        rfb.readRfbFileTransferMsg();
-                        break;
-
-                    default:
-                        System.out.println("msgType = " + msgType);
-                        break;
-                }
-            }
-
 
 
         } catch (NoRouteToHostException e) {
             e.printStackTrace();
-            fatalError("Network error: no route to server: " + host);
+            fatalError("Network error: no route to server");
         } catch (UnknownHostException e) {
             e.printStackTrace();
-            fatalError("Network error: server name unknown: " + host);
+            fatalError("Network error: server name unknown");
         } catch (ConnectException e) {
             e.printStackTrace();
-            fatalError("Network error: could not connect to server: " +
-                    host + ":" + port);
+            fatalError("Network error: could not connect to server");
         } catch (EOFException e) {
             e.printStackTrace();
-
-                if (rfb != null) {
-                    rfb.close();
-                    rfb = null;
-                }
-                fatalError("Network error: remote side closed connection");
+            rfb.close();
+            fatalError("Network error: remote side closed connection");
 
         } catch (IOException e) {
             String str = e.getMessage();
@@ -128,14 +117,14 @@ public class VncViewer
     }
 
 
-    //
-    // Connect to the RFB server and authenticate the user.
-    //
+    //////////////////////////////////////////////////////////
+    // Connect to the RFB server and authenticate the user.//
+    /////////////////////////////////////////////////////////
 
     void connectAndAuthenticate() throws Exception {
-
+        rfb = new RfbProto("192.168.0.23", 5900);
         if (passwordParam != null) {
-            if (!tryAuthenticate(usernameParam,passwordParam)) {
+            if (!tryAuthenticate(usernameParam, passwordParam)) {
                 throw new Exception("VNC authentication failed");
             }
             return;
@@ -143,14 +132,10 @@ public class VncViewer
         prologueDetectAuthProtocol();
 
 
-
-
-
     }
 
     void prologueDetectAuthProtocol() throws Exception {
 
-        rfb = new RfbProto(host, port, this, null, 0); // Modif: troessner - sf@2007: not yet used
 
         rfb.readVersionMsg();
 
@@ -176,7 +161,6 @@ public class VncViewer
 
     boolean tryAuthenticate(String us, String pw) throws Exception {
 
-        rfb = new RfbProto(host, port, this, null, 0); // Modif: troessner - sf@2007: not yet used
 
         rfb.readVersionMsg();
 
@@ -194,17 +178,8 @@ public class VncViewer
                 return true;
 
             case RfbProto.VncAuth:
-
                 if (mslogon) {
-                    System.out.println("showing JOptionPane warning.");
-                    int n = JOptionPane.showConfirmDialog(
-                            ftp, "The current authentication method does not transfer your password securely."
-                                    + "Do you want to continue?",
-                            "Warning",
-                            JOptionPane.YES_NO_OPTION);
-                    if (n != JOptionPane.YES_OPTION) {
-                        throw new Exception("User cancelled insecure MS-Logon");
-                    }
+                    fatalError("authentication fail");
                 }
                 // MS-Logon support
                 byte[] challengems = new byte[64];
@@ -395,44 +370,35 @@ public class VncViewer
     }
 
 
-
     //
     // disconnect() - close connection to server.
     //
 
     boolean disconnectRequested = false;
 
-    synchronized public void disconnect() {
+    public void disconnect() {
         disconnectRequested = true;
-        if (rfb != null) {
-            rfb.close();
-            rfb = null;
-        }
+
+        rfb.close();
+
         System.out.println("Disconnect");
-
-        JOptionPane.showMessageDialog(ftp, "Disconnected", "Info", JOptionPane.INFORMATION_MESSAGE);
-
     }
+
 
     //
     // fatalError() - print out a fatal error message.
     //
 
-    synchronized public void fatalError(String str) {
-        if (rfb != null) {
-            rfb.close();
-            rfb = null;
-        }
+    public void fatalError(String str) {
+        rfb.close();
         System.out.println(str);
 
         if (disconnectRequested) {
             disconnectRequested = false;
             return;
         }
-
-        JOptionPane.showMessageDialog(ftp, str, "Error", JOptionPane.ERROR_MESSAGE);
+        throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR, str);
     }
-
 
 
 }

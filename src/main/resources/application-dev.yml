@@ -12,7 +12,7 @@ server:
 
 file:
   fileKey: asd8g9dqyfeg1ohndsawd0hqidnw
-  directory: ${user.home}/uploads
+  directory: ${user.home}\uploads
 
 
 spring:

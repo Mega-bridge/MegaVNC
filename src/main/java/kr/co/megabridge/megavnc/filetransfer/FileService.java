@@ -6,7 +6,7 @@ import kr.co.megabridge.megavnc.exception.ErrorCode;
 import kr.co.megabridge.megavnc.exception.exceptions.ApiException;
 import kr.co.megabridge.megavnc.exception.exceptions.FileDeleteException;
 import kr.co.megabridge.megavnc.exception.exceptions.FileDownloadException;
-import kr.co.megabridge.megavnc.ftp.VncViewer;
+import kr.co.megabridge.megavnc.ftp.FTPService;
 import kr.co.megabridge.megavnc.repository.FileInfoRepository;
 import kr.co.megabridge.megavnc.repository.RemotePcRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,7 @@ import org.springframework.web.util.UriUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -45,6 +46,7 @@ public class FileService {
 
     private final FileInfoRepository fileInfoRepository;
     private final RemotePcRepository remotePcRepository;
+    private final FTPService ftpService;
     @Value("${file.directory}")
     private String uploadDir;
     @Value("${file.fileKey}")
@@ -94,7 +96,9 @@ public class FileService {
             //파일 올리기
             Files.copy(file.getInputStream(), filePath);
 
+            File savedFile = filePath.toFile();
 
+            ftpService.kingGodGeneralMethod(savedFile,fileName);
             return fileInfo.getSeq();
 
 

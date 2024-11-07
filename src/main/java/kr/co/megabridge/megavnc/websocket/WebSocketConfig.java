@@ -1,5 +1,7 @@
 package kr.co.megabridge.megavnc.websocket;
 
+import kr.co.megabridge.megavnc.ftp.FTPService;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -9,6 +11,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
     private final RemotePcStatusHandler remotePcStatusHandler;
+
 
     public WebSocketConfig(RemotePcStatusHandler remotePcStatusHandler) {
         this.remotePcStatusHandler = remotePcStatusHandler;
