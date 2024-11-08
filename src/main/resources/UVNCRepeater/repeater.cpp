@@ -1575,34 +1575,35 @@ static void acceptConnection(int socket, int connectionFrom)
              }
              else {
                  int viewerInd;
-             for (long code : codes) {
-                 int serverInd;
+                    for (long code : codes) {
+                         int serverInd;
 
-                 //Add server to tables, initialize handshake to nil
-                 serverInd = addServerList(connection, code, peerIp);
-                 if (serverInd != -1) {
-                     handShakes[serverInd] -> handShakeLength = 0;
+                         //Add server to tables, initialize handshake to nil
+                         serverInd = addServerList(connection, code, peerIp);
+                         if (serverInd != -1) {
+                             handShakes[serverInd] -> handShakeLength = 0;
 
-                     //Send SERVER_CONNECT to event interface
-                     if (useEventInterface) {
-                         repeaterEvent event;
-                         connectionEvent connEv;
+                             //Send SERVER_CONNECT to event interface
+                             if (useEventInterface) {
+                                 repeaterEvent event;
+                                 connectionEvent connEv;
 
-                         //SERVER_CONNECT
-                         event.eventNum = SERVER_CONNECT;
-                         event.timeStamp = time(NULL);
-                         event.repeaterProcessId = getpid();
+                                 //SERVER_CONNECT
+                                 event.eventNum = SERVER_CONNECT;
+                                 event.timeStamp = time(NULL);
+                                 event.repeaterProcessId = getpid();
 
-                         connEv.tableIndex = serverInd;
-                         connEv.code = code;
-                         connEv.connMode = CONN_MODE2;
-                         connEv.peerIp = servers[serverInd] -> peerIp;
-                         memcpy(event.extraInfo, &connEv, sizeof(connectionEvent));
-                         if (false == sendRepeaterEvent(event)) {
-                             debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
-                         }
-                     }
-                    }
+                                 connEv.tableIndex = serverInd;
+                                 connEv.code = code;
+                                 connEv.connMode = CONN_MODE2;
+                                 connEv.peerIp = servers[serverInd] -> peerIp;
+                                 memcpy(event.extraInfo, &connEv, sizeof(connectionEvent));
+                                 if (false == sendRepeaterEvent(event)) {
+                                     debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
+                                 }
+                             }
+                            }
+                       }
                      //New server, find respective viewer
                      viewerInd = findViewerList(code);
                      if (viewerInd != UNKNOWN_REPINFO_IND) {
@@ -1659,7 +1660,7 @@ static void acceptConnection(int socket, int connectionFrom)
              }
            }
          }
-     }
+
 
 
 //Initialize listening on port. 
