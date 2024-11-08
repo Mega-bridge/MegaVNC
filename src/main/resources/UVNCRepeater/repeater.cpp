@@ -50,6 +50,8 @@
 #include <arpa/inet.h>
 #include <pwd.h>        //for getpwnam() in dropPrivileges()
 #include <vector>
+#include <string>
+#include <sstream>
 
 #include "commondefines.h"
 #include "repeaterproc.h"
@@ -1290,47 +1292,47 @@ static void acceptConnection(int socket, int connectionFrom)
          if (checkIdCode(id)) {
              if ((allowedModes & CONN_MODE2) > 0) {
                  connMode = CONN_MODE2;
-                codes = parseIds(id);
+                codes = parseIds(std::string(id));
                      if (codes.empty()) {
                          debug(LEVEL_2, "acceptConnection(): Invalid ID, closing connection\n");
                          close(connection);
                          return;
                      }
-            for (long code : codes) {
-                 if (-1 == code) {
-                     debug(LEVEL_3, "acceptConnection(): parseId returned error, closing connection\n");
-                     close(connection);
-                     return;
-                 }
-                 debug(LEVEL_3, "acceptConnection():  %s sent code %ld \n",
-                     (connectionFrom == CONNECTION_FROM_VIEWER) ? "Viewer" : "Server", code);
-
-                 //Check that there isn't similar ID:xxxx string in use
-                 //If similar ID:xxxx is found, refuse new connection
-                 int index;
-                 index = findDuplicateIdIndex(connectionFrom, code);
-                 if (index != -1) {
-                     debug(LEVEL_2, "acceptConnection(): duplicate ID string found, closing connection\n");
-                     close(connection);
-                     return;
-                 }
-
-                 //If listed ID is required, check that ID matches one in list
-                 if (requireListedId) {
-                     if (!isCodeInIdList(code)) {
-                         debug(LEVEL_2,
-                             "acceptConnection(): Id code does not match codes in list, closing connection\n", code);
+                for (long code : codes) {
+                     if (-1 == code) {
+                         debug(LEVEL_3, "acceptConnection(): parseId returned error, closing connection\n");
                          close(connection);
                          return;
                      }
+                     debug(LEVEL_3, "acceptConnection():  %s sent code %ld \n",
+                         (connectionFrom == CONNECTION_FROM_VIEWER) ? "Viewer" : "Server", code);
+
+                     //Check that there isn't similar ID:xxxx string in use
+                     //If similar ID:xxxx is found, refuse new connection
+                     int index;
+                     index = findDuplicateIdIndex(connectionFrom, code);
+                     if (index != -1) {
+                         debug(LEVEL_2, "acceptConnection(): duplicate ID string found, closing connection\n");
+                         close(connection);
+                         return;
+                     }
+
+                     //If listed ID is required, check that ID matches one in list
+                     if (requireListedId) {
+                         if (!isCodeInIdList(code)) {
+                             debug(LEVEL_2,
+                                 "acceptConnection(): Id code does not match codes in list, closing connection\n", code);
+                             close(connection);
+                             return;
+                         }
+                     }
                  }
-             }
-             else {
+            } else {
                  debug(LEVEL_2, "acceptConnection(): mode 2 connections are not allowed, closing connection\n");
                  close(connection);
                  return;
              }
-            }
+
          }
          else {
              if ((allowedModes & CONN_MODE1) > 0) {
