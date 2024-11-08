@@ -604,9 +604,8 @@ static bool checkIdCode(char *IdCode)
 }
 
 
-
-//Parse IdCode string of format "ID:xxx;yyy", where xxx and yyy are some positive (non-zero) long integer numbers
-//Return -1 on error, and parse both xxx and yyy successfully
+//Parse IdCode string of format "ID:xxx;yyy" or "ID:xxx", where xxx and yyy are some positive (non-zero) long integer numbers
+//Return -1 on error, and parse both xxx and yyy successfully if available
 static bool parseId(char *IdCode, long *id1, long *id2)
 {
     unsigned int ii;
@@ -620,11 +619,27 @@ static bool parseId(char *IdCode, long *id1, long *id2)
         return false;
     }
 
-    // Split the IdCode string by ';' to extract both xxx and yyy
+    // Split the IdCode string by ';' to extract both xxx and yyy if available
     char *semicolonPos = strchr(IdCode + 3, ';');
     if (semicolonPos == NULL) {
-        debug(LEVEL_3, "parseId(): IdCode format error, missing semicolon\n");
-        return false;
+        // Only xxx is provided
+        char *idStr1 = IdCode + 3;
+
+        // Parse xxx (first part)
+        for (ii = 0; ii < strlen(idStr1); ii++) {
+            if (!isdigit(idStr1[ii])) {
+                debug(LEVEL_3, "parseId(): IdCode format error, xxx should consist of decimal digits\n");
+                return false;
+            }
+        }
+        retVal = strtol(idStr1, NULL, 10);
+        if (retVal <= 0) {
+            debug(LEVEL_3, "parseId(): IdCode format error, xxx should be a positive long integer number\n");
+            return false;
+        }
+        *id1 = retVal;
+        *id2 = -1; // Indicate that yyy is not provided
+        return true;
     }
 
     *semicolonPos = '\0'; // Null-terminate the first part (xxx)
@@ -661,8 +676,6 @@ static bool parseId(char *IdCode, long *id1, long *id2)
 
     return true;
 }
-
-
 
 
 //Return value: n > 0: number of bytes read
@@ -1239,7 +1252,6 @@ int nonBlockingAccept(int socket, struct sockaddr *sa, socklen_t *sockLen)
     //At last, we are ready to return accept():ed socket ;-)
     return socketToReturn;
 }
-
 // Accept connections from both servers and viewers
 // connectionFrom == CONNECTIONFROMSERVER means server is connecting,
 // connectionFrom==CONNECTIONFROMVIEWER means viewer is connecting
@@ -1304,20 +1316,28 @@ static void acceptConnection(int socket, int connectionFrom)
                     return;
                 }
                 debug(LEVEL_3, "acceptConnection():  %s sent codes %ld and %ld \n",
-                    (connectionFrom == CONNECTION_FROM_VIEWER) ? "Viewer" : "Server", code1, code2);
+                    (connectionFrom == CONNECTION_FROM_VIEWER) ? "Viewer" : "Server", code1, (code2 != -1) ? code2 : 0);
 
-                // Check both parsed IDs (code1 and code2) for duplication
+                // Check parsed IDs for duplication
                 int index1 = findDuplicateIdIndex(connectionFrom, code1);
-                int index2 = findDuplicateIdIndex(connectionFrom, code2);
-                if (index1 != -1 || index2 != -1) {
+                if (index1 != -1) {
                     debug(LEVEL_2, "acceptConnection(): duplicate ID string found, closing connection\n");
                     close(connection);
                     return;
                 }
 
-                //If listed ID is required, check that both IDs match those in the list
+                if (code2 != -1) {
+                    int index2 = findDuplicateIdIndex(connectionFrom, code2);
+                    if (index2 != -1) {
+                        debug(LEVEL_2, "acceptConnection(): duplicate ID string found, closing connection\n");
+                        close(connection);
+                        return;
+                    }
+                }
+
+                //If listed ID is required, check that IDs match those in the list
                 if (requireListedId) {
-                    if (!isCodeInIdList(code1) || !isCodeInIdList(code2)) {
+                    if (!isCodeInIdList(code1) || (code2 != -1 && !isCodeInIdList(code2))) {
                         debug(LEVEL_2,
                             "acceptConnection(): Id code does not match codes in list, closing connection\n", code1);
                         close(connection);
@@ -1325,9 +1345,11 @@ static void acceptConnection(int socket, int connectionFrom)
                     }
                 }
 
-                // Fork repeater for both parsed connections
+                // Fork repeater for parsed connections
                 forkRepeater(connection, code1, code1);
-                forkRepeater(connection, code2, code2);
+                if (code2 != -1) {
+                    forkRepeater(connection, code2, code2);
+                }
 
             }
             else {
