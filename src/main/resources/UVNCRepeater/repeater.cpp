@@ -577,32 +577,28 @@ static int findViewerList(long code)
 }
 
 
-//Check IdCode string, require that 1st 3 characters of IdCode are 'I','D',':'
+
+// Validate the format of the IdCode string (supports "ID:xxx" and "ID:xxx;yyy")
 static bool checkIdCode(char *IdCode)
 {
-    // 기존 ID:xxx 형식 체크
+    // Check that the string starts with 'ID:'
     if ((IdCode[0] != 'I') || (IdCode[1] != 'D') || (IdCode[2] != ':')) {
         debug(LEVEL_3, "checkIdCode(): %s is not IdCode string\n", IdCode);
         return false;
     }
 
-    // ; 구분자가 있는지 확인하여 ID:xxx;yyy 형식도 인식하도록 확장
+    // Check for optional ';' and second part (yyy)
     char *semicolonPos = strchr(IdCode + 3, ';');
-    if (semicolonPos == NULL) {
-        debug(LEVEL_3, "checkIdCode(): %s does not contain a semicolon separator\n", IdCode);
-        return false;
+    if (semicolonPos != NULL) {
+        // Ensure that there's something after the semicolon
+        if (*(semicolonPos + 1) == '\0') {
+            debug(LEVEL_3, "checkIdCode(): %s has no value after semicolon\n", IdCode);
+            return false;
+        }
     }
 
-    // 세미콜론 이후에 숫자가 있는지 체크 (기본적인 유효성 검사)
-    if (*(semicolonPos + 1) == '\0') {
-        debug(LEVEL_3, "checkIdCode(): %s has no value after semicolon\n", IdCode);
-        return false;
-    }
-
-    // 모든 체크 통과 시 true 반환
     return true;
 }
-
 
 //Parse IdCode string of format "ID:xxx;yyy" or "ID:xxx", where xxx and yyy are some positive (non-zero) long integer numbers
 //Return -1 on error, and parse both xxx and yyy successfully if available
