@@ -49,9 +49,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <pwd.h>        //for getpwnam() in dropPrivileges()
-#include <vector>
-#include <string>
-#include <sstream>
 
 #include "commondefines.h"
 #include "repeaterproc.h"
@@ -91,23 +88,23 @@ typedef struct _repeaterInfo {
     //Code is used for cross-connection between servers and viewers
     //In Mode 2, Server/Viewer sends IdCode string "ID:xxxxx", where xxxxx is some positive (1 or bigger) long integer number
     //In Mode 1, Repeater "invents" a non-used code (negative number) and assigns that to both Server/Viewer
-    //code == 0 means that entry in servers[] / viewers[] table is free 
+    //code == 0 means that entry in servers[] / viewers[] table is free
     long code;
 
     unsigned long timeStamp;
 
     //Ip address of peer
-    addrParts peerIp;  
-    
-    //There are 3 connection levels (using variables "code" and "active"): 
+    addrParts peerIp;
+
+    //There are 3 connection levels (using variables "code" and "active"):
     //A. code==0,active==false: fully idle, no connection attempt detected
     //B. code==non-zero,active==false: server/viewer has connected, waiting for other end to connect
     //C. code==non-zero,active=true: doRepeater() running on viewer/server connection, fully active
-    //-after viewer/server disconnects or some error in doRepeater, returns both to level A 
+    //-after viewer/server disconnects or some error in doRepeater, returns both to level A
     //(and closes respective sockets)
-    //This logic means, that when one end disconnects, BOTH ends need to reconnect. 
+    //This logic means, that when one end disconnects, BOTH ends need to reconnect.
     //This is not a bug, it is a feature ;-)
-    bool active;    
+    bool active;
 } repeaterInfo;
 static repeaterInfo *servers[MAX_SESSIONS_MAX];
 static repeaterInfo *viewers[MAX_SESSIONS_MAX];
@@ -121,16 +118,16 @@ typedef struct _handShakeInfo
 } handShakeInfo;
 static handShakeInfo *handShakes[MAX_SESSIONS_MAX];
 
-//mode1ConnCode is used in Mode1 to "invent" code field in repeaterInfo, when new Mode1 connection from 
-//viewer is accepted. This is just decremented for each new Mode 1 connection to ensure unique number 
-//for each Mode 1 session 
+//mode1ConnCode is used in Mode1 to "invent" code field in repeaterInfo, when new Mode1 connection from
+//viewer is accepted. This is just decremented for each new Mode 1 connection to ensure unique number
+//for each Mode 1 session
 //Values for this are: 0=program has just started, -1....MIN_INVENTED_CONN_CODE: Codes for each session
 #define MIN_INVENTED_CONN_CODE -1000000
 static long mode1ConnCode;
 
 
-//This structure (and repeaterProcs[] table) is used for 
-//keeping track of child processes running doRepeater 
+//This structure (and repeaterProcs[] table) is used for
+//keeping track of child processes running doRepeater
 //and cleaning up after they exit
 typedef struct _repeaterProcInfo
 {
@@ -140,17 +137,17 @@ typedef struct _repeaterProcInfo
 static repeaterProcInfo *repeaterProcs[MAX_SESSIONS_MAX];
 
 
-//This structure keeps information of ports/socket used when 
+//This structure keeps information of ports/socket used when
 //routeConnections() listens for new incoming connections
 typedef struct _listenPortInfo {
     int socket;
     int port;
 } listenPortInfo;
 
-//Repeater "events" interface uses this variable. Various "events" 
-//are sent to interface using function sendRepeaterEvent() 
-//and later handled with function handleRepeaterEvents(), which forks a child 
-//process to handle the grunt work of event posting 
+//Repeater "events" interface uses this variable. Various "events"
+//are sent to interface using function sendRepeaterEvent()
+//and later handled with function handleRepeaterEvents(), which forks a child
+//process to handle the grunt work of event posting
 //Child process is later cleaned up calling function cleanUpAfterEventProc()
 static repeaterEvent event;
 
@@ -176,7 +173,7 @@ void debug(int msgLevel, const char *fmt, ...)
         logLineStart("UltraVnc");
 
         va_start(args, fmt);
-    
+
         vfprintf(stderr, fmt, args);
         va_end(args);
     }
@@ -187,13 +184,13 @@ void fatal(const char *fmt, ...)
     va_list args;
 
     logLineStart("UltraVnc FATAL");
-    
+
     va_start(args, fmt);
-   
+
     vfprintf(stderr, fmt, args);
     va_end(args);
- 
-    //Close program down cleanly (as if user just pressed ctrl+c, of course 
+
+    //Close program down cleanly (as if user just pressed ctrl+c, of course
     //log file will show FATAL message in case program shuts down)
     stopped = true;
 }
@@ -206,7 +203,7 @@ int openConnectionToEventListener(const char *host, unsigned short port, char *l
     int s;
     struct sockaddr_in saddr;
     struct hostent *h;
-        
+
     h = gethostbyname(host);
     if (NULL == h) {
         debug(LEVEL_2, "openConnectionToEventListener(): can't resolve hostname: %s\n", host);
@@ -214,19 +211,19 @@ int openConnectionToEventListener(const char *host, unsigned short port, char *l
     }
     saddr.sin_family = AF_INET;
     saddr.sin_port = htons(port);
-    
-    //Interesting;-) typecast / indirection thing copied from "Beej's Guide to network programming". 
+
+    //Interesting;-) typecast / indirection thing copied from "Beej's Guide to network programming".
     //See http://beej.us/guide/bgnet/ for more info
     saddr.sin_addr = *((struct in_addr *)h->h_addr);
 
     memset(&(saddr.sin_zero), '\0', 8); // zero the rest of the struct
-    
+
     strlcpy(listenerIp, inet_ntoa(saddr.sin_addr), listenerIpSize);
-    
+
     debug(LEVEL_3, "openConnectionToEventListener(): connecting to %s:%u\n", listenerIp, port);
 
     s = socket(AF_INET, SOCK_STREAM, 0);
-    
+
     //Trying to connect with timeout
     if (connectWithTimeout(s, (struct sockaddr *) &saddr, sizeof(saddr), TIMEOUT_10SECS) != 0) {
         debug(LEVEL_2, "openConnectionToEventListener(): connectWithTimeout() failed.\n");
@@ -242,7 +239,7 @@ int openConnectionToEventListener(const char *host, unsigned short port, char *l
 //Try to write exact number of bytes to socket
 //return 1 if things went OK,
 //return -2 in case of timeout
-//return -1 in case of error 
+//return -1 in case of error
 int writeExact(int sock, char *buf, int len, int timeOutSecs)
 {
     int n;
@@ -263,7 +260,7 @@ int writeExact(int sock, char *buf, int len, int timeOutSecs)
         }
         else {
             //send() returned -1 to indicate some error
-            //Because we use non-blocking in send(), we have to 
+            //Because we use non-blocking in send(), we have to
             //handle EAGAIN by incrementing timeout counter
             if (errno == EAGAIN) {
                 debug(LEVEL_3, "writeExact(): EAGAIN detected\n");
@@ -318,15 +315,15 @@ static void logLineStart(const char *prefix)
 static bool allocateMemoryForRepeaterLists(int numSessions)
 {
     int ii;
-    
+
     for(ii = 0; ii < MAX_SESSIONS_MAX; ii++) {
         handShakes[ii] = NULL;
         repeaterProcs[ii] = NULL;
         servers[ii] = NULL;
         viewers[ii] = NULL;
     }
-    
-    
+
+
     for(ii = 0; ii < numSessions; ii++) {
         handShakes[ii] = (handShakeInfo *) calloc(1, sizeof(handShakeInfo));
         if (handShakes[ii] == NULL)
@@ -344,7 +341,7 @@ static bool allocateMemoryForRepeaterLists(int numSessions)
         if (viewers[ii] == NULL)
             return false;
     }
-    
+
     return true;
 }
 
@@ -352,23 +349,23 @@ static bool allocateMemoryForRepeaterLists(int numSessions)
 static void freeMemoryOfRepeaterLists(void)
 {
     int ii;
-    
+
     for(ii = 0; ii < MAX_SESSIONS_MAX; ii++) {
         if (handShakes[ii] != NULL) {
             free(handShakes[ii]);
             handShakes[ii] = NULL;
         }
-        
+
         if (repeaterProcs[ii] != NULL) {
             free(repeaterProcs[ii]);
             repeaterProcs[ii] = NULL;
         }
-        
+
         if (servers[ii] != NULL) {
             free(servers[ii]);
             servers[ii] = NULL;
         }
-            
+
         if (viewers[ii] != NULL) {
             free(viewers[ii]);
             viewers[ii] = NULL;
@@ -431,13 +428,13 @@ static int findRepeaterProcList(pid_t pid)
 
     for (i = 0; i < maxSessions; i++) {
         if (repeaterProcs[i] -> pid == pid) {
-            debug(LEVEL_3, "findRepeaterProcList(): proc found at index=%d, pid=%d, code = %ld\n", 
+            debug(LEVEL_3, "findRepeaterProcList(): proc found at index=%d, pid=%d, code = %ld\n",
                 i, pid, repeaterProcs[i] -> code);
             return i;
         }
     }
 
-    debug(LEVEL_2, "findRepeaterProcList(): Warning, did not find any proc (pid=%d)\n", pid); 
+    debug(LEVEL_2, "findRepeaterProcList(): Warning, did not find any proc (pid=%d)\n", pid);
     return UNKNOWN_REPINFO_IND;
 }
 
@@ -457,8 +454,8 @@ static int addServerList(int socket, long code, char *peerIp)
             return i;
         }
     }
-    
-    debug(LEVEL_2, "addServerList(): Warning, no table slots available\n"); 
+
+    debug(LEVEL_2, "addServerList(): Warning, no table slots available\n");
     return -1;  //Not added
 }
 
@@ -591,7 +588,7 @@ static bool checkIdCode(char *IdCode)
 }
 
 
-//Parse IdCode string of format "ID:xxxxx", where xxxxx is some positive (non-zero) long integer number 
+//Parse IdCode string of format "ID:xxxxx", where xxxxx is some positive (non-zero) long integer number
 //Return -1 on error, xxxxx on success
 static long parseId(char *IdCode)
 {
@@ -628,22 +625,7 @@ static long parseId(char *IdCode)
     }
 }
 
-static std::vector<long> parseIds(const std::string& idCode) {
-    std::vector<long> ids;
-    std::stringstream ss(idCode.substr(3)); // "ID:" 이후 부분만 파싱
-    std::string id;
-    while (std::getline(ss, id, ';')) {
-        try {
-            long parsedId = std::stol(id);
-            if (parsedId > 0) {
-                ids.push_back(parsedId);
-            }
-        } catch (const std::exception& e) {
-            debug(LEVEL_3, "parseIds(): IdCode format error: %s\n", e.what());
-        }
-    }
-    return ids;
-}
+
 
 
 //Return value: n > 0: number of bytes read
@@ -654,7 +636,7 @@ static int nonBlockingRead(int sock, char *buf, int len, int timeOut)
     int n;
     int timeOutCtr;
     int numRead = 0;
-    
+
     debug(LEVEL_3, "nonBlockingRead(): start\n");
     timeOutCtr=0;
     while ((len > 0) && (timeOutCtr < timeOut)) {
@@ -668,7 +650,7 @@ static int nonBlockingRead(int sock, char *buf, int len, int timeOut)
         else {
             if (n == -1) {
                 //recv() returned -1 to indicate some error
-                //Because we use non-blocking in recv(), we have to 
+                //Because we use non-blocking in recv(), we have to
                 //handle EAGAIN by incrementing timeout counter
                 if (errno == EAGAIN) {
                     sleep(1);
@@ -687,7 +669,7 @@ static int nonBlockingRead(int sock, char *buf, int len, int timeOut)
         return numRead;
     }
     else {
-        //In case of timeout, return number of bytes received if > 0, 
+        //In case of timeout, return number of bytes received if > 0,
         //otherwise return -2 to indicate timeout
         if (numRead > 0) {
             debug(LEVEL_3, "nonBlockingRead(): returning %d bytes\n", numRead);
@@ -729,7 +711,7 @@ bool isPeerDisconnected(int socket, int connectionFrom)
 
     char buf[SIZE_RFBPROTOCOLVERSIONMSG+1];
     buf[SIZE_RFBPROTOCOLVERSIONMSG] = '\0';
-    
+
     n = recv(socket, buf, SIZE_RFBPROTOCOLVERSIONMSG, MSG_DONTWAIT);
 
     if (n == 0) {
@@ -750,7 +732,7 @@ bool isPeerDisconnected(int socket, int connectionFrom)
     else if (n >= 1) {
         //peer has sent data OK
         debug(LEVEL_3, "isPeerDisconnected: recv() returned: %s\n", buf);
-        return false;  
+        return false;
     }
     else {
         //unknown error
@@ -759,16 +741,16 @@ bool isPeerDisconnected(int socket, int connectionFrom)
     }
 }
 
-//Remove [old idle | broken] [viewer | server] connection 
+//Remove [old idle | broken] [viewer | server] connection
 static void connectionRemover(int connectionFrom, repeaterInfo *rI, int index)
 {
     bool fRemove;
     char removalReason[MY_TMP_BUF_LEN];
-    
+
     fRemove = false;
     strlcpy(removalReason, "", MY_TMP_BUF_LEN);
 
-     
+
     if (isExistingConnectionInactive(rI -> active, (rI -> code != 0))) {
         if (isConnectionTooOld(rI -> timeStamp)) {
             //Existing connection has been idle for too long, remove
@@ -786,7 +768,7 @@ static void connectionRemover(int connectionFrom, repeaterInfo *rI, int index)
             if (useEventInterface) {
                 repeaterEvent event;
                 connectionEvent connEv;
-                            
+
                 event.eventNum = (connectionFrom == CONNECTION_FROM_VIEWER) ? VIEWER_DISCONNECT : SERVER_DISCONNECT;
                 event.timeStamp = time(NULL);
                 event.repeaterProcessId = getpid();
@@ -796,20 +778,20 @@ static void connectionRemover(int connectionFrom, repeaterInfo *rI, int index)
                 connEv.connMode = (rI -> code < 0) ? CONN_MODE1 : CONN_MODE2;
                 connEv.peerIp = rI -> peerIp;
                 memcpy(event.extraInfo, &connEv, sizeof(connectionEvent));
-                
+
                 if (false == sendRepeaterEvent(event)) {
                     debug(LEVEL_1, "connectionRemover(): Warning, event fifo is full\n");
                 }
             }
 
-            //Remove & close connection 
+            //Remove & close connection
             close(rI -> socket);
-            debug(LEVEL_1, "connectionRemover(): Removing %s %ld at index %d (%s)\n", 
+            debug(LEVEL_1, "connectionRemover(): Removing %s %ld at index %d (%s)\n",
                 (connectionFrom == CONNECTION_FROM_VIEWER) ? "viewer" : "server",
-                rI -> code, 
+                rI -> code,
                 index,
                 removalReason);
-            
+
             if (connectionFrom == CONNECTION_FROM_VIEWER)
                 removeViewerList(rI -> code);
             else
@@ -841,9 +823,9 @@ static bool parseHostAndPort(char *id, char *host, int hostLen, int *port)
 {
     int tmpPort;
     char *colonPos;
-    
+
     debug(LEVEL_3, "parseHostAndPort() start: id = %s\n", id);
-    
+
     colonPos = strchr(id, ':');
     if (hostLen < (int) strlen(id)) {
         debug(LEVEL_3, "parseHostAndPort(): Id string too long\n");
@@ -888,86 +870,86 @@ static bool parseHostAndPort(char *id, char *host, int hostLen, int *port)
 static int connectWithTimeout(int socket, const struct sockaddr *addr, socklen_t addrlen, int timeOutSecs)
 {
     int res;
-    long arg; 
-    fd_set myset; 
-    struct timeval tv; 
-    int valopt;     
+    long arg;
+    fd_set myset;
+    struct timeval tv;
+    int valopt;
     socklen_t lon;
-    
-    //First, set socket non-blocking 
-    arg = fcntl(socket, F_GETFL, NULL);
-    if (arg < 0) { 
-        debug(LEVEL_2, "connectWithTimeout(): error in fcntl(..., F_GETFL) (%s)\n", strerror(errno)); 
-        return -1; 
-    } 
-    arg |= O_NONBLOCK; 
-    if (fcntl(socket, F_SETFL, arg) < 0) { 
-        debug(LEVEL_2, "connectWithTimeout(): error in fcntl(..., F_SETFL) (%s)\n", strerror(errno)); 
-        return -1; 
-    }     
 
-    //Try to connect with timeout 
-    res = connect(socket, addr, addrlen); 
-    if (res < 0) { 
-        if (errno == EINPROGRESS) { 
-            debug(LEVEL_3, "connectWithTimeout(): EINPROGRESS in connect() - selecting\n"); 
-        
-            do { 
-                tv.tv_sec = timeOutSecs; 
-                tv.tv_usec = 0; 
-                
-                FD_ZERO(&myset); 
-                FD_SET(socket, &myset); 
-                
-                res = select(socket + 1, NULL, &myset, NULL, &tv); 
-           
-                if ((res < 0) && (errno != EINTR)) { 
-                    debug(LEVEL_3, "connectWithTimeout(): Error connecting %d (%s)\n", errno, strerror(errno)); 
-                    return -1; 
-                } 
-                else if (res > 0) { 
-                    // Socket selected for write, check if connection was succesful 
-                    lon = sizeof(int); 
-                    
-                    if (getsockopt(socket, SOL_SOCKET, SO_ERROR, (void*)(&valopt), &lon) < 0) { 
-                        debug(LEVEL_2, "connectWithTimeout(): Error in getsockopt() %d (%s)\n", errno, strerror(errno)); 
-                        return -1; 
-                    } 
-              
-                    // Check the value returned... 
-                    if (valopt) { 
-                        debug(LEVEL_2, "connectWithTimeout(): Error in delayed connection() %d (%s)\n", 
-                            valopt, strerror(valopt)); 
-                        return -1; 
-                    } 
+    //First, set socket non-blocking
+    arg = fcntl(socket, F_GETFL, NULL);
+    if (arg < 0) {
+        debug(LEVEL_2, "connectWithTimeout(): error in fcntl(..., F_GETFL) (%s)\n", strerror(errno));
+        return -1;
+    }
+    arg |= O_NONBLOCK;
+    if (fcntl(socket, F_SETFL, arg) < 0) {
+        debug(LEVEL_2, "connectWithTimeout(): error in fcntl(..., F_SETFL) (%s)\n", strerror(errno));
+        return -1;
+    }
+
+    //Try to connect with timeout
+    res = connect(socket, addr, addrlen);
+    if (res < 0) {
+        if (errno == EINPROGRESS) {
+            debug(LEVEL_3, "connectWithTimeout(): EINPROGRESS in connect() - selecting\n");
+
+            do {
+                tv.tv_sec = timeOutSecs;
+                tv.tv_usec = 0;
+
+                FD_ZERO(&myset);
+                FD_SET(socket, &myset);
+
+                res = select(socket + 1, NULL, &myset, NULL, &tv);
+
+                if ((res < 0) && (errno != EINTR)) {
+                    debug(LEVEL_3, "connectWithTimeout(): Error connecting %d (%s)\n", errno, strerror(errno));
+                    return -1;
+                }
+                else if (res > 0) {
+                    // Socket selected for write, check if connection was succesful
+                    lon = sizeof(int);
+
+                    if (getsockopt(socket, SOL_SOCKET, SO_ERROR, (void*)(&valopt), &lon) < 0) {
+                        debug(LEVEL_2, "connectWithTimeout(): Error in getsockopt() %d (%s)\n", errno, strerror(errno));
+                        return -1;
+                    }
+
+                    // Check the value returned...
+                    if (valopt) {
+                        debug(LEVEL_2, "connectWithTimeout(): Error in delayed connection() %d (%s)\n",
+                            valopt, strerror(valopt));
+                        return -1;
+                    }
                     else {
-                        debug(LEVEL_3, "connectWithTimeout(): connected OK\n"); 
+                        debug(LEVEL_3, "connectWithTimeout(): connected OK\n");
                         break;
-                    } 
-                } 
-                else { 
-                    debug(LEVEL_3, "connectWithTimeout(): Timeout in select() - Cancelling!\n"); 
-                    return -1; 
-                } 
-            } while (1); 
-        } 
-        else { 
-            debug(LEVEL_3, "connectWithTimeout(): Error connecting %d (%s)\n", errno, strerror(errno)); 
-            return -1; 
-        } 
-    } 
-  
-    //Set to blocking mode again... 
-    if ((arg = fcntl(socket, F_GETFL, NULL)) < 0) { 
-        debug(LEVEL_2, "connectWithTimeout(): Error fcntl(..., F_GETFL) (%s)\n", strerror(errno)); 
-        return -1; 
-    } 
-    arg &= (~O_NONBLOCK); 
-    if (fcntl(socket, F_SETFL, arg) < 0) { 
-        debug(LEVEL_2, "connectWithTimeout(): Error fcntl(..., F_SETFL) (%s)\n", strerror(errno)); 
-        return -1; 
-    } 
-    
+                    }
+                }
+                else {
+                    debug(LEVEL_3, "connectWithTimeout(): Timeout in select() - Cancelling!\n");
+                    return -1;
+                }
+            } while (1);
+        }
+        else {
+            debug(LEVEL_3, "connectWithTimeout(): Error connecting %d (%s)\n", errno, strerror(errno));
+            return -1;
+        }
+    }
+
+    //Set to blocking mode again...
+    if ((arg = fcntl(socket, F_GETFL, NULL)) < 0) {
+        debug(LEVEL_2, "connectWithTimeout(): Error fcntl(..., F_GETFL) (%s)\n", strerror(errno));
+        return -1;
+    }
+    arg &= (~O_NONBLOCK);
+    if (fcntl(socket, F_SETFL, arg) < 0) {
+        debug(LEVEL_2, "connectWithTimeout(): Error fcntl(..., F_SETFL) (%s)\n", strerror(errno));
+        return -1;
+    }
+
     return 0;
 }
 
@@ -977,19 +959,19 @@ static int connectWithTimeout(int socket, const struct sockaddr *addr, socklen_t
 static bool isServerAddressDenied(addrParts srvAddr)
 {
     int ii;
-    
+
     for(ii = 0; ii < SERVERS_LIST_SIZE; ii++) {
         if (((srvAddr.a == srvListDeny[ii].a) || (srvListDeny[ii].a == 0)) &&
             ((srvAddr.b == srvListDeny[ii].b) || (srvListDeny[ii].b == 0)) &&
             ((srvAddr.c == srvListDeny[ii].c) || (srvListDeny[ii].c == 0)) &&
             ((srvAddr.d == srvListDeny[ii].d) || (srvListDeny[ii].d == 0)) ) {
-                debug(LEVEL_3, "isServerAddressDenied(): address is in deny list, denying (%d.%d.%d.%d)\n", 
+                debug(LEVEL_3, "isServerAddressDenied(): address is in deny list, denying (%d.%d.%d.%d)\n",
                     srvAddr.a,srvAddr.b,srvAddr.c,srvAddr.d);
-                
+
                 return true;
         }
     }
-    
+
     return false;
 }
 
@@ -1000,27 +982,27 @@ static bool isServerAddressAllowed(char *serverIp)
     int ii;
     addrParts srvAddr;
     bool allow;
-    
+
     srvAddr = getAddrPartsFromString(serverIp);
-    
+
     for(ii = 0; ii < SERVERS_LIST_SIZE; ii++) {
         allow = true;
 
         //List 255 == denied
-        if ((srvListAllow[ii].a == 255) || (srvListAllow[ii].b == 255) || 
+        if ((srvListAllow[ii].a == 255) || (srvListAllow[ii].b == 255) ||
             (srvListAllow[ii].c == 255) || (srvListAllow[ii].d == 255))
             allow = false;
-            
+
         //server 255 == denied
         if ((srvAddr.a == 255) || (srvAddr.b == 255) || (srvAddr.c == 255) || (srvAddr.d == 255))
             allow = false;
-            
+
         //server 0 == denied
         if ((srvAddr.a == 0) || (srvAddr.b == 0) || (srvAddr.c == 0) || (srvAddr.d == 0))
             allow = false;
-            
-        
-        //allowed so far ? 
+
+
+        //allowed so far ?
         if (allow)
         {
             //allow if exact match or if place is 0 in allow list
@@ -1036,7 +1018,7 @@ static bool isServerAddressAllowed(char *serverIp)
             }
         }
     }
-    
+
     return false;
 }
 
@@ -1048,7 +1030,7 @@ static int openConnectionToVncServer(const char *host, unsigned short port, char
     int s;
     struct sockaddr_in saddr;
     struct hostent *h;
-        
+
     h = gethostbyname(host);
     if (NULL == h) {
         debug(LEVEL_2, "openConnectionToVncServer(): can't resolve hostname: %s\n", host);
@@ -1056,15 +1038,15 @@ static int openConnectionToVncServer(const char *host, unsigned short port, char
     }
     saddr.sin_family = AF_INET;
     saddr.sin_port = htons(port);
-    
-    //Interesting;-) typecast / indirection thing copied from "Beej's Guide to network programming". 
+
+    //Interesting;-) typecast / indirection thing copied from "Beej's Guide to network programming".
     //See http://beej.us/guide/bgnet/ for more info
     saddr.sin_addr = *((struct in_addr *)h->h_addr);
 
     memset(&(saddr.sin_zero), '\0', 8); // zero the rest of the struct
-    
+
     strlcpy(serverIp, inet_ntoa(saddr.sin_addr), MAX_IP_LEN);
-    
+
     //Check server addresses against list of allowed addresses / ranges
     if (requireListedServer == 1) {
         if (!isServerAddressAllowed(serverIp)) {
@@ -1072,11 +1054,11 @@ static int openConnectionToVncServer(const char *host, unsigned short port, char
             return -1;
         }
     }
-    
+
     debug(LEVEL_3, "openConnectionToVncServer(): connecting to %s:%u\n", serverIp, port);
 
     s = socket(AF_INET, SOCK_STREAM, 0);
-    
+
     //Trying to connect with timeout
     if (connectWithTimeout(s, (struct sockaddr *) &saddr, sizeof(saddr), TIMEOUT_10SECS) != 0) {
         debug(LEVEL_2, "openConnectionToVncServer(): connectWithTimeout() failed.\n");
@@ -1096,12 +1078,12 @@ static int findDuplicateIdIndex(int connectionFrom, long code)
 {
     repeaterInfo *repInfo;
     int ii;
-    
+
     for(ii = 0; ii < maxSessions; ii++) {
         if (connectionFrom == CONNECTION_FROM_VIEWER)
-            repInfo = viewers[ii]; 
+            repInfo = viewers[ii];
         else
-            repInfo = servers[ii]; 
+            repInfo = servers[ii];
 
         if (repInfo -> code == code) {
             debug(LEVEL_2, "findDuplicateIdIndex(): similar %s ID already there\n",
@@ -1109,7 +1091,7 @@ static int findDuplicateIdIndex(int connectionFrom, long code)
             return ii;
         }
     }
-    
+
     debug(LEVEL_3, "findDuplicateIdIndex(): similar ID not found\n");
     return -1;
 }
@@ -1135,7 +1117,7 @@ static void forkRepeater(int serverSocket, int viewerSocket, long idCode)
         //Add necessary information of child to repeaterProcs list so we can
         //properly clean up after child has exited
         addRepeaterProcList(idCode, pid);
-        
+
         //Close (parents copies of) repeater sockets right away here,
         //so we don't need to close them in cleanUpAfterRepeaterProcExit()
         close(serverSocket);
@@ -1148,7 +1130,7 @@ static void forkRepeater(int serverSocket, int viewerSocket, long idCode)
 static bool isCodeInIdList(long code)
 {
     int ii;
-    
+
     for(ii = 0; ii < ID_LIST_SIZE; ii++) {
         if (code == idList[ii]) {
             debug(LEVEL_3, "isCodeInIdList(): ID code match found (%ld)\n", code);
@@ -1163,10 +1145,10 @@ static bool isCodeInIdList(long code)
 void readPeerHandShake(int socket, int index)
 {
     int len;
-    
+
     //Make sure handshake is null-terminated
     handShakes[index] -> handShake[MAX_HANDSHAKE_LEN-1] ='\0';
-    
+
     len = nonBlockingRead(socket, handShakes[index] -> handShake, MAX_HANDSHAKE_LEN - 1, TIMEOUT_5SECS);
     if (len < 0) {
        strlcpy(handShakes[index] -> handShake, "", MAX_HANDSHAKE_LEN);
@@ -1184,492 +1166,479 @@ void readPeerHandShake(int socket, int index)
 //Return -1 if error, accept():ed socket in normal case
 int nonBlockingAccept(int socket, struct sockaddr *sa, socklen_t *sockLen)
 {
-    long arg; 
+    long arg;
     int socketToReturn;
-    
-    //First, set socket non-blocking 
+
+    //First, set socket non-blocking
     arg = fcntl(socket, F_GETFL, NULL);
-    if (arg < 0) { 
-        debug(LEVEL_2, "nonBlockingAccept(): error in fcntl(..., F_GETFL) (%s)\n", strerror(errno)); 
-        return -1; 
-    } 
-    arg |= O_NONBLOCK; 
-    if (fcntl(socket, F_SETFL, arg) < 0) { 
-        debug(LEVEL_2, "nonBlockingAccept(): error in fcntl(..., F_SETFL) (%s)\n", strerror(errno)); 
-        return -1; 
-    }     
-    
-    //Accept connection 
+    if (arg < 0) {
+        debug(LEVEL_2, "nonBlockingAccept(): error in fcntl(..., F_GETFL) (%s)\n", strerror(errno));
+        return -1;
+    }
+    arg |= O_NONBLOCK;
+    if (fcntl(socket, F_SETFL, arg) < 0) {
+        debug(LEVEL_2, "nonBlockingAccept(): error in fcntl(..., F_SETFL) (%s)\n", strerror(errno));
+        return -1;
+    }
+
+    //Accept connection
     socketToReturn = accept(socket, sa, sockLen);
 
-    //Set to blocking mode again... 
-    if ((arg = fcntl(socket, F_GETFL, NULL)) < 0) { 
-        debug(LEVEL_2, "nonBlockingAccept(): Error fcntl(..., F_GETFL) (%s)\n", strerror(errno)); 
+    //Set to blocking mode again...
+    if ((arg = fcntl(socket, F_GETFL, NULL)) < 0) {
+        debug(LEVEL_2, "nonBlockingAccept(): Error fcntl(..., F_GETFL) (%s)\n", strerror(errno));
         if (socketToReturn != -1)
             close(socketToReturn);
-        return -1; 
-    } 
-    arg &= (~O_NONBLOCK); 
-    if (fcntl(socket, F_SETFL, arg) < 0) { 
-        debug(LEVEL_2, "nonBlockingAccept(): Error fcntl(..., F_SETFL) (%s)\n", strerror(errno)); 
+        return -1;
+    }
+    arg &= (~O_NONBLOCK);
+    if (fcntl(socket, F_SETFL, arg) < 0) {
+        debug(LEVEL_2, "nonBlockingAccept(): Error fcntl(..., F_SETFL) (%s)\n", strerror(errno));
         if (socketToReturn != -1)
             close(socketToReturn);
-        return -1; 
-    } 
+        return -1;
+    }
 
     //At last, we are ready to return accept():ed socket ;-)
     return socketToReturn;
 }
 
 
-//Accept connections from both servers and viewers 
-// connectionFrom == CONNECTIONFROMSERVER means server is connecting, 
+//Accept connections from both servers and viewers
+// connectionFrom == CONNECTIONFROMSERVER means server is connecting,
 // connectionFrom==CONNECTIONFROMVIEWER means viewer is connecting
 // Mode 1 connections are only accepted from viewers (repeater then connects to server)
 static void acceptConnection(int socket, int connectionFrom)
- {
-     rfbProtocolVersionMsg pv;
-     int connection;
-     char id[MAX_HOST_NAME_LEN + 1];
-     struct sockaddr_in client;
-     socklen_t sockLen;
-     char peerIp[MAX_IP_LEN];
-     int connMode;   //Connection mode: CONN_MODE1 or CONN_MODE2
-     std::vector<long> codes;
-     //These variables are used in Mode 1
-     char host[MAX_HOST_NAME_LEN+1];
-     char connMode1ServerIp[MAX_IP_LEN];
-     int port;
-     long code;
-     sockLen = sizeof(struct sockaddr_in);
+{
+    rfbProtocolVersionMsg pv;
+    int connection;
+    char id[MAX_HOST_NAME_LEN + 1];
+    long code;
+    struct sockaddr_in client;
+    socklen_t sockLen;
+    char peerIp[MAX_IP_LEN];
+    int connMode;   //Connection mode: CONN_MODE1 or CONN_MODE2
 
-     connection = nonBlockingAccept(socket, (struct sockaddr *) &client, &sockLen);
+    //These variables are used in Mode 1
+    char host[MAX_HOST_NAME_LEN+1];
+    char connMode1ServerIp[MAX_IP_LEN];
+    int port;
 
-     if (connection < 0)
-         debug(LEVEL_2, "acceptConnection(): accept() failed, errno=%d (%s)\n", errno, strerror(errno));
-     else {
-         strlcpy(peerIp, inet_ntoa(client.sin_addr), MAX_IP_LEN);
+    sockLen = sizeof(struct sockaddr_in);
 
-         debug(LEVEL_1, "acceptConnection(): connection accepted ok from ip: %s\n", peerIp);
+    connection = nonBlockingAccept(socket, (struct sockaddr *) &client, &sockLen);
 
-         if (connectionFrom == CONNECTION_FROM_VIEWER) {
-             //We handshake viewers by transmitting rfbProtocolVersion first
-             snprintf(pv, SIZE_RFBPROTOCOLVERSIONMSG+1, RFB_PROTOCOL_VERSION_FORMAT,
-                 RFB_PROTOCOL_MAJOR_VERSION, RFB_PROTOCOL_MINOR_VERSION);
+    if (connection < 0)
+        debug(LEVEL_2, "acceptConnection(): accept() failed, errno=%d (%s)\n", errno, strerror(errno));
+    else {
+        strlcpy(peerIp, inet_ntoa(client.sin_addr), MAX_IP_LEN);
 
-             debug(LEVEL_3, "acceptConnection(): pv = %s", pv);
+        debug(LEVEL_1, "acceptConnection(): connection accepted ok from ip: %s\n", peerIp);
 
-             if (writeExact(connection, pv, SIZE_RFBPROTOCOLVERSIONMSG, TIMEOUT_10SECS) < 0) {
-                 debug(LEVEL_2, "acceptConnection(): Writing protocol version error\n");
-                 close(connection);
-                 return;
-             }
-         }
+        if (connectionFrom == CONNECTION_FROM_VIEWER) {
+            //We handshake viewers by transmitting rfbProtocolVersion first
+            snprintf(pv, SIZE_RFBPROTOCOLVERSIONMSG+1, RFB_PROTOCOL_VERSION_FORMAT,
+                RFB_PROTOCOL_MAJOR_VERSION, RFB_PROTOCOL_MINOR_VERSION);
 
-         //Make sure that id is null-terminated
-         id[MAX_HOST_NAME_LEN] = '\0';
-         if (nonBlockingRead(connection, id, MAX_HOST_NAME_LEN, TIMEOUT_5SECS) < 0) {
-             debug(LEVEL_2, "acceptConnection(): Reading id error\n");
-             close(connection);
-             return;
-         }
+            debug(LEVEL_3, "acceptConnection(): pv = %s", pv);
 
-         //id can be of format:
-         //Normally in Mode 2:
-         //"ID:xxxxx", where xxxxx is some positive (non-zero) long integer number.
-         //
-         //Normally in Mode 1:
-         //"xx.yy.zz.nn::pppp" (Ip address, 2 colons, port number)
-         //"xx.yy.zz.nn:pppp" (Ip address, 1 colons, some number): This is a problematic case.
-         //It is interpreted in the following way (copied directly from original repeater):
-         //If pppp is < 100, it is a display number. If >= 100, it is a port number.
-         //"xx.yy.zz.nn" (Only Ip Address): Default port number RFB_PORT_OFFSET is used
-         //In mode 1, instead of ip address, also DNS hostname can be used in any combination with
-         //port / display number
+            if (writeExact(connection, pv, SIZE_RFBPROTOCOLVERSIONMSG, TIMEOUT_10SECS) < 0) {
+                debug(LEVEL_2, "acceptConnection(): Writing protocol version error\n");
+                close(connection);
+                return;
+            }
+        }
 
+        //Make sure that id is null-terminated
+        id[MAX_HOST_NAME_LEN] = '\0';
+        if (nonBlockingRead(connection, id, MAX_HOST_NAME_LEN, TIMEOUT_5SECS) < 0) {
+            debug(LEVEL_2, "acceptConnection(): Reading id error\n");
+            close(connection);
+            return;
+        }
 
+        //id can be of format:
+        //Normally in Mode 2:
+        //"ID:xxxxx", where xxxxx is some positive (non-zero) long integer number.
+        //
+        //Normally in Mode 1:
+        //"xx.yy.zz.nn::pppp" (Ip address, 2 colons, port number)
+        //"xx.yy.zz.nn:pppp" (Ip address, 1 colons, some number): This is a problematic case.
+        //It is interpreted in the following way (copied directly from original repeater):
+        //If pppp is < 100, it is a display number. If >= 100, it is a port number.
+        //"xx.yy.zz.nn" (Only Ip Address): Default port number RFB_PORT_OFFSET is used
+        //In mode 1, instead of ip address, also DNS hostname can be used in any combination with
+        //port / display number
+        if (checkIdCode(id)) {
+            if ((allowedModes & CONN_MODE2) > 0) {
+                connMode = CONN_MODE2;
 
-         if (checkIdCode(id)) {
-             if ((allowedModes & CONN_MODE2) > 0) {
-                 connMode = CONN_MODE2;
-                codes = parseIds(std::string(id));
-                     if (codes.empty()) {
-                         debug(LEVEL_2, "acceptConnection(): Invalid ID, closing connection\n");
-                         close(connection);
-                         return;
-                     }else if(codes.size() == 1){
-                     code = codes[0];
-                     }
-                for (long code : codes) {
-                     if (-1 == code) {
-                         debug(LEVEL_3, "acceptConnection(): parseId returned error, closing connection\n");
-                         close(connection);
-                         return;
-                     }
-                     debug(LEVEL_3, "acceptConnection():  %s sent code %ld \n",
-                         (connectionFrom == CONNECTION_FROM_VIEWER) ? "Viewer" : "Server", code);
+                //id is an IdCode string, parse it
+                code = parseId(id);
+                if (-1 == code) {
+                    debug(LEVEL_3, "acceptConnection(): parseId returned error, closing connection\n");
+                    close(connection);
+                    return;
+                }
+                debug(LEVEL_3, "acceptConnection():  %s sent code %ld \n",
+                    (connectionFrom == CONNECTION_FROM_VIEWER) ? "Viewer" : "Server", code);
 
-                     //Check that there isn't similar ID:xxxx string in use
-                     //If similar ID:xxxx is found, refuse new connection
-                     int index;
-                     index = findDuplicateIdIndex(connectionFrom, code);
-                     if (index != -1) {
-                         debug(LEVEL_2, "acceptConnection(): duplicate ID string found, closing connection\n");
-                         close(connection);
-                         return;
-                     }
+                //Check that there isn't similar ID:xxxx string in use
+                //If similar ID:xxxx is found, refuse new connection
+                int index;
+                index = findDuplicateIdIndex(connectionFrom, code);
+                if (index != -1) {
+                    debug(LEVEL_2, "acceptConnection(): duplicate ID string found, closing connection\n");
+                    close(connection);
+                    return;
+                }
 
-                     //If listed ID is required, check that ID matches one in list
-                     if (requireListedId) {
-                         if (!isCodeInIdList(code)) {
-                             debug(LEVEL_2,
-                                 "acceptConnection(): Id code does not match codes in list, closing connection\n", code);
-                             close(connection);
-                             return;
-                         }
-                     }
-                 }
-            } else {
-                 debug(LEVEL_2, "acceptConnection(): mode 2 connections are not allowed, closing connection\n");
-                 close(connection);
-                 return;
-             }
+                //If listed ID is required, check that ID matches one in list
+                if (requireListedId) {
+                    if (!isCodeInIdList(code)) {
+                        debug(LEVEL_2,
+                            "acceptConnection(): Id code does not match codes in list, closing connection\n", code);
+                        close(connection);
+                        return;
+                    }
+                }
+            }
+            else {
+                debug(LEVEL_2, "acceptConnection(): mode 2 connections are not allowed, closing connection\n");
+                close(connection);
+                return;
+            }
+        }
+        else {
+            if ((allowedModes & CONN_MODE1) > 0) {
+                connMode = CONN_MODE1;
 
-         }
-         else {
-             if ((allowedModes & CONN_MODE1) > 0) {
-                 connMode = CONN_MODE1;
+                //id is an [hostname / ip address] / [port number / display number] combination of some sort, parse it
+                if (false == parseHostAndPort(id, host, MAX_HOST_NAME_LEN + 1, &port)) {
+                    debug(LEVEL_2, "acceptConnection(): parseHostAndPort returned error\n");
+                    close(connection);
+                    return;
+                }
 
-                 //id is an [hostname / ip address] / [port number / display number] combination of some sort, parse it
-                 if (false == parseHostAndPort(id, host, MAX_HOST_NAME_LEN + 1, &port)) {
-                     debug(LEVEL_2, "acceptConnection(): parseHostAndPort returned error\n");
-                     close(connection);
-                     return;
-                 }
+                //check server port if not all allowed
+                if (allowedMode1ServerPort != 0) {
+                    if (port != allowedMode1ServerPort) {
+                        debug(LEVEL_2, "acceptConnection(): connection to server port %d is not allowed,"
+                            " closing connection\n", port);
+                        close(connection);
+                        return;
+                    }
+                }
+            }
+            else {
+                debug(LEVEL_2, "acceptConnection(): mode 1 connections are not allowed, closing connection\n");
+                close(connection);
+                return;
+            }
+        }
 
-                 //check server port if not all allowed
-                 if (allowedMode1ServerPort != 0) {
-                     if (port != allowedMode1ServerPort) {
-                         debug(LEVEL_2, "acceptConnection(): connection to server port %d is not allowed,"
-                             " closing connection\n", port);
-                         close(connection);
-                         return;
-                     }
-                 }
-             }
-             else {
-                 debug(LEVEL_2, "acceptConnection(): mode 1 connections are not allowed, closing connection\n");
-                 close(connection);
-                 return;
-             }
-         }
+        if (connMode == CONN_MODE1) {
+            if (connectionFrom == CONNECTION_FROM_VIEWER) {
+                int server;
 
-         if (connMode == CONN_MODE1) {
-             if (connectionFrom == CONNECTION_FROM_VIEWER) {
-                 int server;
+                server = openConnectionToVncServer(host, (unsigned short) port, connMode1ServerIp);
+                if (server == -1) {
+                    debug(LEVEL_2, "acceptConnection(): openConnectionToVncServer() failed\n");
+                    close(connection);
+                    return;
+                }
+                else {
+                    bool fServerOk ;
+                    bool fViewerOk;
+                    int viewerInd;
+                    int serverInd;
 
-                 server = openConnectionToVncServer(host, (unsigned short) port, connMode1ServerIp);
-                 if (server == -1) {
-                     debug(LEVEL_2, "acceptConnection(): openConnectionToVncServer() failed\n");
-                     close(connection);
-                     return;
-                 }
-                 else {
-                     bool fServerOk ;
-                     bool fViewerOk;
-                     int viewerInd;
-                     int serverInd;
+                    fServerOk = true;
+                    fViewerOk = true;
 
-                     fServerOk = true;
-                     fViewerOk = true;
+                    //Invent new unique connection code
+                    //Minus-side numbers are used for Mode1 sessions
+                    mode1ConnCode--;
+                    if (mode1ConnCode < MIN_INVENTED_CONN_CODE)
+                        mode1ConnCode = -1;
 
-                     //Invent new unique connection code
-                     //Minus-side numbers are used for Mode1 sessions
-                     mode1ConnCode--;
-                     if (mode1ConnCode < MIN_INVENTED_CONN_CODE)
-                         mode1ConnCode = -1;
+                    //Add new viewer
+                    viewerInd = addViewerList(connection, mode1ConnCode, peerIp);
+                    if (-1 != viewerInd) {
+                        setViewerActive(mode1ConnCode);
+                    }
+                    else
+                        fViewerOk = false;  //Out of slots in viewer table
 
-                     //Add new viewer
-                     viewerInd = addViewerList(connection, mode1ConnCode, peerIp);
-                     if (-1 != viewerInd) {
-                         setViewerActive(mode1ConnCode);
-                     }
-                     else
-                         fViewerOk = false;  //Out of slots in viewer table
+                    //Add new server
+                    serverInd = addServerList(server, mode1ConnCode, connMode1ServerIp);
+                    if (-1 != serverInd) {
+                        setServerActive(mode1ConnCode);
+                    }
+                    else
+                        fServerOk = false;  //Out of slots in server table
 
-                     //Add new server
-                     serverInd = addServerList(server, mode1ConnCode, connMode1ServerIp);
-                     if (-1 != serverInd) {
-                         setServerActive(mode1ConnCode);
-                     }
-                     else
-                         fServerOk = false;  //Out of slots in server table
+                    if ((fServerOk) && (fViewerOk)) {
+                        //fork repeater
+                        forkRepeater(server, connection, mode1ConnCode);
 
-                     if ((fServerOk) && (fViewerOk)) {
-                         //fork repeater
-                         forkRepeater(server, connection, mode1ConnCode);
+                        //Send appropriate events to event interface
+                        //Here we post 3 events:
+                        //VIEWER_CONNECT, SERVER_CONNECT, VIEWER_SERVER_SESSION_START
+                        if (useEventInterface) {
+                            repeaterEvent event;
+                            connectionEvent connEv;
+                            sessionEvent sessEv;
+                            addrParts serverIp;
+                            addrParts viewerIp;
 
-                         //Send appropriate events to event interface
-                         //Here we post 3 events:
-                         //VIEWER_CONNECT, SERVER_CONNECT, VIEWER_SERVER_SESSION_START
-                         if (useEventInterface) {
-                             repeaterEvent event;
-                             connectionEvent connEv;
-                             sessionEvent sessEv;
-                             addrParts serverIp;
-                             addrParts viewerIp;
+                            //Addresses in compact binary form
+                            viewerIp = getAddrPartsFromString(peerIp);
+                            serverIp = getAddrPartsFromString(connMode1ServerIp);
 
-                             //Addresses in compact binary form
-                             viewerIp = getAddrPartsFromString(peerIp);
-                             serverIp = getAddrPartsFromString(connMode1ServerIp);
+                            //VIEWER_CONNECT
+                            event.eventNum = VIEWER_CONNECT;
+                            event.timeStamp = time(NULL);
+                            event.repeaterProcessId = getpid();
 
-                             //VIEWER_CONNECT
-                             event.eventNum = VIEWER_CONNECT;
-                             event.timeStamp = time(NULL);
-                             event.repeaterProcessId = getpid();
-
-                             connEv.tableIndex = viewerInd;
-                             connEv.code = mode1ConnCode;
-                             connEv.connMode = CONN_MODE1;
-                             connEv.peerIp = viewerIp;
-                             memcpy(event.extraInfo, &connEv, sizeof(connectionEvent));
-                             if (false == sendRepeaterEvent(event)) {
-                                 debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
-                             }
-
-                             //SERVER_CONNECT
-                             event.eventNum = SERVER_CONNECT;
-                             event.timeStamp = time(NULL);
-                             event.repeaterProcessId = getpid();
-
-                             connEv.tableIndex = serverInd;
-                             connEv.code = mode1ConnCode;
-                             connEv.connMode = CONN_MODE1;
-                             connEv.peerIp = serverIp;
-                             memcpy(event.extraInfo, &connEv, sizeof(connectionEvent));
-                             if (false == sendRepeaterEvent(event)) {
-                                 debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
-                             }
-
-                             //VIEWER_SERVER_SESSION_START
-                             event.eventNum = VIEWER_SERVER_SESSION_START;
-                             event.timeStamp = time(NULL);
-                             event.repeaterProcessId = getpid();
-
-                             sessEv.serverTableIndex = serverInd;
-                             sessEv.viewerTableIndex = viewerInd;
-                             sessEv.code = mode1ConnCode;
-                             sessEv.connMode = CONN_MODE1;
-                             sessEv.serverIp = serverIp;
-                             sessEv.viewerIp = viewerIp;
-                             memcpy(event.extraInfo, &sessEv, sizeof(sessionEvent));
-                             if (false == sendRepeaterEvent(event)) {
-                                 debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
-                             }
-                         }
-                     }
-                     else {
-                         //we have run out of slots in server or viewer table, refuse new connection
-                         if (!fServerOk) {
-                             debug(LEVEL_3, "acceptConnection(): Mode1: out of slots in server table, closing connection\n");
-                             close(server);
-                         }
-
-                         if (!fViewerOk) {
-                             debug(LEVEL_3, "acceptConnection(): Mode1: out of slots in viewer table, closing connection\n");
-                             close(connection);
-                         }
-
-                         return;
-                     }
-                 }
-             }
-             else {
-                 debug(LEVEL_3, "acceptConnection():  Mode 1 connections only allowed from viewers, closing connection\n");
-                 close(connection);
-                 return;
-             }
-         }
-         else if (connMode == CONN_MODE2) {
-             if (connectionFrom == CONNECTION_FROM_VIEWER) {
-                 int serverInd;
-                 int viewerInd;
-
-                 viewerInd = addViewerList(connection, code, peerIp);
-                 if (-1 != viewerInd) {
-                     //Send VIEWER_CONNECT to event interface
-                     if (useEventInterface) {
-                         repeaterEvent event;
-                         connectionEvent connEv;
-                         addrParts viewerIp;
-
-                         //Address in compact binary form
-                         viewerIp = getAddrPartsFromString(peerIp);
-
-                         //VIEWER_CONNECT
-                         event.eventNum = VIEWER_CONNECT;
-                         event.timeStamp = time(NULL);
-                         event.repeaterProcessId = getpid();
-
-                         connEv.tableIndex = viewerInd;
-                         connEv.code = code;
-                         connEv.connMode = CONN_MODE2;
-                         connEv.peerIp = viewerIp;
-                         memcpy(event.extraInfo, &connEv, sizeof(connectionEvent));
-                         if (false == sendRepeaterEvent(event)) {
-                             debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
-                         }
-                     }
-
-                     //New viewer, find respective server
-                     serverInd = findServerList(code);
-                     if (serverInd != UNKNOWN_REPINFO_IND) {
-                         int server;
-
-                         //found respective server, activate viewer and server
-                         setViewerActive(code);
-                         setServerActive(code);
-
-                         server = servers[serverInd] -> socket;
-
-                         //kickstart viewer using handshake received previously (if any) from server
-                         if (handShakes[serverInd] -> handShakeLength > 0)
-                             writeExact(connection, handShakes[serverInd] -> handShake,
-                                 handShakes[serverInd] -> handShakeLength, TIMEOUT_5SECS);
-
-                         //fork repeater
-                         forkRepeater(server, connection, code);
-
-                         //Send VIEWER_SERVER_SESSION_START to event interface
-                         if (useEventInterface) {
-                             repeaterEvent event;
-                             sessionEvent sessEv;
-
-                             //VIEWER_SERVER_SESSION_START
-                             event.eventNum = VIEWER_SERVER_SESSION_START;
-                             event.timeStamp = time(NULL);
-                             event.repeaterProcessId = getpid();
-
-                             sessEv.serverTableIndex = serverInd;
-                             sessEv.viewerTableIndex = viewerInd;
-                             sessEv.code = code;
-                             sessEv.connMode = CONN_MODE2;
-                             sessEv.serverIp = servers[serverInd] -> peerIp;
-                             sessEv.viewerIp = viewers[viewerInd] -> peerIp;
-                             memcpy(event.extraInfo, &sessEv, sizeof(sessionEvent));
-                             if (false == sendRepeaterEvent(event)) {
-                                 debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
-                             }
-                         }
-                     }
-                     else {
-                         debug(LEVEL_3, "acceptConnection(): respective server has not connected yet\n");
-                     }
-                 }
-                 else {
-                     //we have run out of slots in viewer table, refuse new connection
-                     debug(LEVEL_3, "acceptConnection(): Mode 2: out of slots in viewer table, closing connection\n");
-                     close(connection);
-                     return;
-                 }
-             }
-             else {
-                 int viewerInd;
-                    for (long code : codes) {
-                         int serverInd;
-
-                         //Add server to tables, initialize handshake to nil
-                         serverInd = addServerList(connection, code, peerIp);
-                         if (serverInd != -1) {
-                             handShakes[serverInd] -> handShakeLength = 0;
-
-                             //Send SERVER_CONNECT to event interface
-                             if (useEventInterface) {
-                                 repeaterEvent event;
-                                 connectionEvent connEv;
-
-                                 //SERVER_CONNECT
-                                 event.eventNum = SERVER_CONNECT;
-                                 event.timeStamp = time(NULL);
-                                 event.repeaterProcessId = getpid();
-
-                                 connEv.tableIndex = serverInd;
-                                 connEv.code = code;
-                                 connEv.connMode = CONN_MODE2;
-                                 connEv.peerIp = servers[serverInd] -> peerIp;
-                                 memcpy(event.extraInfo, &connEv, sizeof(connectionEvent));
-                                 if (false == sendRepeaterEvent(event)) {
-                                     debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
-                                 }
-                             }
+                            connEv.tableIndex = viewerInd;
+                            connEv.code = mode1ConnCode;
+                            connEv.connMode = CONN_MODE1;
+                            connEv.peerIp = viewerIp;
+                            memcpy(event.extraInfo, &connEv, sizeof(connectionEvent));
+                            if (false == sendRepeaterEvent(event)) {
+                                debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
                             }
-                       }
-                     //New server, find respective viewer
-                     viewerInd = findViewerList(code);
-                     if (viewerInd != UNKNOWN_REPINFO_IND) {
-                         int viewer;
 
-                         //found respective viewer, activate server and viewer
-                         setServerActive(code);
-                         setViewerActive(code);
+                            //SERVER_CONNECT
+                            event.eventNum = SERVER_CONNECT;
+                            event.timeStamp = time(NULL);
+                            event.repeaterProcessId = getpid();
 
-                         viewer = viewers[viewerInd] -> socket;
+                            connEv.tableIndex = serverInd;
+                            connEv.code = mode1ConnCode;
+                            connEv.connMode = CONN_MODE1;
+                            connEv.peerIp = serverIp;
+                            memcpy(event.extraInfo, &connEv, sizeof(connectionEvent));
+                            if (false == sendRepeaterEvent(event)) {
+                                debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
+                            }
 
-                         //fork repeater
-                         forkRepeater(connection, viewer, code);
+                            //VIEWER_SERVER_SESSION_START
+                            event.eventNum = VIEWER_SERVER_SESSION_START;
+                            event.timeStamp = time(NULL);
+                            event.repeaterProcessId = getpid();
 
-                         //Send VIEWER_SERVER_SESSION_START to event interface
-                         if (useEventInterface) {
-                             repeaterEvent event;
-                             sessionEvent sessEv;
+                            sessEv.serverTableIndex = serverInd;
+                            sessEv.viewerTableIndex = viewerInd;
+                            sessEv.code = mode1ConnCode;
+                            sessEv.connMode = CONN_MODE1;
+                            sessEv.serverIp = serverIp;
+                            sessEv.viewerIp = viewerIp;
+                            memcpy(event.extraInfo, &sessEv, sizeof(sessionEvent));
+                            if (false == sendRepeaterEvent(event)) {
+                                debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
+                            }
+                        }
+                    }
+                    else {
+                        //we have run out of slots in server or viewer table, refuse new connection
+                        if (!fServerOk) {
+                            debug(LEVEL_3, "acceptConnection(): Mode1: out of slots in server table, closing connection\n");
+                            close(server);
+                        }
 
-                             //VIEWER_SERVER_SESSION_START
-                             event.eventNum = VIEWER_SERVER_SESSION_START;
-                             event.timeStamp = time(NULL);
-                             event.repeaterProcessId = getpid();
+                        if (!fViewerOk) {
+                            debug(LEVEL_3, "acceptConnection(): Mode1: out of slots in viewer table, closing connection\n");
+                            close(connection);
+                        }
 
-                             sessEv.serverTableIndex = serverInd;
-                             sessEv.viewerTableIndex = viewerInd;
-                             sessEv.code = code;
-                             sessEv.connMode = CONN_MODE2;
-                             sessEv.serverIp = servers[serverInd] -> peerIp;
-                             sessEv.viewerIp = viewers[viewerInd] -> peerIp;
-                             memcpy(event.extraInfo, &sessEv, sizeof(sessionEvent));
-                             if (false == sendRepeaterEvent(event)) {
-                                 debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
-                             }
-                         }
-                     }
-                     else {
-                         debug(LEVEL_3, "acceptConnection(): respective viewer has not connected yet\n");
+                        return;
+                    }
+                }
+            }
+            else {
+                debug(LEVEL_3, "acceptConnection():  Mode 1 connections only allowed from viewers, closing connection\n");
+                close(connection);
+                return;
+            }
+        }
+        else if (connMode == CONN_MODE2) {
+            if (connectionFrom == CONNECTION_FROM_VIEWER) {
+                int serverInd;
+                int viewerInd;
 
-                         //Read servers' handshake string to buffer, for use when respective
-                         //viewer later connects and needs a kickstart
-                         if (serverInd != -1) {
-                             readPeerHandShake(connection, serverInd);
-                         }
-                     }
-                 }
-                 else {
-                     //we have run out of slots in server table, refuse new connection
-                     debug(LEVEL_3, "acceptConnection(): Mode 2: out of slots in server table, closing connection\n");
-                     close(connection);
-                     return;
-                 }
+                viewerInd = addViewerList(connection, code, peerIp);
+                if (-1 != viewerInd) {
+                    //Send VIEWER_CONNECT to event interface
+                    if (useEventInterface) {
+                        repeaterEvent event;
+                        connectionEvent connEv;
+                        addrParts viewerIp;
 
-             }
-           }
-         }
+                        //Address in compact binary form
+                        viewerIp = getAddrPartsFromString(peerIp);
 
+                        //VIEWER_CONNECT
+                        event.eventNum = VIEWER_CONNECT;
+                        event.timeStamp = time(NULL);
+                        event.repeaterProcessId = getpid();
 
+                        connEv.tableIndex = viewerInd;
+                        connEv.code = code;
+                        connEv.connMode = CONN_MODE2;
+                        connEv.peerIp = viewerIp;
+                        memcpy(event.extraInfo, &connEv, sizeof(connectionEvent));
+                        if (false == sendRepeaterEvent(event)) {
+                            debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
+                        }
+                    }
 
-//Initialize listening on port. 
+                    //New viewer, find respective server
+                    serverInd = findServerList(code);
+                    if (serverInd != UNKNOWN_REPINFO_IND) {
+                        int server;
+
+                        //found respective server, activate viewer and server
+                        setViewerActive(code);
+                        setServerActive(code);
+
+                        server = servers[serverInd] -> socket;
+
+                        //kickstart viewer using handshake received previously (if any) from server
+                        if (handShakes[serverInd] -> handShakeLength > 0)
+                            writeExact(connection, handShakes[serverInd] -> handShake,
+                                handShakes[serverInd] -> handShakeLength, TIMEOUT_5SECS);
+
+                        //fork repeater
+                        forkRepeater(server, connection, code);
+
+                        //Send VIEWER_SERVER_SESSION_START to event interface
+                        if (useEventInterface) {
+                            repeaterEvent event;
+                            sessionEvent sessEv;
+
+                            //VIEWER_SERVER_SESSION_START
+                            event.eventNum = VIEWER_SERVER_SESSION_START;
+                            event.timeStamp = time(NULL);
+                            event.repeaterProcessId = getpid();
+
+                            sessEv.serverTableIndex = serverInd;
+                            sessEv.viewerTableIndex = viewerInd;
+                            sessEv.code = code;
+                            sessEv.connMode = CONN_MODE2;
+                            sessEv.serverIp = servers[serverInd] -> peerIp;
+                            sessEv.viewerIp = viewers[viewerInd] -> peerIp;
+                            memcpy(event.extraInfo, &sessEv, sizeof(sessionEvent));
+                            if (false == sendRepeaterEvent(event)) {
+                                debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
+                            }
+                        }
+                    }
+                    else {
+                        debug(LEVEL_3, "acceptConnection(): respective server has not connected yet\n");
+                    }
+                }
+                else {
+                    //we have run out of slots in viewer table, refuse new connection
+                    debug(LEVEL_3, "acceptConnection(): Mode 2: out of slots in viewer table, closing connection\n");
+                    close(connection);
+                    return;
+                }
+            }
+            else {
+                int viewerInd;
+                int serverInd;
+
+                //Add server to tables, initialize handshake to nil
+                serverInd = addServerList(connection, code, peerIp);
+                if (serverInd != -1) {
+                    handShakes[serverInd] -> handShakeLength = 0;
+
+                    //Send SERVER_CONNECT to event interface
+                    if (useEventInterface) {
+                        repeaterEvent event;
+                        connectionEvent connEv;
+
+                        //SERVER_CONNECT
+                        event.eventNum = SERVER_CONNECT;
+                        event.timeStamp = time(NULL);
+                        event.repeaterProcessId = getpid();
+
+                        connEv.tableIndex = serverInd;
+                        connEv.code = code;
+                        connEv.connMode = CONN_MODE2;
+                        connEv.peerIp = servers[serverInd] -> peerIp;
+                        memcpy(event.extraInfo, &connEv, sizeof(connectionEvent));
+                        if (false == sendRepeaterEvent(event)) {
+                            debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
+                        }
+                    }
+
+                    //New server, find respective viewer
+                    viewerInd = findViewerList(code);
+                    if (viewerInd != UNKNOWN_REPINFO_IND) {
+                        int viewer;
+
+                        //found respective viewer, activate server and viewer
+                        setServerActive(code);
+                        setViewerActive(code);
+
+                        viewer = viewers[viewerInd] -> socket;
+
+                        //fork repeater
+                        forkRepeater(connection, viewer, code);
+
+                        //Send VIEWER_SERVER_SESSION_START to event interface
+                        if (useEventInterface) {
+                            repeaterEvent event;
+                            sessionEvent sessEv;
+
+                            //VIEWER_SERVER_SESSION_START
+                            event.eventNum = VIEWER_SERVER_SESSION_START;
+                            event.timeStamp = time(NULL);
+                            event.repeaterProcessId = getpid();
+
+                            sessEv.serverTableIndex = serverInd;
+                            sessEv.viewerTableIndex = viewerInd;
+                            sessEv.code = code;
+                            sessEv.connMode = CONN_MODE2;
+                            sessEv.serverIp = servers[serverInd] -> peerIp;
+                            sessEv.viewerIp = viewers[viewerInd] -> peerIp;
+                            memcpy(event.extraInfo, &sessEv, sizeof(sessionEvent));
+                            if (false == sendRepeaterEvent(event)) {
+                                debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
+                            }
+                        }
+                    }
+                    else {
+                        debug(LEVEL_3, "acceptConnection(): respective viewer has not connected yet\n");
+
+                        //Read servers' handshake string to buffer, for use when respective
+                        //viewer later connects and needs a kickstart
+                        if (serverInd != -1) {
+                            readPeerHandShake(connection, serverInd);
+                        }
+                    }
+                }
+                else {
+                    //we have run out of slots in server table, refuse new connection
+                    debug(LEVEL_3, "acceptConnection(): Mode 2: out of slots in server table, closing connection\n");
+                    close(connection);
+                    return;
+                }
+            }
+        }
+    }
+}
+
+//Initialize listening on port.
 //Listening itself happens on function routeConnections
 static void startListeningOnPort(listenPortInfo * pInfo)
 {
     int yes = 1;
     struct sockaddr_in name;
-    
+
     pInfo->socket = socket(PF_INET, SOCK_STREAM, 0);
 
     if (pInfo->socket < 0)
@@ -1689,7 +1658,7 @@ static void startListeningOnPort(listenPortInfo * pInfo)
     name.sin_addr.s_addr = inet_addr(ownIpAddress);
 
     if (bind(pInfo->socket, (struct sockaddr *) &name, sizeof(name)) < 0)
-        fatal("startListeningOnPort(): bind() to (ip: %s, port: %d) failed, errno=%d (%s)\n", 
+        fatal("startListeningOnPort(): bind() to (ip: %s, port: %d) failed, errno=%d (%s)\n",
             ownIpAddress, pInfo -> port, errno, strerror(errno));
     else
         debug(LEVEL_3, "startListeningOnPort(): bind() to (ip: %s, port: %d) succeeded\n", ownIpAddress, pInfo->port);
@@ -1707,8 +1676,8 @@ static int myMax(int valA, int valB)
     return (valA > valB) ? valA : valB;
 }
 
-//Listen for new connections on both server and viewer ports, 
-//call acceptConnection() to accept them. 
+//Listen for new connections on both server and viewer ports,
+//call acceptConnection() to accept them.
 //Periodically also remove old inactive (or broken) connections by calling removeOldOrBrokenConnections()
 //Periodically call updateServerViewerInfo() to check changes in servers[]/viewers[] tables
 static void routeConnections(int viewerSocket, int serverSocket)
@@ -1723,7 +1692,7 @@ static void routeConnections(int viewerSocket, int serverSocket)
     const int CLEANUP_SECONDS=5;
     const int HEARTBEAT_SECONDS=90;
     startEndEvent seEv;
-        
+
     seconds = 0;
     heartBeatSeconds = 0;
     numfds = myMax(viewerSocket, serverSocket) + 1;
@@ -1731,16 +1700,16 @@ static void routeConnections(int viewerSocket, int serverSocket)
     debug(LEVEL_0, "routeConnections(): starting select() loop, terminate with ctrl+c\n");
     while (stopped == false) {
         FD_ZERO(&readfds);
-        
+
         if (viewerSocket != -1)
             FD_SET(viewerSocket, &readfds);
-            
+
         if (serverSocket != -1)
             FD_SET(serverSocket, &readfds);
 
         tv.tv_sec = SELECT_WAIT_SECONDS;
         tv.tv_usec = 0;
-        
+
         select_ok = true;
         if (-1 == select(numfds, &readfds, NULL, NULL, &tv)) {
             select_ok = false;
@@ -1772,7 +1741,7 @@ static void routeConnections(int viewerSocket, int serverSocket)
                 seconds = 0;
                 removeOldOrBrokenConnections();
             }
-            
+
             //Send REPEATER_HEATBEAT to event interface every 90 seconds
             heartBeatSeconds += SELECT_WAIT_SECONDS;
             if (heartBeatSeconds >= HEARTBEAT_SECONDS) {
@@ -1781,19 +1750,19 @@ static void routeConnections(int viewerSocket, int serverSocket)
                     event.eventNum = REPEATER_HEARTBEAT;
                     event.timeStamp = time(NULL);
                     event.repeaterProcessId = getpid();
-     
+
                     seEv.maxSessions = maxSessions;
                     memcpy(event.extraInfo, &seEv, sizeof(startEndEvent));
-                    
+
                     if (false == sendRepeaterEvent(event)) {
                         debug(LEVEL_1, "routeConnections(): Warning, event fifo is full\n");
                     }
                 }
             }
-        
+
             //Clean up after children (Repeaterprocs that have exited)
             cleanUpAfterRepeaterProcs();
-            
+
             //Handle event interface posting & cleanup
             handleRepeaterEvents();
         }
@@ -1801,38 +1770,38 @@ static void routeConnections(int viewerSocket, int serverSocket)
 }
 
 
-//After doRepeater process has exited, this function reads exit code/pid and clears 
+//After doRepeater process has exited, this function reads exit code/pid and clears
 //servers[], viewers[] and repeaterProcs[] tables accordingly
 static void cleanUpAfterRepeaterProcExit(int exitCode, pid_t pid) {
     long code;
     int index;
     int serverInd;
     int viewerInd;
-    
+
     debug(LEVEL_3, "cleanUpAfterRepeaterProcExit(): exitCode=%d, pid=%d\n", exitCode, pid);
     index = findRepeaterProcList(pid);
     if (index != UNKNOWN_REPINFO_IND) {
         code = repeaterProcs[index] -> code;
         serverInd = findServerList(code);
         viewerInd = findViewerList(code);
-        
+
         if ((serverInd != UNKNOWN_REPINFO_IND) && (viewerInd != UNKNOWN_REPINFO_IND)) {
             //Remove repeaterproc from list
             removeRepeaterProcList(pid);
-            
-            debug(LEVEL_3, "cleanUpAfterRepeaterProcExit(): code=%ld, serverInd=%d, viewerInd=%d\n", 
+
+            debug(LEVEL_3, "cleanUpAfterRepeaterProcExit(): code=%ld, serverInd=%d, viewerInd=%d\n",
                 code, serverInd, viewerInd);
-        
+
             //Send VIEWER_SERVER_SESSION_END to event interface
             if (useEventInterface) {
                 repeaterEvent event;
                 sessionEvent sessEv;
-                            
+
                 //VIEWER_SERVER_SESSION_END
                 event.eventNum = VIEWER_SERVER_SESSION_END;
                 event.timeStamp = time(NULL);
                 event.repeaterProcessId = getpid();
-                
+
                 sessEv.serverTableIndex = serverInd;
                 sessEv.viewerTableIndex = viewerInd;
                 sessEv.code = code;
@@ -1844,19 +1813,19 @@ static void cleanUpAfterRepeaterProcExit(int exitCode, pid_t pid) {
                     debug(LEVEL_1, "cleanUpAfterRepeaterProcExit(): Warning, event fifo is full\n");
                 }
             }
-        
+
             switch(exitCode) {
                 case 1:
                     //Error in select(), fall through
                 case 2:
                     //Server has disconnected, fall through
-                case 3:                
+                case 3:
                     //Viewer has disconnected, fall through
-                case 4:                
+                case 4:
                     //Error when reading from viewer, fall through
                 case 5:
                     //Error when reading from server
-                    debug(LEVEL_1, "cleanUpAfterRepeaterProcExit(): closing connection (server=%d, viewer=%d)\n", 
+                    debug(LEVEL_1, "cleanUpAfterRepeaterProcExit(): closing connection (server=%d, viewer=%d)\n",
                         servers[serverInd] -> socket, viewers[viewerInd] -> socket);
                     removeServerList(code);
                     removeViewerList(code);
@@ -1867,29 +1836,29 @@ static void cleanUpAfterRepeaterProcExit(int exitCode, pid_t pid) {
             }
         }
         else {
-            debug(LEVEL_2, "cleanUpAfterRepeaterProcExit(): illegal viewerInd = %d or serverInd =%d\n", 
+            debug(LEVEL_2, "cleanUpAfterRepeaterProcExit(): illegal viewerInd = %d or serverInd =%d\n",
                 viewerInd, serverInd);
-        }        
+        }
     }
     else {
         debug(LEVEL_2, "cleanUpAfterRepeaterProcExit(): proc not found\n");
     }
 }
-        
+
 //Check each possible children and clean up after they have exited
 static void cleanUpAfterRepeaterProcs(void)
 {
     int status;
     pid_t pid;
     int i;
-    
+
     for(i = 0; i < maxSessions; i++) {
         if (repeaterProcs[i] -> code != 0) {
             pid = waitpid(repeaterProcs[i] -> pid, &status, WNOHANG);
             if (pid > 0) {
                 cleanUpAfterRepeaterProcExit(WEXITSTATUS(status), pid);
             }
-        } 
+        }
     }
 }
 
@@ -1904,28 +1873,28 @@ static void handleSigInt(int s)
 static void listInitializationValues(void)
 {
     int ii;
-    
+
     debug(LEVEL_2, "listInitializationValues(): viewerPort : %d\n", viewerPort);
     debug(LEVEL_2, "listInitializationValues(): serverPort : %d\n", serverPort);
     debug(LEVEL_2, "listInitializationValues(): maxSessions: %d\n", maxSessions);
     debug(LEVEL_2, "listInitializationValues(): loggingLevel: %d\n", loggingLevel);
     debug(LEVEL_2, "listInitializationValues(): ownIpAddress (0.0.0.0 = listen all interfaces) : %s\n", ownIpAddress);
     debug(LEVEL_2, "listInitializationValues(): runAsUser (if started as root) : %s\n", runAsUser);
-    
-    debug(LEVEL_2, "listInitializationValues(): Mode 1 connections allowed : %s\n", 
+
+    debug(LEVEL_2, "listInitializationValues(): Mode 1 connections allowed : %s\n",
         ((allowedModes & CONN_MODE1) > 0) ? "Yes" : "No");
-    debug(LEVEL_2, "listInitializationValues(): Mode 2 connections allowed : %s\n", 
+    debug(LEVEL_2, "listInitializationValues(): Mode 2 connections allowed : %s\n",
         ((allowedModes & CONN_MODE2) > 0) ? "Yes" : "No");
 
     debug(LEVEL_2, "listInitializationValues(): Mode 1 allowed server port (0=All) : %d\n", allowedMode1ServerPort);
-    debug(LEVEL_2, "listInitializationValues(): Mode 1 requires listed addresses : %s\n", 
+    debug(LEVEL_2, "listInitializationValues(): Mode 1 requires listed addresses : %s\n",
         (requireListedServer == 1) ? "Yes" : "No");
     if (requireListedServer == 1) {
         //Allow list
         if (LEVEL_2 <= loggingLevel) {
             debug(LEVEL_2, "listInitializationValues(): Mode 1 allowed servers/networks (255=Not allowed):");
             for(ii = 0; ii < SERVERS_LIST_SIZE; ii++) {
-                fprintf(stderr, " %d.%d.%d.%d", srvListAllow[ii].a, srvListAllow[ii].b, 
+                fprintf(stderr, " %d.%d.%d.%d", srvListAllow[ii].a, srvListAllow[ii].b,
                     srvListAllow[ii].c, srvListAllow[ii].d);
             }
             fprintf(stderr, "\n");
@@ -1943,11 +1912,11 @@ static void listInitializationValues(void)
 
     debug(LEVEL_2, "listInitializationValues(): Mode 2 requires listed ID numbers : %s\n",
         (requireListedId == 1) ? "Yes" : "No");
-    
+
     if (requireListedId == 1) {
         if (LEVEL_2 <= loggingLevel) {
             debug(LEVEL_2, "listInitializationValues(): Mode 2 allowed ID list (0=Not allowed):");
-        
+
             for(ii = 0; ii < ID_LIST_SIZE; ii++) {
                 fprintf(stderr, " %d", idList[ii]);
             }
@@ -1955,38 +1924,38 @@ static void listInitializationValues(void)
         }
     }
 
-    debug(LEVEL_2, "listInitializationValues(): useEventInterface: %s\n", 
+    debug(LEVEL_2, "listInitializationValues(): useEventInterface: %s\n",
     	(useEventInterface) ? "true" : "false");
-    
+
     debug(LEVEL_2, "listInitializationValues(): eventListenerHost : %s\n", eventListenerHost);
-    
+
     debug(LEVEL_2, "listInitializationValues(): eventListenerPort : %d\n", eventListenerPort);
-    
-    debug(LEVEL_2, "listInitializationValues(): useHttpForEventListener : %s\n", 
+
+    debug(LEVEL_2, "listInitializationValues(): useHttpForEventListener : %s\n",
     	(useHttpForEventListener) ? "true" : "false");
 }
 
 //After bind() we drop to mere mortal privileges (in case we started as root)
-//to limit damages in case of security flaws in this program  
+//to limit damages in case of security flaws in this program
 //In case of error, calls fatal() which sets up a clean exit from program
 static void dropRootPrivileges()
 {
     struct passwd *pw;
-    
+
     pw = getpwnam(runAsUser);
 
     if (pw != NULL) {
         if (0 != setgid(pw -> pw_gid)) {
-            fatal("dropRootPrivileges(): setgid() failed\n");    
+            fatal("dropRootPrivileges(): setgid() failed\n");
         }
 
         if (0 != setuid(pw -> pw_uid)) {
-            fatal("dropRootPrivileges(): setuid() failed\n");    
+            fatal("dropRootPrivileges(): setuid() failed\n");
         }
-                                
+
         //We should now be mere mortal, check effective uid to be sure
         if (geteuid() == 0) {
-            //Still root, was this intended ? 
+            //Still root, was this intended ?
             if (strcmp("root", runAsUser) == 0) {
                 //Intentionally root, complain about this security violation
                 debug(LEVEL_1, "dropRootPrivileges(): you seem to WANT TO run as user root, this IS VERY DANGEROUS !\n");
@@ -1998,7 +1967,7 @@ static void dropRootPrivileges()
             debug(LEVEL_1, "dropRootPrivileges(): privileges successfully dropped, now running as user %s\n", runAsUser);
     }
     else
-        fatal("dropRootPrivileges(): getpwnam() failed\n");    
+        fatal("dropRootPrivileges(): getpwnam() failed\n");
 }
 
 
@@ -2020,12 +1989,12 @@ int main(int argc, char **argv)
 
     //Startup event
     startEndEvent seEv;
-    
+
     stopped = false;
     mode1ConnCode = 0;
-    
+
     fprintf(stderr, "UltraVnc Linux Repeater version %s\n", REPEATER_VERSION);
-    
+
     //Read parameters from ini file
     strlcpy(tmpBuf, (argc >= 2) ? argv[1] : defaultIniFilePathAndName, MAX_PATH);
     if (false == readIniFile(tmpBuf)) {
@@ -2033,16 +2002,16 @@ int main(int argc, char **argv)
     }
     listInitializationValues();
 
-    //Send startup event to event interface 
+    //Send startup event to event interface
     initRepeaterEventInterface();
     if (useEventInterface) {
         event.eventNum = REPEATER_STARTUP;
         event.timeStamp = time(NULL);
         event.repeaterProcessId = getpid();
-        
+
         seEv.maxSessions = maxSessions;
         memcpy(event.extraInfo, &seEv, sizeof(startEndEvent));
-        
+
         //Event fifo can not be full here ;-)
         sendRepeaterEvent(event);
     }
@@ -2061,9 +2030,9 @@ int main(int argc, char **argv)
     if (memoryOk) {
         //Initialize ctrl+c signal handler
         memset(&saInt, 0, sizeof(saInt));
-    
-        //Restart interrupted system calls after handler returns    
-        saInt.sa_flags = SA_RESTART;    
+
+        //Restart interrupted system calls after handler returns
+        saInt.sa_flags = SA_RESTART;
         saInt.sa_handler = &handleSigInt;
         sigaction(SIGINT, &saInt, NULL);
 
@@ -2081,7 +2050,7 @@ int main(int argc, char **argv)
 
         //Drop root privileges (if we are running as root) after all listen ports have been bound
         if (geteuid() == 0) {
-            dropRootPrivileges(); 
+            dropRootPrivileges();
         }
 
         //Accept & Route new connections
@@ -2101,7 +2070,7 @@ int main(int argc, char **argv)
         event.eventNum = REPEATER_SHUTDOWN;
         event.timeStamp = time(NULL);
         event.repeaterProcessId = getpid();
-        
+
         seEv.maxSessions = maxSessions;
         memcpy(event.extraInfo, &seEv, sizeof(startEndEvent));
         if (false == sendRepeaterEvent(event)) {
