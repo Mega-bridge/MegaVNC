@@ -577,32 +577,20 @@ static int findViewerList(long code)
 }
 
 
-
-// Validate the format of the IdCode string (supports "ID:xxx" and "ID:xxx;yyy")
+//Check IdCode string, require that 1st 3 characters of IdCode are 'I','D',':'
 static bool checkIdCode(char *IdCode)
 {
-    // Check that the string starts with 'ID:'
     if ((IdCode[0] != 'I') || (IdCode[1] != 'D') || (IdCode[2] != ':')) {
         debug(LEVEL_3, "checkIdCode(): %s is not IdCode string\n", IdCode);
         return false;
     }
-
-    // Check for optional ';' and second part (yyy)
-    char *semicolonPos = strchr(IdCode + 3, ';');
-    if (semicolonPos != NULL) {
-        // Ensure that there's something after the semicolon
-        if (*(semicolonPos + 1) == '\0') {
-            debug(LEVEL_3, "checkIdCode(): %s has no value after semicolon\n", IdCode);
-            return false;
-        }
-    }
-
     return true;
 }
 
-//Parse IdCode string of format "ID:xxx;yyy" or "ID:xxx", where xxx and yyy are some positive (non-zero) long integer numbers
-//Return -1 on error, and parse both xxx and yyy successfully if available
-static bool parseId(char *IdCode, long *id1, long *id2)
+
+//Parse IdCode string of format "ID:xxxxx", where xxxxx is some positive (non-zero) long integer number
+//Return -1 on error, xxxxx on success
+static long parseId(char *IdCode)
 {
     unsigned int ii;
     int retVal;
@@ -611,67 +599,33 @@ static bool parseId(char *IdCode, long *id1, long *id2)
 
     //Require that 1st 3 characters of IdCode are 'I','D',':'
     if (false == checkIdCode(IdCode)) {
-        debug(LEVEL_3, "parseId(): IdCode format error, does not start with \"ID:\" \n");
-        return false;
+        debug(LEVEL_3, "parseId(): IdCode format error, does not start ""ID:"" \n");
+        return -1;
     }
-
-    // Split the IdCode string by ';' to extract both xxx and yyy if available
-    char *semicolonPos = strchr(IdCode + 3, ';');
-    if (semicolonPos == NULL) {
-        // Only xxx is provided
-        char *idStr1 = IdCode + 3;
-
-        // Parse xxx (first part)
-        for (ii = 0; ii < strlen(idStr1); ii++) {
-            if (!isdigit(idStr1[ii])) {
-                debug(LEVEL_3, "parseId(): IdCode format error, xxx should consist of decimal digits\n");
-                return false;
+    else {
+        //Require that all other characters of IdCode are digits
+        for (ii = 3; ii < strlen(IdCode); ii++) {
+            if (!isdigit(IdCode[ii])) {
+                debug(LEVEL_3, "parseId(): IdCode format error, code should consist of decimal digits\n");
+                return -1;
             }
         }
-        retVal = strtol(idStr1, NULL, 10);
+
+        retVal = strtol(&(IdCode[3]), NULL, 10);
         if (retVal <= 0) {
-            debug(LEVEL_3, "parseId(): IdCode format error, xxx should be a positive long integer number\n");
-            return false;
+            debug(LEVEL_3, "parseId(): IdCode format error, code should be positive long integer number\n");
+            return -1;
         }
-        *id1 = retVal;
-        *id2 = -1; // Indicate that yyy is not provided
-        return true;
-    }
-
-    *semicolonPos = '\0'; // Null-terminate the first part (xxx)
-    char *idStr1 = IdCode + 3;
-    char *idStr2 = semicolonPos + 1;
-
-    // Parse xxx (first part)
-    for (ii = 0; ii < strlen(idStr1); ii++) {
-        if (!isdigit(idStr1[ii])) {
-            debug(LEVEL_3, "parseId(): IdCode format error, xxx should consist of decimal digits\n");
-            return false;
+        else if (retVal == LONG_MAX) {
+            debug(LEVEL_3, "parseId(): IdCode format error, code is too big\n");
+            return -1;
         }
-    }
-    retVal = strtol(idStr1, NULL, 10);
-    if (retVal <= 0) {
-        debug(LEVEL_3, "parseId(): IdCode format error, xxx should be a positive long integer number\n");
-        return false;
-    }
-    *id1 = retVal;
 
-    // Parse yyy (second part)
-    for (ii = 0; ii < strlen(idStr2); ii++) {
-        if (!isdigit(idStr2[ii])) {
-            debug(LEVEL_3, "parseId(): IdCode format error, yyy should consist of decimal digits\n");
-            return false;
-        }
+        return retVal;
     }
-    retVal = strtol(idStr2, NULL, 10);
-    if (retVal <= 0) {
-        debug(LEVEL_3, "parseId(): IdCode format error, yyy should be a positive long integer number\n");
-        return false;
-    }
-    *id2 = retVal;
-
-    return true;
 }
+
+
 
 
 //Return value: n > 0: number of bytes read
@@ -1248,7 +1202,9 @@ int nonBlockingAccept(int socket, struct sockaddr *sa, socklen_t *sockLen)
     //At last, we are ready to return accept():ed socket ;-)
     return socketToReturn;
 }
-// Accept connections from both servers and viewers
+
+
+//Accept connections from both servers and viewers
 // connectionFrom == CONNECTIONFROMSERVER means server is connecting,
 // connectionFrom==CONNECTIONFROMVIEWER means viewer is connecting
 // Mode 1 connections are only accepted from viewers (repeater then connects to server)
@@ -1257,7 +1213,7 @@ static void acceptConnection(int socket, int connectionFrom)
     rfbProtocolVersionMsg pv;
     int connection;
     char id[MAX_HOST_NAME_LEN + 1];
-    long code1, code2;
+    long code;
     struct sockaddr_in client;
     socklen_t sockLen;
     char peerIp[MAX_IP_LEN];
@@ -1301,52 +1257,51 @@ static void acceptConnection(int socket, int connectionFrom)
             return;
         }
 
+        //id can be of format:
+        //Normally in Mode 2:
+        //"ID:xxxxx", where xxxxx is some positive (non-zero) long integer number.
+        //
+        //Normally in Mode 1:
+        //"xx.yy.zz.nn::pppp" (Ip address, 2 colons, port number)
+        //"xx.yy.zz.nn:pppp" (Ip address, 1 colons, some number): This is a problematic case.
+        //It is interpreted in the following way (copied directly from original repeater):
+        //If pppp is < 100, it is a display number. If >= 100, it is a port number.
+        //"xx.yy.zz.nn" (Only Ip Address): Default port number RFB_PORT_OFFSET is used
+        //In mode 1, instead of ip address, also DNS hostname can be used in any combination with
+        //port / display number
         if (checkIdCode(id)) {
             if ((allowedModes & CONN_MODE2) > 0) {
                 connMode = CONN_MODE2;
 
                 //id is an IdCode string, parse it
-                if (!parseId(id, &code1, &code2)) {
+                code = parseId(id);
+                if (-1 == code) {
                     debug(LEVEL_3, "acceptConnection(): parseId returned error, closing connection\n");
                     close(connection);
                     return;
                 }
-                debug(LEVEL_3, "acceptConnection():  %s sent codes %ld and %ld \n",
-                    (connectionFrom == CONNECTION_FROM_VIEWER) ? "Viewer" : "Server", code1, (code2 != -1) ? code2 : 0);
+                debug(LEVEL_3, "acceptConnection():  %s sent code %ld \n",
+                    (connectionFrom == CONNECTION_FROM_VIEWER) ? "Viewer" : "Server", code);
 
-                // Check parsed IDs for duplication
-                int index1 = findDuplicateIdIndex(connectionFrom, code1);
-                if (index1 != -1) {
+                //Check that there isn't similar ID:xxxx string in use
+                //If similar ID:xxxx is found, refuse new connection
+                int index;
+                index = findDuplicateIdIndex(connectionFrom, code);
+                if (index != -1) {
                     debug(LEVEL_2, "acceptConnection(): duplicate ID string found, closing connection\n");
                     close(connection);
                     return;
                 }
 
-                if (code2 != -1) {
-                    int index2 = findDuplicateIdIndex(connectionFrom, code2);
-                    if (index2 != -1) {
-                        debug(LEVEL_2, "acceptConnection(): duplicate ID string found, closing connection\n");
-                        close(connection);
-                        return;
-                    }
-                }
-
-                //If listed ID is required, check that IDs match those in the list
+                //If listed ID is required, check that ID matches one in list
                 if (requireListedId) {
-                    if (!isCodeInIdList(code1) || (code2 != -1 && !isCodeInIdList(code2))) {
+                    if (!isCodeInIdList(code)) {
                         debug(LEVEL_2,
-                            "acceptConnection(): Id code does not match codes in list, closing connection\n", code1);
+                            "acceptConnection(): Id code does not match codes in list, closing connection\n", code);
                         close(connection);
                         return;
                     }
                 }
-
-                // Fork repeater for parsed connections
-                forkRepeater(connection, code1, code1);
-                if (code2 != -1) {
-                    forkRepeater(connection, code2, code2);
-                }
-
             }
             else {
                 debug(LEVEL_2, "acceptConnection(): mode 2 connections are not allowed, closing connection\n");
@@ -1393,7 +1348,7 @@ static void acceptConnection(int socket, int connectionFrom)
                     return;
                 }
                 else {
-                    bool fServerOk;
+                    bool fServerOk ;
                     bool fViewerOk;
                     int viewerInd;
                     int serverInd;
@@ -1506,6 +1461,172 @@ static void acceptConnection(int socket, int connectionFrom)
                 debug(LEVEL_3, "acceptConnection():  Mode 1 connections only allowed from viewers, closing connection\n");
                 close(connection);
                 return;
+            }
+        }
+        else if (connMode == CONN_MODE2) {
+            if (connectionFrom == CONNECTION_FROM_VIEWER) {
+                int serverInd;
+                int viewerInd;
+
+                viewerInd = addViewerList(connection, code, peerIp);
+                if (-1 != viewerInd) {
+                    //Send VIEWER_CONNECT to event interface
+                    if (useEventInterface) {
+                        repeaterEvent event;
+                        connectionEvent connEv;
+                        addrParts viewerIp;
+
+                        //Address in compact binary form
+                        viewerIp = getAddrPartsFromString(peerIp);
+
+                        //VIEWER_CONNECT
+                        event.eventNum = VIEWER_CONNECT;
+                        event.timeStamp = time(NULL);
+                        event.repeaterProcessId = getpid();
+
+                        connEv.tableIndex = viewerInd;
+                        connEv.code = code;
+                        connEv.connMode = CONN_MODE2;
+                        connEv.peerIp = viewerIp;
+                        memcpy(event.extraInfo, &connEv, sizeof(connectionEvent));
+                        if (false == sendRepeaterEvent(event)) {
+                            debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
+                        }
+                    }
+
+                    //New viewer, find respective server
+                    serverInd = findServerList(code);
+                    if (serverInd != UNKNOWN_REPINFO_IND) {
+                        int server;
+
+                        //found respective server, activate viewer and server
+                        setViewerActive(code);
+                        setServerActive(code);
+
+                        server = servers[serverInd] -> socket;
+
+                        //kickstart viewer using handshake received previously (if any) from server
+                        if (handShakes[serverInd] -> handShakeLength > 0)
+                            writeExact(connection, handShakes[serverInd] -> handShake,
+                                handShakes[serverInd] -> handShakeLength, TIMEOUT_5SECS);
+
+                        //fork repeater
+                        forkRepeater(server, connection, code);
+
+                        //Send VIEWER_SERVER_SESSION_START to event interface
+                        if (useEventInterface) {
+                            repeaterEvent event;
+                            sessionEvent sessEv;
+
+                            //VIEWER_SERVER_SESSION_START
+                            event.eventNum = VIEWER_SERVER_SESSION_START;
+                            event.timeStamp = time(NULL);
+                            event.repeaterProcessId = getpid();
+
+                            sessEv.serverTableIndex = serverInd;
+                            sessEv.viewerTableIndex = viewerInd;
+                            sessEv.code = code;
+                            sessEv.connMode = CONN_MODE2;
+                            sessEv.serverIp = servers[serverInd] -> peerIp;
+                            sessEv.viewerIp = viewers[viewerInd] -> peerIp;
+                            memcpy(event.extraInfo, &sessEv, sizeof(sessionEvent));
+                            if (false == sendRepeaterEvent(event)) {
+                                debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
+                            }
+                        }
+                    }
+                    else {
+                        debug(LEVEL_3, "acceptConnection(): respective server has not connected yet\n");
+                    }
+                }
+                else {
+                    //we have run out of slots in viewer table, refuse new connection
+                    debug(LEVEL_3, "acceptConnection(): Mode 2: out of slots in viewer table, closing connection\n");
+                    close(connection);
+                    return;
+                }
+            }
+            else {
+                int viewerInd;
+                int serverInd;
+
+                //Add server to tables, initialize handshake to nil
+                serverInd = addServerList(connection, code, peerIp);
+                if (serverInd != -1) {
+                    handShakes[serverInd] -> handShakeLength = 0;
+
+                    //Send SERVER_CONNECT to event interface
+                    if (useEventInterface) {
+                        repeaterEvent event;
+                        connectionEvent connEv;
+
+                        //SERVER_CONNECT
+                        event.eventNum = SERVER_CONNECT;
+                        event.timeStamp = time(NULL);
+                        event.repeaterProcessId = getpid();
+
+                        connEv.tableIndex = serverInd;
+                        connEv.code = code;
+                        connEv.connMode = CONN_MODE2;
+                        connEv.peerIp = servers[serverInd] -> peerIp;
+                        memcpy(event.extraInfo, &connEv, sizeof(connectionEvent));
+                        if (false == sendRepeaterEvent(event)) {
+                            debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
+                        }
+                    }
+
+                    //New server, find respective viewer
+                    viewerInd = findViewerList(code);
+                    if (viewerInd != UNKNOWN_REPINFO_IND) {
+                        int viewer;
+
+                        //found respective viewer, activate server and viewer
+                        setServerActive(code);
+                        setViewerActive(code);
+
+                        viewer = viewers[viewerInd] -> socket;
+
+                        //fork repeater
+                        forkRepeater(connection, viewer, code);
+
+                        //Send VIEWER_SERVER_SESSION_START to event interface
+                        if (useEventInterface) {
+                            repeaterEvent event;
+                            sessionEvent sessEv;
+
+                            //VIEWER_SERVER_SESSION_START
+                            event.eventNum = VIEWER_SERVER_SESSION_START;
+                            event.timeStamp = time(NULL);
+                            event.repeaterProcessId = getpid();
+
+                            sessEv.serverTableIndex = serverInd;
+                            sessEv.viewerTableIndex = viewerInd;
+                            sessEv.code = code;
+                            sessEv.connMode = CONN_MODE2;
+                            sessEv.serverIp = servers[serverInd] -> peerIp;
+                            sessEv.viewerIp = viewers[viewerInd] -> peerIp;
+                            memcpy(event.extraInfo, &sessEv, sizeof(sessionEvent));
+                            if (false == sendRepeaterEvent(event)) {
+                                debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
+                            }
+                        }
+                    }
+                    else {
+                        debug(LEVEL_3, "acceptConnection(): respective viewer has not connected yet\n");
+
+                        //Read servers' handshake string to buffer, for use when respective
+                        //viewer later connects and needs a kickstart
+                        if (serverInd != -1) {
+                            readPeerHandShake(connection, serverInd);
+                        }
+                    }
+                }
+                else {
+                    //we have run out of slots in server table, refuse new connection
+                    debug(LEVEL_3, "acceptConnection(): Mode 2: out of slots in server table, closing connection\n");
+                    close(connection);
+                    return;
+                }
             }
         }
     }
