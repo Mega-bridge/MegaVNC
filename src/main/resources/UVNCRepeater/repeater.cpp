@@ -1240,7 +1240,7 @@ static void acceptConnection(int socket, int connectionFrom)
      char host[MAX_HOST_NAME_LEN+1];
      char connMode1ServerIp[MAX_IP_LEN];
      int port;
-
+     long code;
      sockLen = sizeof(struct sockaddr_in);
 
      connection = nonBlockingAccept(socket, (struct sockaddr *) &client, &sockLen);
@@ -1297,6 +1297,8 @@ static void acceptConnection(int socket, int connectionFrom)
                          debug(LEVEL_2, "acceptConnection(): Invalid ID, closing connection\n");
                          close(connection);
                          return;
+                     }else if(codes.size() == 1){
+                     code = codes[0];
                      }
                 for (long code : codes) {
                      if (-1 == code) {
@@ -1489,7 +1491,6 @@ static void acceptConnection(int socket, int connectionFrom)
              }
          }
          else if (connMode == CONN_MODE2) {
-             for (long code : codes) {
              if (connectionFrom == CONNECTION_FROM_VIEWER) {
                  int serverInd;
                  int viewerInd;
@@ -1574,6 +1575,7 @@ static void acceptConnection(int socket, int connectionFrom)
              }
              else {
                  int viewerInd;
+             for (long code : codes) {
                  int serverInd;
 
                  //Add server to tables, initialize handshake to nil
@@ -1600,7 +1602,7 @@ static void acceptConnection(int socket, int connectionFrom)
                              debug(LEVEL_1, "acceptConnection(): Warning, event fifo is full\n");
                          }
                      }
-
+                    }
                      //New server, find respective viewer
                      viewerInd = findViewerList(code);
                      if (viewerInd != UNKNOWN_REPINFO_IND) {
@@ -1653,7 +1655,7 @@ static void acceptConnection(int socket, int connectionFrom)
                      close(connection);
                      return;
                  }
-             }
+
              }
            }
          }
