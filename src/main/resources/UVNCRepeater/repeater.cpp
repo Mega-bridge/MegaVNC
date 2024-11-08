@@ -1658,7 +1658,7 @@ static void acceptConnection(int socket, int connectionFrom)
            }
          }
      }
- }
+
 
 //Initialize listening on port. 
 //Listening itself happens on function routeConnections
