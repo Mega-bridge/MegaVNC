@@ -625,7 +625,22 @@ static long parseId(char *IdCode)
     }
 }
 
-
+static std::vector<long> parseIds(const std::string& idCode) {
+    std::vector<long> ids;
+    std::stringstream ss(idCode.substr(3)); // "ID:" 이후 부분만 파싱
+    std::string id;
+    while (std::getline(ss, id, ';')) {
+        try {
+            long parsedId = std::stol(id);
+            if (parsedId > 0) {
+                ids.push_back(parsedId);
+            }
+        } catch (const std::exception& e) {
+            debug(LEVEL_3, "parseIds(): IdCode format error: %s\n", e.what());
+        }
+    }
+    return ids;
+}
 
 
 //Return value: n > 0: number of bytes read
@@ -1213,12 +1228,11 @@ static void acceptConnection(int socket, int connectionFrom)
     rfbProtocolVersionMsg pv;
     int connection;
     char id[MAX_HOST_NAME_LEN + 1];
-    long code;
     struct sockaddr_in client;
     socklen_t sockLen;
     char peerIp[MAX_IP_LEN];
     int connMode;   //Connection mode: CONN_MODE1 or CONN_MODE2
-
+    std::vector<long> codes;
     //These variables are used in Mode 1
     char host[MAX_HOST_NAME_LEN+1];
     char connMode1ServerIp[MAX_IP_LEN];
@@ -1269,12 +1283,19 @@ static void acceptConnection(int socket, int connectionFrom)
         //"xx.yy.zz.nn" (Only Ip Address): Default port number RFB_PORT_OFFSET is used
         //In mode 1, instead of ip address, also DNS hostname can be used in any combination with 
         //port / display number
+
+
+
         if (checkIdCode(id)) {
             if ((allowedModes & CONN_MODE2) > 0) {
                 connMode = CONN_MODE2;
-
-                //id is an IdCode string, parse it
-                code = parseId(id);
+               codes = parseIds(id);
+                    if (codes.empty()) {
+                        debug(LEVEL_2, "acceptConnection(): Invalid ID, closing connection\n");
+                        close(connection);
+                        return;
+                    }
+           for ( code : codes) {
                 if (-1 == code) {
                     debug(LEVEL_3, "acceptConnection(): parseId returned error, closing connection\n");
                     close(connection);
@@ -1464,6 +1485,7 @@ static void acceptConnection(int socket, int connectionFrom)
             }
         }
         else if (connMode == CONN_MODE2) {
+            for ( code : codes) {
             if (connectionFrom == CONNECTION_FROM_VIEWER) {
                 int serverInd;
                 int viewerInd;
@@ -1628,6 +1650,8 @@ static void acceptConnection(int socket, int connectionFrom)
                     return;
                 }
             }
+            }
+          }
         }
     }
 }
