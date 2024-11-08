@@ -82,10 +82,6 @@ public class RfbProto {
     sz_rfbBlockSize = 8192;// New v2 File Transfer Protocol
 
 
-    String host;
-    // End of File Transfer part
-
-    int port;
 
 
     Socket sock;
@@ -103,11 +99,11 @@ public class RfbProto {
     // Constructor. Make TCP connection to RFB server.
     //
 
-    RfbProto(String h, int p) throws IOException {
-        host = h;
-        port = p;
-        sock = new Socket(host, port);
-        System.out.println("소켓 연결됨: " + host + ", port: " + port);
+    RfbProto( String repeaterHost, int repeaterPort, String repeaterId) throws IOException {
+
+        sock = new Socket(repeaterHost, repeaterPort);
+        System.out.println("리피터 소켓 연결됨: " + repeaterHost + ", port: " + repeaterPort);
+        doRepeater(sock, repeaterId);
         is = new DataInputStream(new BufferedInputStream(sock.getInputStream(), 16384));
         os = sock.getOutputStream();
         osw = new OutputStreamWriter(sock.getOutputStream());
@@ -121,6 +117,18 @@ public class RfbProto {
         sendFileSource = "";
     }
 
+    private void doRepeater(Socket sock, String repeaterId) throws IOException {
+        // Read the RFB protocol version
+        final String buf2 = "";
+        sock.getOutputStream().write(buf2.getBytes());
+        System.out.println("빈 문자열 전송 완료");
+
+        String dest = "ID:" + repeaterId;
+        byte[] buf = new byte[250];
+        System.arraycopy(dest.getBytes("ISO-8859-1"), 0, buf, 0, dest.length());
+        System.out.println("Repeater ID 전송 완료: " + dest);
+        sock.getOutputStream().write(buf);
+    }
 
     void close() {
         try {
@@ -162,7 +170,7 @@ public class RfbProto {
                 || (b[10] > '9')
                 || (b[11] != '\n')) {
             throw new Exception(
-                    "Host " + host + " port " + port + " is not an RFB server");
+                " is not an RFB server");
         }
 
         serverMajor = (b[4] - '0') * 100 + (b[5] - '0') * 10 + (b[6] - '0');

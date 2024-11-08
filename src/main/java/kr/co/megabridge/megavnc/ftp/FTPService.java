@@ -122,7 +122,7 @@ public class FTPService {
     /////////////////////////////////////////////////////////
 
     void connectAndAuthenticate() throws Exception {
-        rfb = new RfbProto("192.168.0.23", 5900);
+        rfb = new RfbProto("vnc.megabridge.co.kr", 5900,"101");
         if (passwordParam != null) {
             if (!tryAuthenticate(usernameParam, passwordParam)) {
                 throw new Exception("VNC authentication failed");
@@ -138,7 +138,6 @@ public class FTPService {
 
 
         rfb.readVersionMsg();
-
         System.out.println("RFB server supports protocol version " +
                 rfb.serverMajor + "." + rfb.serverMinor);
 
@@ -162,6 +161,11 @@ public class FTPService {
     boolean tryAuthenticate(String us, String pw) throws Exception {
 
 
+
+        rfb.readVersionMsg();
+
+        System.out.println("RFB server supports protocol version " +
+                rfb.serverMajor + "." + rfb.serverMinor);
         rfb.readVersionMsg();
 
         System.out.println("RFB server supports protocol version " +
