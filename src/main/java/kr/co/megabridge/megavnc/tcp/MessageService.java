@@ -74,48 +74,76 @@ public class MessageService {
         }
         RemotePc remotePc = null;
         List<Integer> validNumbers = Arrays.asList(2, 3, 4, 5);
+
         if (validNumbers.contains(eventMessage.getEvNum())) {
-            remotePc = remotePcRepository.findByRepeaterId(eventMessage.getRepeaterId()).orElseThrow(() -> new RemotePcException(ErrorCode.PC_NOT_FOUND));
+            Long repeaterId = eventMessage.getRepeaterId();
+            System.out.println("repeaterId = " + repeaterId);
+            if (repeaterId % 2 == 0) {
+                remotePc = remotePcRepository.findByRepeaterId(repeaterId).orElseThrow(() -> new RemotePcException(ErrorCode.PC_NOT_FOUND));
+
+            } else {
+                remotePc = remotePcRepository.findBySecondaryRepeaterId(repeaterId).orElseThrow(() -> new RemotePcException(ErrorCode.PC_NOT_FOUND));
+            }
+
         }
 
-        switch (eventMessage.getEvNum()) {
-            case 2: // SERVER_CONNECT
-                remotePcService.setRemotePcStatus(remotePc, Status.STANDBY);
-                 logService.saveAccessLog(remotePc, Status.STANDBY.getValue(), eventMessage.getIp());
-                log.info("SERVER_CONNECT: " + eventMessage.getRepeaterId());
-                break;
-            case 3: // SERVER_DISCONNECT
-                remotePcService.setRemotePcStatus(remotePc, Status.OFFLINE);
-                  logService.saveAccessLog(remotePc, Status.OFFLINE.getValue(), eventMessage.getIp());
-                 log.info("SERVER_DISCONNECT: " + eventMessage.getRepeaterId());
-                break;
-            case 4: // VIEWER_SERVER_SESSION_START
-                remotePcService.setRemotePcStatus(remotePc, Status.ACTIVE);
-                 logService.saveAccessLog(remotePc, Status.ACTIVE.getValue(), eventMessage.getSvrIp());
-                log.info("VIEWER_SERVER_SESSION_START: " + eventMessage.getRepeaterId());
-                break;
-            case 5: // VIEWER_SERVER_SESSION_END
-                //api를 통해 먼저 연결 해제를 시켜버리므로 모든 값이 null, 즉 여기서 assinedAt이 null 이면 Offline 으로 하면 됨
-                if (remotePc.getAssignedAt() == null) {
-                    remotePcService.setRemotePcStatus(remotePc, Status.OFFLINE);
-                    logService.saveAccessLog(remotePc, Status.STANDBY.getValue(), eventMessage.getIp());
-                } else {
-                    remotePcService.setRemotePcStatus(remotePc, Status.STANDBY);
-                    logService.saveAccessLog(remotePc, Status.STANDBY.getValue(), eventMessage.getIp());
+            switch (eventMessage.getEvNum()) {
+                case 2: // SERVER_CONNECT
+                    if (eventMessage.getRepeaterId() % 2 == 0) {
+                        remotePcService.setRemotePcStatus(remotePc, Status.STANDBY);
+                        logService.saveAccessLog(remotePc, Status.STANDBY.getValue(), eventMessage.getIp());
+                        log.info("SERVER_CONNECT: " + remotePc.getRepeaterId());
+                    } else {
+                        log.info("FILE_SERVER_CONNECT: " + remotePc.getSecondaryRepeaterId());
+                    }
+                    break;
+                case 3: // SERVER_DISCONNECT
+                    if (eventMessage.getRepeaterId() % 2 == 0) {
+                        remotePcService.setRemotePcStatus(remotePc, Status.OFFLINE);
+                        logService.saveAccessLog(remotePc, Status.OFFLINE.getValue(), eventMessage.getIp());
+                        log.info("SERVER_DISCONNECT: " + remotePc.getRepeaterId());
+                    } else {
+                        log.info("FILE_SERVER_DISCONNECT: " + remotePc.getSecondaryRepeaterId());
+                    }
 
-                }
-                log.info("VIEWER_SERVER_SESSION_END: " + eventMessage.getRepeaterId());
-                break;
-            case 6: // REPEATER_STARTUP // debug // FIXME
-                log.info("REPEATER_STARTUP");
-                break;
-            case 7: // REPEATER_SHUTDOWN // debug // FIXME
-                log.info("REPEATER_SHUTDOWN");
-                break;
-            default: // no-op
-                break;
+                    break;
+                case 4: // VIEWER_SERVER_SESSION_START
+                    if (eventMessage.getRepeaterId() % 2 == 0) {
+                        remotePcService.setRemotePcStatus(remotePc, Status.ACTIVE);
+                        logService.saveAccessLog(remotePc, Status.ACTIVE.getValue(), eventMessage.getSvrIp());
+                        log.info("VIEWER_SERVER_SESSION_START: " + remotePc.getRepeaterId());
+                    } else {
+                        log.info("FILE_VIEWER_SERVER_SESSION_START: " + remotePc.getSecondaryRepeaterId());
+                    }
+                    break;
+                case 5: // VIEWER_SERVER_SESSION_END
+                    //api를 통해 먼저 연결 해제를 시켜버리므로 모든 값이 null, 즉 여기서 assinedAt이 null 이면 Offline 으로 하면 됨
+
+
+                    if (eventMessage.getRepeaterId() % 2 == 0) {
+                        if (remotePc.getAssignedAt() == null) {
+                            remotePcService.setRemotePcStatus(remotePc, Status.OFFLINE);
+                            logService.saveAccessLog(remotePc, Status.STANDBY.getValue(), eventMessage.getIp());
+                        } else {
+                            remotePcService.setRemotePcStatus(remotePc, Status.STANDBY);
+                            logService.saveAccessLog(remotePc, Status.STANDBY.getValue(), eventMessage.getIp());
+                        }
+                        log.info("VIEWER_SERVER_SESSION_END: " + remotePc.getRepeaterId());
+                    } else {
+                        log.info("FILE_VIEWER_SERVER_SESSION_END: " + remotePc.getSecondaryRepeaterId());
+                    }
+
+
+                    break;
+                case 6: // REPEATER_STARTUP // debug // FIXME
+                    log.info("REPEATER_STARTUP");
+                    break;
+                case 7: // REPEATER_SHUTDOWN // debug // FIXME
+                    log.info("REPEATER_SHUTDOWN");
+                    break;
+                default: // no-op
+                    break;
+            }
         }
 
-
-    }
 }

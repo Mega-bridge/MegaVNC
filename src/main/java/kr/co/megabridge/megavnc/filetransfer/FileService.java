@@ -46,7 +46,6 @@ public class FileService {
 
     private final FileInfoRepository fileInfoRepository;
     private final RemotePcRepository remotePcRepository;
-    private final FTPService ftpService;
     @Value("${file.directory}")
     private String uploadDir;
     @Value("${file.fileKey}")
@@ -63,8 +62,9 @@ public class FileService {
     public Integer uploadFile(MultipartFile file, Long repeaterId, User user) {
         try {
             String reconnectId ;
+            RemotePc remotePc = null;
             if (repeaterId != null) {
-                RemotePc remotePc = remotePcRepository.findByRepeaterId(repeaterId).orElseThrow(() -> new ApiException(ErrorCode.PC_NOT_FOUND));
+                 remotePc = remotePcRepository.findByRepeaterId(repeaterId).orElseThrow(() -> new ApiException(ErrorCode.PC_NOT_FOUND));
                 reconnectId = Optional.ofNullable(remotePc.getReconnectId()).orElseThrow(() -> new ApiException(ErrorCode.DISASSIGNED_PC));
             }else if(user.isAdmin()){
                 reconnectId = ADMIN_REQUEST;
@@ -98,7 +98,10 @@ public class FileService {
 
             File savedFile = filePath.toFile();
 
+            if (repeaterId != null) {
+            FTPService ftpService = new FTPService(String.valueOf(remotePc.getSecondaryRepeaterId()),remotePc.getAccessPassword());
             ftpService.kingGodGeneralMethod(savedFile,fileName);
+            }
             return fileInfo.getSeq();
 
 

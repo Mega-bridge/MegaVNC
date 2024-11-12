@@ -1,12 +1,14 @@
 package kr.co.megabridge.megavnc.ftp;
 
 
+import kr.co.megabridge.megavnc.exception.BusinessException;
+
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Vector;
+import java.net.URLEncoder;
+import java.nio.BufferOverflowException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -21,15 +23,14 @@ public class RfbProto {
 
     final int
             FramebufferUpdateRequest = 3;
-
+    boolean isFileReadDone = false;
 
     // sf@2004 - File Transfer part
     ArrayList remoteDirsList;
     ArrayList remoteFilesList;
     ArrayList a;
-    boolean fAbort = false;
     boolean fFileReceptionError = false;
-    boolean fFileReceptionRunning = false;
+    boolean fFileReceptionRunning = true;
     boolean inDirectory2;
     FileOutputStream fos;
     FileInputStream fis;
@@ -125,7 +126,7 @@ public class RfbProto {
 
         String dest = "ID:" + repeaterId;
         byte[] buf = new byte[250];
-        System.arraycopy(dest.getBytes("ISO-8859-1"), 0, buf, 0, dest.length());
+        System.arraycopy(dest.getBytes(StandardCharsets.ISO_8859_1), 0, buf, 0, dest.length());
         System.out.println("Repeater ID 전송 완료: " + dest);
         sock.getOutputStream().write(buf);
     }
@@ -264,11 +265,12 @@ public class RfbProto {
     //
 
     int readServerMessageType() throws IOException {
-        int msgType = is.readUnsignedByte();
-        return msgType;
+        return is.readUnsignedByte();
     }
 
-
+    private void logDebug(String message) {
+        System.out.println("[DEBUG]: " + message);
+    }
     //	Parsing Rfb message to see what type
 
     void readRfbFileTransferMsg() throws IOException {
@@ -278,28 +280,32 @@ public class RfbProto {
         contentParamT = is.readUnsignedByte();
         contentParamT = contentParamT << 8;
         contentParam = contentParam | contentParamT;
-        if (contentType == rfbRDrivesList || contentType == rfbDirPacket) {
+
+        logDebug("읽은 파일 전송 메시지 - contentType: " + contentType + ", contentParam: " + contentParam);
+
+        if (contentType == rfbDirPacket) {
+            logDebug("디렉토리 패킷을 처리 중...");
             readDriveOrDirectory(contentParam);
         } else if (contentType == rfbFileHeader) {
+            logDebug("파일 헤더를 처리 중...");
             receiveFileHeader();
         } else if (contentType == rfbFilePacket) {
+            logDebug("파일 청크를 처리 중...");
             receiveFileChunk();
         } else if (contentType == rfbEndOfFile) {
+            logDebug("파일 전송 끝 신호를 받음");
             endOfReceiveFile(true); // Ok
-        } else if (contentType == rfbAbortFileTransfer) {
-            if (fFileReceptionRunning) {
-                endOfReceiveFile(false); // Error
-            } else {
-                // sf@2004 - Todo: Add TestPermission
-                // System.out.println("File Transfer Aborted!");
-            }
-
-        } else if (contentType == rfbCommandReturn) {
+        }  else if (contentType == rfbCommandReturn) {
+            logDebug("명령 응답 처리 중...");
             createDirectoryorDeleteFile(contentParam);
         } else if (contentType == rfbFileAcceptHeader) {
+            logDebug("서버에서 파일 수락 신호를 받음");
             sendFile();
         } else if (contentType == rfbFileChecksums) {
+            logDebug("파일 체크섬을 처리 중...");
             ReceiveDestinationFileChecksums();
+        } else {
+            logDebug("알 수 없는 contentType: " + contentType);
         }
     }
 
@@ -315,15 +321,20 @@ public class RfbProto {
 
     //Refactored from readRfbFileTransferMsg()
     public void readDriveOrDirectory(int contentParam) throws IOException {
-
+        logDebug("readDriveOrDirectory 호출됨 - contentParam: " + contentParam);
         if (contentParam == rfbADirectory && !inDirectory2) {
             inDirectory2 = true;
+            logDebug("디렉토리 시작 신호를 받음, 디렉토리 리스트 읽기 시작...");
             readFTPMsgDirectoryList();
-        } else if (contentParam == rfbADirectory && inDirectory2) {
+        } else if (contentParam == rfbADirectory) {
+            logDebug("디렉토리 내용 읽기...");
             readFTPMsgDirectoryListContent();
         } else if (contentParam == 0) {
+            logDebug("디렉토리 리스트 끝 신호를 받음");
             readFTPMsgDirectoryListEndContent();
             inDirectory2 = false;
+        } else {
+            logDebug("알 수 없는 contentParam: " + contentParam);
         }
 
     }
@@ -385,9 +396,7 @@ public class RfbProto {
     }
 
     //Internally used. Write an rfb message to the server for sending files ONLY
-    int writeRfbFileTransferMsgForSendFile(
-            int contentType,
-            int contentParam,
+    void writeRfbFileTransferMsgForSendFile(
             String source
     ) throws IOException {
         File f = new File(source);
@@ -414,8 +423,8 @@ public class RfbProto {
             if (compressedSize > bytesRead)
                 fCompress = false;
             this.writeRfbFileTransferMsg(
-                    contentType,
-                    contentParam,
+                    RfbProto.rfbFilePacket,
+                    0,
                     (fCompress ? 1 : 0),
                     (fCompress ? compressedSize - 1 : bytesRead - 1),
                     null
@@ -431,21 +440,21 @@ public class RfbProto {
             // Todo: test read error !
             bytesRead = fis.read(byteBuffer);
 
-            if (fAbort == true) {
-                fAbort = false;
-                fError = true;
-                break;
-            }
+
             try {
                 Thread.sleep(5);
             } catch (InterruptedException e) {
                 System.err.println("Interrupted");
             }
+
         }
         System.out.println("파일전송 완료: " + source);
-        writeRfbFileTransferMsg(fError ? rfbAbortFileTransfer : rfbEndOfFile, 0, 0, 0, null);
+        writeRfbFileTransferMsg(rfbEndOfFile, 0, 0, 0, null);
         fis.close();
-        return (fError ? -1 : 1);
+        fileSize = 0;
+
+        fFileReceptionRunning = false;
+        //fos.close();
     }
 
     //This method is internally used to send the file to the server once the server is ready
@@ -460,8 +469,6 @@ public class RfbProto {
             }
 
             writeRfbFileTransferMsgForSendFile(
-                    rfbFilePacket,
-                    0,
                     sendFileSource);
 
 
@@ -480,7 +487,7 @@ public class RfbProto {
             int iLowSize = (int) (lSize & 0x00000000FFFFFFFF);
             int iHighSize = (int) (lSize >> 32);
 
-            String temp = destinationPath + fileName;
+            String temp = destinationPath + URLEncoder.encode(fileName, StandardCharsets.UTF_8);
             System.out.println("서버에 제공할 파일: " + f.getPath());
             writeRfbFileTransferMsg(
                     rfbFileTransferOffer,
@@ -555,7 +562,7 @@ public class RfbProto {
     //Internally used when transferring file from server. Here, the server sends
     //a rfb packet signalling that it is ready to send the file requested
     void receiveFileHeader() throws IOException {
-        fFileReceptionRunning = true;
+        //fFileReceptionRunning = true;
         fFileReceptionError = false;
         int size = is.readInt();
         int length = is.readInt();
@@ -614,17 +621,13 @@ public class RfbProto {
             fileSize += length;
         }
 
-        if (fAbort == true) {
-            fAbort = false;
-            fFileReceptionError = true;
-            writeRfbFileTransferMsg(rfbAbortFileTransfer, 0, 0, 0, null);
 
-        }
 
     }
 
     //Internally used when transferring file from server. Server signals end of file.
     void endOfReceiveFile(boolean fReceptionOk) throws IOException {
+        System.out.println("fReceptionOk = " + fReceptionOk);
         fileSize = 0;
         fos.close();
 
@@ -636,7 +639,7 @@ public class RfbProto {
         fFileReceptionRunning = false;
     }
 
-    //1.C 드라이브 전체 디렉토리 읽어옴
+
     void readServerDirectory(String text) {
         try {
             String temp = text;
@@ -657,9 +660,11 @@ public class RfbProto {
     //Internally used to receive directory content from server
     //Here, the server marks the start of the directory listing
     void readFTPMsgDirectoryList() throws IOException {
+        logDebug("readFTPMsgDirectoryList 호출됨");
         is.readInt();
         int length = is.readInt();
         if (length == 0) {
+            logDebug("디렉토리의 길이가 0입니다 - 드라이브가 준비되지 않았거나 액세스 권한이 없을 수 있습니다.");
             inDirectory2 = false;
         } else {
             // sf@2004 - New File Transfer Protocol sends remote directory name
@@ -670,6 +675,7 @@ public class RfbProto {
                     str += temp;
                 }
             }
+            logDebug("받은 디렉토리 이름: " + str);
 
         }
     }
@@ -677,65 +683,33 @@ public class RfbProto {
     //Internally used to receive directory content from server
     //Here, the server sends one file/directory with it's attributes
     void readFTPMsgDirectoryListContent() throws IOException {
-        String fileName = "", alternateFileName = "";
-        int dwFileAttributes,
-                nFileSizeHigh,
-                nFileSizeLow,
-                dwReserved0,
-                dwReserved1;
-        long ftCreationTime, ftLastAccessTime, ftLastWriteTime;
-        char cFileName, cAlternateFileName;
-        int length = 0;
-        is.readInt();
-        length = is.readInt();
-        dwFileAttributes = is.readInt();
-        length -= 4;
-        ftCreationTime = is.readLong();
-        length -= 8;
-        ftLastAccessTime = is.readLong();
-        length -= 8;
-        ftLastWriteTime = is.readLong();
-        length -= 8;
-        nFileSizeHigh = is.readInt();
-        length -= 4;
-        nFileSizeLow = is.readInt();
-        length -= 4;
-        dwReserved0 = is.readInt();
-        length -= 4;
-        dwReserved1 = is.readInt();
-        length -= 4;
-        cFileName = (char) is.readUnsignedByte();
-        length--;
-        while (cFileName != '\0') {
-            fileName += cFileName;
-            cFileName = (char) is.readUnsignedByte();
-            length--;
-        }
-        cAlternateFileName = (char) is.readByte();
-        length--;
-        while (length != 0) {
-            alternateFileName += cAlternateFileName;
-            cAlternateFileName = (char) is.readUnsignedByte();
-            length--;
-        }
+        logDebug("readFTPMsgDirectoryListContent 호출됨");
+        StringBuilder fileName = new StringBuilder();
 
-        // Added Jef Fix (jdp) - check for FILE_ATTRIBUTE_DIRECTORY attribute bit
-        // note that we're looking at a little-endian value in a big-endian world
-        if ((dwFileAttributes & 0x10000000) == 0x10000000) {
-            fileName = " [" + fileName + "]";
-            remoteDirsList.add(fileName); // sf@2004
-        } else {
-            remoteFilesList.add(" " + fileName); // sf@2004
-        }
+        int dwFileAttributes = is.readInt();
+        logDebug("파일 속성: " + dwFileAttributes);
+        long ftCreationTime = is.readLong();
+        long ftLastAccessTime = is.readLong();
+        long ftLastWriteTime = is.readLong();
 
+        logDebug("생성 시간: " + ftCreationTime + ", 마지막 액세스 시간: " + ftLastAccessTime + ", 마지막 수정 시간: " + ftLastWriteTime);
+
+
+        int length = is.readInt();
+        for (int i = 0; i < length; i++) {
+            char cFileName = (char) is.readUnsignedByte();
+            fileName.append(cFileName);
+        }
+        logDebug("읽은 파일 이름: " + fileName);
 
     }
 
     //Internally used to read directory content of server.
     //Here, server signals end of directory.
     void readFTPMsgDirectoryListEndContent() throws IOException {
-        is.readInt();
-
+        logDebug("readFTPMsgDirectoryListEndContent 호출됨");
+        is.readInt(); // 패딩 읽기
+        logDebug("디렉토리 목록 끝을 정상적으로 읽음");
         // sf@2004
         a.clear();
         for (int i = 0; i < remoteDirsList.size(); i++)
@@ -801,6 +775,7 @@ public class RfbProto {
         }
 
         System.out.println("remoteList.get(0) = " + remoteList.get(0));
+
     }
 
 
@@ -816,17 +791,82 @@ public class RfbProto {
     }
 
 
-    /**
-     * 새 폴더를 만듬
-     */
-    public void doNewFolder(String destinationPath, String name) {
-        if (name == null) {
-            return;
-        }
-        name = destinationPath + name;
-        createRemoteDirectory(name);
 
+    public String findDestinationPath() throws IOException, InterruptedException {
+        System.out.println("🚀 목적지 조회를 시작합니다!");
+        // 폴더가 있는지 검사하고 없으면 생성
+        List<String> directoryStack = new ArrayList<>();
+        Stack<String> pathStack = new Stack<>();
+        directoryStack.add("C:\\");
+        pathStack.push("C:\\");
+        boolean desktopFound = false;
+
+        while (!directoryStack.isEmpty()) {
+            String currentDirectory = directoryStack.remove(directoryStack.size() - 1);
+
+
+            // 스택 정리: 현재 디렉토리가 pathStack의 최상위와 다를 경우, 상위 경로를 맞추기 위해 pop
+            while (!pathStack.isEmpty() && !pathStack.peek().equals(currentDirectory)) {
+                System.out.println("🔄 스택 조정 중: 현재 디렉토리 " + currentDirectory + " 에 맞춰 상위 경로 정리");
+                pathStack.pop();
+            }
+
+            System.out.println("📂 탐색 중인 디렉토리: " + currentDirectory);
+            pathStack.push(currentDirectory);
+            readServerDirectory(currentDirectory);
+
+
+
+
+            // "Desktop" 폴더를 찾은 경우
+            if (!desktopFound && remoteList.contains(" [Desktop]")) {
+                System.out.println("✨ 데스크탑 폴더 발견! 현재 디렉토리: " + currentDirectory);
+                desktopFound = true;
+                currentDirectory = currentDirectory + "\\Desktop";
+                directoryStack.add(currentDirectory);
+                pathStack.push("\\Desktop");
+                continue;
+            }
+
+
+            // "mega_vnc_remote_files" 폴더가 있는 경우 해당 디렉토리를 반환
+            if (desktopFound && remoteList.contains(" [mega_vnc_remote_files]")) {
+                System.out.println("🎉 mega_vnc_remote_files 폴더 발견! 현재 디렉토리: " + currentDirectory);
+                String absolutePath = String.join("\\", pathStack) + "\\mega_vnc_remote_files";
+                return absolutePath;
+            } else if (desktopFound) {
+                // "mega_vnc_remote_files" 폴더가 없는 경우 원격 경로에 생성 후 반환
+                System.out.println("🔨 mega_vnc_remote_files 폴더가 없어서 새로 생성 중... 현재 디렉토리: " + currentDirectory);
+                createRemoteDirectory(currentDirectory + "\\mega_vnc_remote_files");
+                String absolutePath = String.join("\\", pathStack) + "\\mega_vnc_remote_files";
+                return absolutePath;
+            }
+
+            for (Object dirObj : remoteList) {
+                String dir = (String) dirObj;
+                if (dir.startsWith(" [") && dir.endsWith("]")) {
+                    String subDir = dir.substring(2, dir.length() - 1);
+                    System.out.println("📁 하위 디렉토리 발견: " + subDir + " 를 탐색 대기열에 추가합니다.");
+                    directoryStack.add(subDir);
+                }
+            }
+            System.out.println("⬆️ 디렉토리 탐색이 끝나서 스택에서 경로 제거: " + pathStack.peek());
+            pathStack.pop();
+
+        }
+        throw new IOException("🚫 경로 생성 실패.");
     }
+/*
+
+    private boolean isDirectoryLoading() {
+        // 서버의 응답을 확인하는 로직을 구현해야 함. 예시로 remoteList가 비어있는지 확인.
+        boolean loading = remoteList.isEmpty();
+        logDebug("isDirectoryLoading 호출됨 - 현재 로딩 상태: " + loading);
+        return loading;
+    }
+
+*/
+
 
 
     public class StrComp implements java.util.Comparator {

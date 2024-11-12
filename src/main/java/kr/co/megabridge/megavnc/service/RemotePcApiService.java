@@ -63,7 +63,7 @@ public class RemotePcApiService {
             response.updateReconnectId(remotePcDto.getReconnectId());
         }
 
-        return new ResponseRemotePcApiDto(response.getRepeaterId());
+        return new ResponseRemotePcApiDto(response.getRepeaterId(),response.getSecondaryRepeaterId());
     }
 
 
@@ -90,7 +90,7 @@ public class RemotePcApiService {
         }
 
         if (currTop.isPresent())
-            nextRepeaterId = currTop.get().getRepeaterId() + 1;
+            nextRepeaterId = currTop.get().getRepeaterId() + 2;
         if (registerRemotePcDto.getGroupName().equals("")) {
             throw new ApiException(ErrorCode.GROUP_NOT_SELECTED, "PC를 추가하려면 상단에서 그룹을 먼저 선택해주세요.");
         }

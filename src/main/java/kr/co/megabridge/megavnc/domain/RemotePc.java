@@ -18,6 +18,9 @@ public class RemotePc {
     @Column(unique = true)
     private Long repeaterId;
 
+    @Column(unique = true)
+    private Long secondaryRepeaterId;
+
     private String name;
 
     private Date assignedAt;
@@ -47,6 +50,7 @@ public class RemotePc {
         remotePc.accessPassword = accessPassword;
         remotePc.group = group;
         remotePc.reconnectId = "";
+        remotePc.secondaryRepeaterId = repeaterId + 1;
         return remotePc;
     }
 

@@ -9,4 +9,5 @@ public class ResponseRemotePcApiDto {
 
     private Long repeaterId;
 
+    private Long secondaryRepeaterId;
 }

@@ -2,7 +2,6 @@ package kr.co.megabridge.megavnc.ftp;
 
 import kr.co.megabridge.megavnc.exception.ErrorCode;
 import kr.co.megabridge.megavnc.exception.exceptions.ApiException;
-import org.springframework.stereotype.Component;
 
 import java.io.EOFException;
 import java.io.File;
@@ -12,10 +11,11 @@ import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
 
 
-@Component
+
 public class FTPService {
-    public FTPService() {
-        passwordParam = "1234";
+    public FTPService(String repeaterId,String passwordParam) {
+        this.repeaterId = repeaterId;
+        this.passwordParam = passwordParam;
     }
 
 
@@ -23,6 +23,7 @@ public class FTPService {
     private volatile RfbProto rfb;
     private volatile boolean running;
 
+    String repeaterId;
     String passwordParam;
 
 
@@ -34,9 +35,20 @@ public class FTPService {
     byte[] passwd = new byte[32];
     int i;
 
-    public void kingGodGeneralMethod(File file, String FileName) {
+    public void kingGodGeneralMethod(File file, String FileName)  {
         connect();
+        //디렉토리 잘 생성되나 보자
         running = true;
+       /* try {
+            String destinationPath = rfb.findDestinationPath();
+            System.out.println("destinationPath = " + destinationPath);
+        } catch (IOException e){
+            fatalError(e.toString());
+
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }*/
+
         Thread thread = new Thread(() -> {
             try {
                 //rfb 객체에서 파일 전송 메시지 확인
@@ -44,9 +56,6 @@ public class FTPService {
                         if (rfb.readServerMessageType() == RfbProto.rfbFileTransfer) {
                             rfb.readRfbFileTransferMsg();
 
-                        }
-                        if (Thread.currentThread().isInterrupted()) {
-                            break;
                         }
 
                 }
@@ -58,17 +67,17 @@ public class FTPService {
                 } else {
                     fatalError(e.toString());
                 }
-            } finally {
-                running = false;
-                disconnect();
             }
         });
         thread.start(); // 스레드 시작
-        rfb.doSend(file, FileName, "C:\\Users\\User\\Desktop\\MegaVNC\\"); // 파일 전송
-
-
-
-        //thread.interrupt();
+        rfb.doSend(file, FileName, "C:\\Users\\Ted\\Desktop\\"); // 파일 전송
+       while (running) {
+        if (!rfb.fFileReceptionRunning){
+            running = false;
+            thread.interrupt();
+            rfb.close();
+        }
+       }
     }
 
 
@@ -122,7 +131,7 @@ public class FTPService {
     /////////////////////////////////////////////////////////
 
     void connectAndAuthenticate() throws Exception {
-        rfb = new RfbProto("vnc.megabridge.co.kr", 5900,"101");
+        rfb = new RfbProto("vnc.megabridge.co.kr", 5900,repeaterId);
         if (passwordParam != null) {
             if (!tryAuthenticate(usernameParam, passwordParam)) {
                 throw new Exception("VNC authentication failed");
@@ -374,19 +383,8 @@ public class FTPService {
     }
 
 
-    //
-    // disconnect() - close connection to server.
-    //
 
-    boolean disconnectRequested = false;
 
-    public void disconnect() {
-        disconnectRequested = true;
-
-        rfb.close();
-
-        System.out.println("Disconnect");
-    }
 
 
     //
@@ -396,11 +394,6 @@ public class FTPService {
     public void fatalError(String str) {
         rfb.close();
         System.out.println(str);
-
-        if (disconnectRequested) {
-            disconnectRequested = false;
-            return;
-        }
         throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR, str);
     }
 

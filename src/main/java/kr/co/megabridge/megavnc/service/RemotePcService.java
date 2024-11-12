@@ -95,39 +95,7 @@ public class RemotePcService {
         return groups;
     }
 
-    @Transactional
-    public void registerRemotePc(RegisterRemotePcDto registerRemotePcDto) {
-        Optional<RemotePc> currTop = remotePcRepository.findTopByOrderByRepeaterIdDesc();
 
-        // Make sure the repeater id starts from 100.
-        // Base remote pc in data loader also ensures it.
-        long nextRepeaterId = 100;
-        if (registerRemotePcDto.getRemotePcName().isEmpty()) {
-            throw new RemotePcException(ErrorCode.MISSING_PC_NAME);
-        }
-        if (registerRemotePcDto.getAccessPassword().isEmpty()) {
-            throw new RemotePcException(ErrorCode.MISSING_ACCESS_PASSWORD);
-        }
-
-        if (currTop.isPresent())
-            nextRepeaterId = currTop.get().getRepeaterId() + 1;
-        if (registerRemotePcDto.getGroupName().equals(ALL_GROUP)) {
-            throw new RemotePcException(ErrorCode.GROUP_NOT_SELECTED, "PC를 추가하려면 상단에서 그룹을 먼저 선택해주세요.");
-        }
-        Optional<Group> optionalGroup = groupRepository.findByGroupName(registerRemotePcDto.getGroupName());
-        Group group = optionalGroup.orElseThrow(() -> new RemotePcException(ErrorCode.GROUP_NOT_FOUND));
-
-        if (remotePcRepository.existsByNameAndGroup(registerRemotePcDto.getRemotePcName(), group)) {
-            throw new RemotePcException(ErrorCode.PC_NAME_DUPLICATION);
-        }
-
-        RemotePc remotePc = RemotePc.createRemotePc(nextRepeaterId, registerRemotePcDto.getRemotePcName(), registerRemotePcDto.getAccessPassword(), group);
-
-
-        remotePcRepository.save(remotePc);
-
-
-    }
 
 
     @Transactional
