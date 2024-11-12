@@ -11,9 +11,8 @@ import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
 
 
-
 public class FTPService {
-    public FTPService(String repeaterId,String passwordParam) {
+    public FTPService(String repeaterId, String passwordParam) {
         this.repeaterId = repeaterId;
         this.passwordParam = passwordParam;
     }
@@ -22,7 +21,6 @@ public class FTPService {
     boolean mslogon = false;
     private volatile RfbProto rfb;
     private volatile boolean running;
-
     String repeaterId;
     String passwordParam;
 
@@ -35,29 +33,24 @@ public class FTPService {
     byte[] passwd = new byte[32];
     int i;
 
-    public void kingGodGeneralMethod(File file, String FileName)  {
+    public void kingGodGeneralMethod(File file, String FileName) {
         connect();
-        //디렉토리 잘 생성되나 보자
+        //fixme: 디렉토리 조회 및 생성 오류, 예상 원인1. 원본의 gui를 삭제하면서 서버에서 보내주는 메시지 처리 로직이 제대로 동작 안함, 원인2. 비동기 처리가 잘못되어 있음. 자바 쓰레드와 병렬처리에 대해 충분히 학습 후 작업 진행
         running = true;
-       /* try {
+        /*try {
             String destinationPath = rfb.findDestinationPath();
             System.out.println("destinationPath = " + destinationPath);
         } catch (IOException e){
             fatalError(e.toString());
 
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }*/
-
         Thread thread = new Thread(() -> {
             try {
                 //rfb 객체에서 파일 전송 메시지 확인
                 while (running) {
-                        if (rfb.readServerMessageType() == RfbProto.rfbFileTransfer) {
-                            rfb.readRfbFileTransferMsg();
-
-                        }
-
+                    if (rfb.readServerMessageType() == RfbProto.rfbFileTransfer) {
+                        rfb.readRfbFileTransferMsg();
+                    }
                 }
             } catch (Exception e) {
                 String str = e.getMessage();
@@ -70,14 +63,15 @@ public class FTPService {
             }
         });
         thread.start(); // 스레드 시작
-        rfb.doSend(file, FileName, "C:\\Users\\Ted\\Desktop\\"); // 파일 전송
-       while (running) {
-        if (!rfb.fFileReceptionRunning){
-            running = false;
-            thread.interrupt();
-            rfb.close();
+        //todo: 일단 하드코딩, 나중에 목적지 생성 로직 개편후 사용
+        rfb.doSend(file, FileName); // 파일 전송
+        while (running) {
+            if (!rfb.fFileReceptionRunning) {
+                running = false;
+                thread.interrupt();
+                rfb.close();
+            }
         }
-       }
     }
 
 
@@ -131,7 +125,7 @@ public class FTPService {
     /////////////////////////////////////////////////////////
 
     void connectAndAuthenticate() throws Exception {
-        rfb = new RfbProto("vnc.megabridge.co.kr", 5900,repeaterId);
+        rfb = new RfbProto("vnc.megabridge.co.kr", 5900, repeaterId);
         if (passwordParam != null) {
             if (!tryAuthenticate(usernameParam, passwordParam)) {
                 throw new Exception("VNC authentication failed");
@@ -168,7 +162,6 @@ public class FTPService {
     //
 
     boolean tryAuthenticate(String us, String pw) throws Exception {
-
 
 
         rfb.readVersionMsg();
@@ -381,10 +374,6 @@ public class FTPService {
                 rfb.framebufferHeight);
 
     }
-
-
-
-
 
 
     //

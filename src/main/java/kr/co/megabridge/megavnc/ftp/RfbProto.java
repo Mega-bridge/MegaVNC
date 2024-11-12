@@ -6,9 +6,13 @@ import kr.co.megabridge.megavnc.exception.BusinessException;
 import java.io.*;
 import java.net.Socket;
 import java.net.URLEncoder;
-import java.nio.BufferOverflowException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -83,8 +87,6 @@ public class RfbProto {
     sz_rfbBlockSize = 8192;// New v2 File Transfer Protocol
 
 
-
-
     Socket sock;
     DataInputStream is;
     OutputStream os;
@@ -100,7 +102,7 @@ public class RfbProto {
     // Constructor. Make TCP connection to RFB server.
     //
 
-    RfbProto( String repeaterHost, int repeaterPort, String repeaterId) throws IOException {
+    RfbProto(String repeaterHost, int repeaterPort, String repeaterId) throws IOException {
 
         sock = new Socket(repeaterHost, repeaterPort);
         System.out.println("리피터 소켓 연결됨: " + repeaterHost + ", port: " + repeaterPort);
@@ -171,7 +173,7 @@ public class RfbProto {
                 || (b[10] > '9')
                 || (b[11] != '\n')) {
             throw new Exception(
-                " is not an RFB server");
+                    " is not an RFB server");
         }
 
         serverMajor = (b[4] - '0') * 100 + (b[5] - '0') * 10 + (b[6] - '0');
@@ -295,7 +297,7 @@ public class RfbProto {
         } else if (contentType == rfbEndOfFile) {
             logDebug("파일 전송 끝 신호를 받음");
             endOfReceiveFile(true); // Ok
-        }  else if (contentType == rfbCommandReturn) {
+        } else if (contentType == rfbCommandReturn) {
             logDebug("명령 응답 처리 중...");
             createDirectoryorDeleteFile(contentParam);
         } else if (contentType == rfbFileAcceptHeader) {
@@ -477,9 +479,17 @@ public class RfbProto {
         }
     }
 
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     //Call this method to send a file from local pc to server
-    void offerLocalFile(File f, String fileName, String destinationPath) {
+    void offerLocalFile(File f, String fileName) {
+
+        AtomicReference<String> destinationPath = new AtomicReference<>();
         try {
+            //todo: 예외처리 필수
+            Future<String> future = executor.submit(() -> doNewFolder("C:\\Temp", "mega_vnc_remote_files"));
+
+            // Future.get()으로 폴더 생성 완료를 대기하고 결과를 가져옴
+            destinationPath.set(future.get());
             sendFileSource = f.getPath();
             /* File f = new File(source);*/
             // sf@2004 - Add support for huge files
@@ -487,8 +497,10 @@ public class RfbProto {
             int iLowSize = (int) (lSize & 0x00000000FFFFFFFF);
             int iHighSize = (int) (lSize >> 32);
 
-            String temp = destinationPath + URLEncoder.encode(fileName, StandardCharsets.UTF_8);
+            String temp = destinationPath+ "\\" + URLEncoder.encode(fileName, StandardCharsets.UTF_8);
+
             System.out.println("서버에 제공할 파일: " + f.getPath());
+            System.out.println("파일이 저장된 위치 = " + temp);
             writeRfbFileTransferMsg(
                     rfbFileTransferOffer,
                     0,
@@ -515,6 +527,8 @@ public class RfbProto {
             os.write(b);
         } catch (IOException e) {
             System.err.println(e);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -620,7 +634,6 @@ public class RfbProto {
             fos.write(ReceptionBuffer, 0, length);
             fileSize += length;
         }
-
 
 
     }
@@ -782,17 +795,18 @@ public class RfbProto {
     /**
      * 파일을 전송함
      */
-    public void doSend(File file, String fileName, String destinationPath) {
+    public void doSend(File file, String fileName) {
       /*  if (remoteList.contains(fileName)) {
             System.out.println("이미 존재하는 피일입니다.");
             return;
         }*/
-        offerLocalFile(file, fileName, destinationPath);
+        offerLocalFile(file, fileName);
     }
 
-
-
-    public String findDestinationPath() throws IOException, InterruptedException {
+   /* private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition listUpdated = lock.newCondition();
+    public String findDestinationPath() throws IOException {
         System.out.println("🚀 목적지 조회를 시작합니다!");
         // 폴더가 있는지 검사하고 없으면 생성
         List<String> directoryStack = new ArrayList<>();
@@ -802,7 +816,7 @@ public class RfbProto {
         boolean desktopFound = false;
 
         while (!directoryStack.isEmpty()) {
-            String currentDirectory = directoryStack.remove(directoryStack.size() - 1);
+            final String currentDirectory = directoryStack.remove(directoryStack.size() - 1);
 
 
             // 스택 정리: 현재 디렉토리가 pathStack의 최상위와 다를 경우, 상위 경로를 맞추기 위해 pop
@@ -813,8 +827,39 @@ public class RfbProto {
 
             System.out.println("📂 탐색 중인 디렉토리: " + currentDirectory);
             pathStack.push(currentDirectory);
-            readServerDirectory(currentDirectory);
 
+
+            // 비동기적으로 readServerDirectory 실행하고 완료될 때까지 대기
+            Future<?> future = executor.submit(() -> {
+                lock.lock();
+                try {
+                    readServerDirectory(currentDirectory);
+                    listUpdated.signalAll();  // remoteList가 업데이트되었음을 알림
+                } finally {
+                    lock.unlock();
+                }
+            });
+
+            // 비동기 작업의 완료 대기
+            try {
+                future.get(); // 비동기 작업이 완료될 때까지 대기
+            } catch (InterruptedException | ExecutionException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Error while executing directory read task", e);
+            }
+
+            lock.lock();
+            try {
+                // remoteList가 비어 있지 않도록 대기
+                while (remoteList.isEmpty()) {
+                    listUpdated.await(); // remoteList가 업데이트될 때까지 대기
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Interrupted while waiting for remoteList update", e);
+            } finally {
+                lock.unlock();
+            }
 
 
 
@@ -822,8 +867,8 @@ public class RfbProto {
             if (!desktopFound && remoteList.contains(" [Desktop]")) {
                 System.out.println("✨ 데스크탑 폴더 발견! 현재 디렉토리: " + currentDirectory);
                 desktopFound = true;
-                currentDirectory = currentDirectory + "\\Desktop";
-                directoryStack.add(currentDirectory);
+                //currentDirectory = currentDirectory + "\\Desktop";
+                directoryStack.add(currentDirectory+ "\\Desktop");
                 pathStack.push("\\Desktop");
                 continue;
             }
@@ -855,7 +900,7 @@ public class RfbProto {
 
         }
         throw new IOException("🚫 경로 생성 실패.");
-    }
+    }*/
 /*
 
     private boolean isDirectoryLoading() {
@@ -866,8 +911,15 @@ public class RfbProto {
     }
 
 */
+   public String doNewFolder(String destinationPath, String name) {
+       if (name == null) {
+           throw new NullPointerException("make new folder fail");
+       }
+       name = destinationPath +"\\"+name;
+       createRemoteDirectory(name);
+       return name;
 
-
+   }
 
     public class StrComp implements java.util.Comparator {
         public int compare(Object obj1, Object obj2) {
